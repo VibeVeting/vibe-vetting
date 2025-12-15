@@ -1,7 +1,7 @@
 {
   "name": "vibe-vetting",
   "version": "1.0.0",
-  "description": "Vive vetting foundation site",
+  "description": "Vibe vetting foundation site",
   "private": true,
   "scripts": {
     "dev": "next dev",
