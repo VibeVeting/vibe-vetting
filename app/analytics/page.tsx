@@ -1,56 +1,100 @@
 "use client";
 
 import { Sidebar } from '@/components/common/Sidebar';
+import { ProtectedRoute } from '@/components/common/ProtectedRoute';
+import { useEffect, useState } from 'react';
 
-const kpis = [
-  { label: 'Total Campaigns', value: '24', change: '+12%', icon: 'fa-bullhorn', iconBg: 'rgba(102, 126, 234, 0.15)', iconColor: '#667eea' },
-  { label: 'Creators Analyzed', value: '1,847', change: '+28%', icon: 'fa-users', iconBg: 'rgba(34, 197, 94, 0.15)', iconColor: '#22c55e' },
-  { label: 'Avg. Alignment Score', value: '87%', change: '+5%', icon: 'fa-chart-line', iconBg: 'rgba(245, 158, 11, 0.15)', iconColor: '#f59e0b' },
-  { label: 'High Risk Detected', value: '23', change: '-8%', icon: 'fa-shield-halved', iconBg: 'rgba(239, 68, 68, 0.15)', iconColor: '#ef4444', negative: true },
-];
+interface KPI {
+  label: string;
+  value: string;
+  change: string;
+  icon: string;
+  iconBg: string;
+  iconColor: string;
+  negative?: boolean;
+}
 
 const tableData = [
-  { platform: 'Instagram', creators: 847, avgScore: 89, performance: 92 },
-  { platform: 'YouTube', creators: 523, avgScore: 85, performance: 88 },
-  { platform: 'TikTok', creators: 312, avgScore: 82, performance: 79 },
-  { platform: 'Twitter', creators: 165, avgScore: 78, performance: 71 },
+  { platform: 'Instagram', creators: 0, avgScore: 0, performance: 0 },
+  { platform: 'YouTube', creators: 0, avgScore: 0, performance: 0 },
+  { platform: 'TikTok', creators: 0, avgScore: 0, performance: 0 },
+  { platform: 'Twitter', creators: 0, avgScore: 0, performance: 0 },
 ];
 
 export default function AnalyticsPage() {
+  const [kpis, setKpis] = useState<KPI[]>([
+    { label: 'Total Campaigns', value: '0', change: '0%', icon: 'fa-bullhorn', iconBg: 'rgba(102, 126, 234, 0.15)', iconColor: '#667eea' },
+    { label: 'Creators Analyzed', value: '0', change: '0%', icon: 'fa-users', iconBg: 'rgba(34, 197, 94, 0.15)', iconColor: '#22c55e' },
+    { label: 'Avg. Alignment Score', value: '0%', change: '0%', icon: 'fa-chart-line', iconBg: 'rgba(245, 158, 11, 0.15)', iconColor: '#f59e0b' },
+    { label: 'High Risk Detected', value: '0', change: '0%', icon: 'fa-shield-halved', iconBg: 'rgba(239, 68, 68, 0.15)', iconColor: '#ef4444', negative: true },
+  ]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        const response = await fetch('/api/user/stats', {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const stats = data.stats;
+          setKpis([
+            { label: 'Total Campaigns', value: stats.activeCampaigns?.toString() || '0', change: '+0%', icon: 'fa-bullhorn', iconBg: 'rgba(102, 126, 234, 0.15)', iconColor: '#667eea' },
+            { label: 'Creators Analyzed', value: stats.creatorsAnalyzed?.toString() || '0', change: '+0%', icon: 'fa-users', iconBg: 'rgba(34, 197, 94, 0.15)', iconColor: '#22c55e' },
+            { label: 'Avg. Alignment Score', value: `${stats.avgAlignmentScore?.toFixed(0) || 0}%`, change: '+0%', icon: 'fa-chart-line', iconBg: 'rgba(245, 158, 11, 0.15)', iconColor: '#f59e0b' },
+            { label: 'High Risk Detected', value: stats.highRiskDetected?.toString() || '0', change: '0%', icon: 'fa-shield-halved', iconBg: 'rgba(239, 68, 68, 0.15)', iconColor: '#ef4444', negative: true },
+          ]);
+        }
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
   return (
-    <div className="dashboard-wrapper">
-      <Sidebar />
-      <div className="main-content">
-        <div className="container">
-          {/* Page Header */}
-          <div className="page-header">
-            <div className="header-top">
-              <div className="header-left">
-                <h1>Analytics Dashboard</h1>
-                <p>Campaign performance and insights</p>
-              </div>
-              <div className="date-range">
-                <i className="fa-solid fa-calendar"></i>
-                Last 30 Days
+    <ProtectedRoute>
+      <div className="dashboard-wrapper">
+        <Sidebar />
+        <div className="main-content">
+          <div className="container">
+            {/* Page Header */}
+            <div className="page-header">
+              <div className="header-top">
+                <div className="header-left">
+                  <h1>Analytics Dashboard</h1>
+                  <p>Campaign performance and insights</p>
+                </div>
+                <div className="date-range">
+                  <i className="fa-solid fa-calendar"></i>
+                  Last 30 Days
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* KPI Grid */}
-          <div className="kpi-grid">
-            {kpis.map((kpi, index) => (
-              <div key={index} className="kpi-card">
-                <div className="kpi-header">
-                  <span className="kpi-label">{kpi.label}</span>
-                  <div className="kpi-icon" style={{ background: kpi.iconBg, color: kpi.iconColor }}>
-                    <i className={`fa-solid ${kpi.icon}`}></i>
+            {/* KPI Grid */}
+            <div className="kpi-grid">
+              {kpis.map((kpi, index) => (
+                <div key={index} className="kpi-card">
+                  <div className="kpi-header">
+                    <span className="kpi-label">{kpi.label}</span>
+                    <div className="kpi-icon" style={{ background: kpi.iconBg, color: kpi.iconColor }}>
+                      <i className={`fa-solid ${kpi.icon}`}></i>
+                    </div>
                   </div>
+                  <div className="kpi-value">{loading ? '...' : kpi.value}</div>
+                  <div className={`kpi-change ${kpi.negative ? 'negative' : ''}`}>{kpi.change}</div>
                 </div>
-                <div className="kpi-value">{kpi.value}</div>
-                <div className={`kpi-change ${kpi.negative ? 'negative' : ''}`}>{kpi.change}</div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
 
           {/* Charts Grid */}
           <div className="charts-grid">
@@ -115,8 +159,9 @@ export default function AnalyticsPage() {
               </tbody>
             </table>
           </div>
+          </div>
         </div>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }

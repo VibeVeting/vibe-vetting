@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAuth } from '@/lib/auth-context';
 
 const menuItems = [
   { icon: 'fa-home', label: 'Dashboard', href: '/dashboard' },
@@ -14,6 +15,7 @@ const menuItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { logout, user } = useAuth();
 
   return (
     <aside className="sidebar">
@@ -40,6 +42,24 @@ export function Sidebar() {
           );
         })}
       </nav>
+
+      <div className="sidebar-footer">
+        {user && (
+          <div className="sidebar-user-info">
+            <div className="sidebar-user-avatar">
+              {user.name?.charAt(0).toUpperCase() || 'U'}
+            </div>
+            <div className="sidebar-user-details">
+              <span className="sidebar-user-name">{user.name}</span>
+              <span className="sidebar-user-email">{user.email}</span>
+            </div>
+          </div>
+        )}
+        <button onClick={logout} className="sidebar-logout-btn">
+          <i className="fa-solid fa-sign-out-alt"></i>
+          Logout
+        </button>
+      </div>
     </aside>
   );
 }

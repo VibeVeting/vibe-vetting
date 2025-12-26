@@ -1,6 +1,7 @@
 "use client";
 
 import { Sidebar } from '@/components/common/Sidebar';
+import { ProtectedRoute } from '@/components/common/ProtectedRoute';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 
@@ -36,8 +37,9 @@ export default function CreatorProfilePage() {
   const params = useParams();
 
   return (
-    <div className="dashboard-wrapper">
-      <Sidebar />
+    <ProtectedRoute>
+      <div className="dashboard-wrapper">
+        <Sidebar />
       <div className="main-content">
         <div className="container">
           {/* Creator Header */}
@@ -175,6 +177,6 @@ export default function CreatorProfilePage() {
           </div>
         </div>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }

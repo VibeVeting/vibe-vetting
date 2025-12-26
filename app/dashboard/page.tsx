@@ -5,32 +5,45 @@ import { TopBar } from '@/components/common/TopBar';
 import { StatsGrid } from './components/StatsGrid';
 import { ChartsSection } from './components/ChartsSection';
 import { RecentAnalysesTable } from './components/RecentAnalysesTable';
+import { ProtectedRoute } from '@/components/common/ProtectedRoute';
+import { useAuth } from '@/lib/auth-context';
 
 export default function DashboardPage() {
+  const { user } = useAuth();
+  
   const handleNewCampaign = () => {
     window.location.href = '/campaigns/create';
   };
 
-  return (
-    <div className="dashboard-wrapper">
-      <Sidebar />
-      <div className="main-content">
-        <div className="container">
-          <TopBar
-            title="Welcome Back!"
-            subtitle="Tuesday, December 24, 2024"
-            actionButton={{
-              label: 'New Campaign',
-              icon: 'fa-plus',
-              onClick: handleNewCampaign,
-            }}
-          />
+  const today = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
 
-          <StatsGrid />
-          <ChartsSection />
-          <RecentAnalysesTable />
+  return (
+    <ProtectedRoute>
+      <div className="dashboard-wrapper">
+        <Sidebar />
+        <div className="main-content">
+          <div className="container">
+            <TopBar
+              title={`Welcome Back${user?.name ? `, ${user.name.split(' ')[0]}` : ''}!`}
+              subtitle={today}
+              actionButton={{
+                label: 'New Campaign',
+                icon: 'fa-plus',
+                onClick: handleNewCampaign,
+              }}
+            />
+
+            <StatsGrid />
+            <ChartsSection />
+            <RecentAnalysesTable />
+          </div>
         </div>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }

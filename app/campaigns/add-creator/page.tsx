@@ -1,6 +1,7 @@
 "use client";
 
 import { Sidebar } from '@/components/common/Sidebar';
+import { ProtectedRoute } from '@/components/common/ProtectedRoute';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -20,8 +21,9 @@ export default function AddCreatorPage() {
   };
 
   return (
-    <div className="dashboard-wrapper">
-      <Sidebar />
+    <ProtectedRoute>
+      <div className="dashboard-wrapper">
+        <Sidebar />
       <div className="main-content">
         <div className="container">
           {/* Page Header */}
@@ -117,6 +119,6 @@ export default function AddCreatorPage() {
           </div>
         </div>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }

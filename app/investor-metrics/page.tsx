@@ -1,13 +1,8 @@
 "use client";
 
 import { Sidebar } from '@/components/common/Sidebar';
-
-const kpis = [
-  { label: 'Monthly Revenue', value: '$127K', change: '+18%', icon: 'fa-dollar-sign', iconBg: 'rgba(34, 197, 94, 0.15)', iconColor: '#22c55e' },
-  { label: 'Active Users', value: '2,847', change: '+24%', icon: 'fa-users', iconBg: 'rgba(102, 126, 234, 0.15)', iconColor: '#667eea' },
-  { label: 'Conversion Rate', value: '4.2%', change: '+0.8%', icon: 'fa-percent', iconBg: 'rgba(245, 158, 11, 0.15)', iconColor: '#f59e0b' },
-  { label: 'Churn Rate', value: '2.1%', change: '-0.3%', icon: 'fa-arrow-trend-down', iconBg: 'rgba(239, 68, 68, 0.15)', iconColor: '#ef4444' },
-];
+import { ProtectedRoute } from '@/components/common/ProtectedRoute';
+import { useEffect, useState } from 'react';
 
 const riskItems = [
   { title: 'Political Content', level: 'high', label: 'Not Allowed' },
@@ -17,32 +12,67 @@ const riskItems = [
 ];
 
 export default function InvestorMetricsPage() {
-  return (
-    <div className="dashboard-wrapper">
-      <Sidebar />
-      <div className="main-content">
-        <div className="container">
-          {/* Page Header */}
-          <div className="page-header">
-            <h1>Brand Compatibility & Risk</h1>
-            <p>Digital brand blueprint and risk assessment</p>
-          </div>
+  const [stats, setStats] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-          {/* KPI Grid */}
-          <div className="kpi-grid">
-            {kpis.map((kpi, index) => (
-              <div key={index} className="kpi-card">
-                <div className="kpi-header">
-                  <span className="kpi-label">{kpi.label}</span>
-                  <div className="kpi-icon" style={{ background: kpi.iconBg, color: kpi.iconColor }}>
-                    <i className={`fa-solid ${kpi.icon}`}></i>
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        const response = await fetch('/api/user/stats', {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setStats(data.stats);
+        }
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  const kpis = [
+    { label: 'Verified Creators', value: loading ? '...' : (stats?.totalCreatorsVerified?.toString() || '0'), change: '+0%', icon: 'fa-users', iconBg: 'rgba(34, 197, 94, 0.15)', iconColor: '#22c55e' },
+    { label: 'Active Campaigns', value: loading ? '...' : (stats?.activeCampaigns?.toString() || '0'), change: '+0%', icon: 'fa-bullhorn', iconBg: 'rgba(102, 126, 234, 0.15)', iconColor: '#667eea' },
+    { label: 'Avg. Score', value: loading ? '...' : `${stats?.avgAlignmentScore?.toFixed(0) || 0}%`, change: '+0%', icon: 'fa-percent', iconBg: 'rgba(245, 158, 11, 0.15)', iconColor: '#f59e0b' },
+    { label: 'High Risk', value: loading ? '...' : (stats?.highRiskDetected?.toString() || '0'), change: '0%', icon: 'fa-triangle-exclamation', iconBg: 'rgba(239, 68, 68, 0.15)', iconColor: '#ef4444' },
+  ];
+
+  return (
+    <ProtectedRoute>
+      <div className="dashboard-wrapper">
+        <Sidebar />
+        <div className="main-content">
+          <div className="container">
+            {/* Page Header */}
+            <div className="page-header">
+              <h1>Brand Compatibility & Risk</h1>
+              <p>Digital brand blueprint and risk assessment</p>
+            </div>
+
+            {/* KPI Grid */}
+            <div className="kpi-grid">
+              {kpis.map((kpi, index) => (
+                <div key={index} className="kpi-card">
+                  <div className="kpi-header">
+                    <span className="kpi-label">{kpi.label}</span>
+                    <div className="kpi-icon" style={{ background: kpi.iconBg, color: kpi.iconColor }}>
+                      <i className={`fa-solid ${kpi.icon}`}></i>
+                    </div>
                   </div>
+                  <div className="kpi-value">{kpi.value}</div>
+                  <div className="kpi-change">{kpi.change}</div>
                 </div>
-                <div className="kpi-value">{kpi.value}</div>
-                <div className="kpi-change">{kpi.change}</div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
 
           {/* Main Content Grid */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
@@ -123,8 +153,9 @@ export default function InvestorMetricsPage() {
               Lock Blueprint
             </button>
           </div>
+          </div>
         </div>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }

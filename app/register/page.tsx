@@ -14,15 +14,56 @@ export default function RegisterPage() {
     confirmPassword: '',
     agreeTerms: false,
   });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+
     if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match');
+      setError('Passwords do not match');
       return;
     }
-    console.log('Register:', formData);
-    router.push('/dashboard');
+
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          company: formData.company || undefined,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || 'Registration failed');
+        setLoading(false);
+        return;
+      }
+
+      // Store token in localStorage
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+
+      router.push('/dashboard');
+    } catch (err) {
+      setError('Something went wrong. Please try again.');
+      setLoading(false);
+    }
   };
 
   return (
@@ -44,6 +85,12 @@ export default function RegisterPage() {
           </div>
 
           <form onSubmit={handleSubmit}>
+            {error && (
+              <div className="auth-error" style={{ color: '#ef4444', backgroundColor: '#fef2f2', padding: '12px', borderRadius: '8px', marginBottom: '16px', fontSize: '14px' }}>
+                {error}
+              </div>
+            )}
+
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label">Full Name</label>
@@ -134,9 +181,9 @@ export default function RegisterPage() {
               </label>
             </div>
 
-            <button type="submit" className="btn btn-primary auth-btn">
-              <i className="fa-solid fa-user-plus"></i>
-              Create Account
+            <button type="submit" className="btn btn-primary auth-btn" disabled={loading}>
+              <i className={loading ? "fa-solid fa-spinner fa-spin" : "fa-solid fa-user-plus"}></i>
+              {loading ? 'Creating Account...' : 'Create Account'}
             </button>
           </form>
 

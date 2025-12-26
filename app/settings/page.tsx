@@ -1,9 +1,12 @@
 "use client";
 
 import { Sidebar } from '@/components/common/Sidebar';
+import { ProtectedRoute } from '@/components/common/ProtectedRoute';
+import { useAuth } from '@/lib/auth-context';
 import { useState } from 'react';
 
 export default function SettingsPage() {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('account');
   const [notifications, setNotifications] = useState({
     email: true,
@@ -13,82 +16,83 @@ export default function SettingsPage() {
   });
 
   return (
-    <div className="dashboard-wrapper">
-      <Sidebar />
-      <div className="main-content">
-        <div className="container" style={{ maxWidth: '1000px' }}>
-          {/* Page Header */}
-          <div className="page-header">
-            <h1>Settings</h1>
-            <p>Manage your account and preferences</p>
-          </div>
-
-          {/* Settings Layout */}
-          <div className="settings-wrapper">
-            {/* Navigation */}
-            <div className="settings-nav">
-              <div className="settings-nav-title">Settings</div>
-              <div 
-                className={`settings-nav-item ${activeTab === 'account' ? 'active' : ''}`}
-                onClick={() => setActiveTab('account')}
-              >
-                <i className="fa-solid fa-user"></i>
-                Account
-              </div>
-              <div 
-                className={`settings-nav-item ${activeTab === 'notifications' ? 'active' : ''}`}
-                onClick={() => setActiveTab('notifications')}
-              >
-                <i className="fa-solid fa-bell"></i>
-                Notifications
-              </div>
-              <div 
-                className={`settings-nav-item ${activeTab === 'security' ? 'active' : ''}`}
-                onClick={() => setActiveTab('security')}
-              >
-                <i className="fa-solid fa-shield"></i>
-                Security
-              </div>
-              <div 
-                className={`settings-nav-item ${activeTab === 'billing' ? 'active' : ''}`}
-                onClick={() => setActiveTab('billing')}
-              >
-                <i className="fa-solid fa-credit-card"></i>
-                Billing
-              </div>
+    <ProtectedRoute>
+      <div className="dashboard-wrapper">
+        <Sidebar />
+        <div className="main-content">
+          <div className="container" style={{ maxWidth: '1000px' }}>
+            {/* Page Header */}
+            <div className="page-header">
+              <h1>Settings</h1>
+              <p>Manage your account and preferences</p>
             </div>
 
-            {/* Content */}
-            <div className="settings-content">
-              {activeTab === 'account' && (
-                <>
-                  <div className="section-title">
-                    <i className="fa-solid fa-user"></i>
-                    Profile Information
-                  </div>
-                  <div className="setting-item">
-                    <div className="setting-label">
-                      <div className="setting-title">Full Name</div>
-                      <div className="setting-description">Your display name</div>
+            {/* Settings Layout */}
+            <div className="settings-wrapper">
+              {/* Navigation */}
+              <div className="settings-nav">
+                <div className="settings-nav-title">Settings</div>
+                <div 
+                  className={`settings-nav-item ${activeTab === 'account' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('account')}
+                >
+                  <i className="fa-solid fa-user"></i>
+                  Account
+                </div>
+                <div 
+                  className={`settings-nav-item ${activeTab === 'notifications' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('notifications')}
+                >
+                  <i className="fa-solid fa-bell"></i>
+                  Notifications
+                </div>
+                <div 
+                  className={`settings-nav-item ${activeTab === 'security' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('security')}
+                >
+                  <i className="fa-solid fa-shield"></i>
+                  Security
+                </div>
+                <div 
+                  className={`settings-nav-item ${activeTab === 'billing' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('billing')}
+                >
+                  <i className="fa-solid fa-credit-card"></i>
+                  Billing
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="settings-content">
+                {activeTab === 'account' && (
+                  <>
+                    <div className="section-title">
+                      <i className="fa-solid fa-user"></i>
+                      Profile Information
                     </div>
-                    <input type="text" className="form-input" defaultValue="Vinay Prajapati" style={{ width: '250px' }} />
-                  </div>
-                  <div className="setting-item">
-                    <div className="setting-label">
-                      <div className="setting-title">Email Address</div>
-                      <div className="setting-description">Your primary email</div>
+                    <div className="setting-item">
+                      <div className="setting-label">
+                        <div className="setting-title">Full Name</div>
+                        <div className="setting-description">Your display name</div>
+                      </div>
+                      <input type="text" className="form-input" defaultValue={user?.name || ''} style={{ width: '250px' }} />
                     </div>
-                    <input type="email" className="form-input" defaultValue="vinay91098@gmail.com" style={{ width: '250px' }} />
-                  </div>
-                  <div className="setting-item">
-                    <div className="setting-label">
-                      <div className="setting-title">Company</div>
-                      <div className="setting-description">Your organization</div>
+                    <div className="setting-item">
+                      <div className="setting-label">
+                        <div className="setting-title">Email Address</div>
+                        <div className="setting-description">Your primary email</div>
+                      </div>
+                      <input type="email" className="form-input" defaultValue={user?.email || ''} style={{ width: '250px' }} />
                     </div>
-                    <input type="text" className="form-input" defaultValue="VibeVetting" style={{ width: '250px' }} />
-                  </div>
-                </>
-              )}
+                    <div className="setting-item">
+                      <div className="setting-label">
+                        <div className="setting-title">Company</div>
+                        <div className="setting-description">Your organization</div>
+                      </div>
+                      <input type="text" className="form-input" defaultValue={user?.company || ''} style={{ width: '250px' }} />
+                    </div>
+                  </>
+                )}
 
               {activeTab === 'notifications' && (
                 <>
@@ -200,8 +204,9 @@ export default function SettingsPage() {
               )}
             </div>
           </div>
+          </div>
         </div>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }
