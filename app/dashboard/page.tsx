@@ -12,13 +12,13 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="dashboard-wrapper">
       <Sidebar />
-      <main className="flex-1 ml-[280px] p-8">
-        <div className="max-w-[1400px] mx-auto">
+      <div className="main-content">
+        <div className="container">
           <TopBar
             title="Welcome Back!"
-            subtitle="Monday, December 11, 2024"
+            subtitle="Tuesday, December 24, 2024"
             actionButton={{
               label: 'New Campaign',
               icon: 'fa-plus',
@@ -30,7 +30,7 @@ export default function DashboardPage() {
           <ChartsSection />
           <RecentAnalysesTable />
         </div>
-      </main>
+      </div>
     </div>
   );
 }

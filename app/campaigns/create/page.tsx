@@ -1,27 +1,59 @@
 "use client";
 
 import { Sidebar } from '@/components/common/Sidebar';
-import { TopBar } from '@/components/common/TopBar';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function CreateCampaignPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
+    // Basic Info
     name: '',
     description: '',
+    industry: '',
+    budget: '',
+    // Platform & Reach
     platforms: [] as string[],
+    followerRange: '',
+    // Creator Matching Criteria
+    engagementRate: '',
+    audienceAge: [] as string[],
+    audienceGender: '',
+    audienceLocation: [] as string[],
+    // Content Requirements
+    contentType: [] as string[],
+    contentStyle: '',
+    postingFrequency: '',
+    // Brand Safety & Quality
+    minTrustScore: '',
+    maxRiskLevel: '',
+    brandValues: [] as string[],
+    excludeCategories: [] as string[],
+    // Campaign Timeline
+    startDate: '',
+    endDate: '',
+    deliverables: '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Submit to API
     console.log('Creating campaign:', formData);
     router.push('/campaigns/scanning');
   };
 
-  const handleCancel = () => {
-    router.push('/campaigns');
+  const handleArrayToggle = (field: keyof typeof formData, value: string) => {
+    const currentArray = formData[field] as string[];
+    if (currentArray.includes(value)) {
+      setFormData({
+        ...formData,
+        [field]: currentArray.filter((item) => item !== value),
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [field]: [...currentArray, value],
+      });
+    }
   };
 
   return (
@@ -29,71 +61,504 @@ export default function CreateCampaignPage() {
       <Sidebar />
       <div className="main-content">
         <div className="container">
-          <TopBar
-            title="Create New Campaign"
-            subtitle="Set up your influencer vetting campaign"
-          />
+          {/* Page Header */}
+          <div className="page-header">
+            <div className="header-left">
+              <h1>Create New Campaign</h1>
+              <p>Set up your influencer vetting campaign with AI-powered creator matching</p>
+            </div>
+          </div>
 
-          <div className="campaign-form-container">
-            <form onSubmit={handleSubmit} className="campaign-form">
-              <div className="form-group">
-                <label htmlFor="name">Campaign Name</label>
-                <input
-                  type="text"
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Enter campaign name"
-                  required
-                />
-              </div>
+          {/* Form Card */}
+          <div className="form-card">
+            <form onSubmit={handleSubmit}>
+              {/* Section 1: Basic Campaign Info */}
+              <div className="form-section">
+                <div className="section-header">
+                  <div className="section-icon">
+                    <i className="fa-solid fa-bullseye"></i>
+                  </div>
+                  <div>
+                    <h3>Campaign Details</h3>
+                    <p>Basic information about your campaign</p>
+                  </div>
+                </div>
 
-              <div className="form-group">
-                <label htmlFor="description">Description</label>
-                <textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Describe your campaign objectives"
-                  rows={4}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Platforms</label>
-                <div className="platform-checkboxes">
-                  {['Instagram', 'YouTube', 'TikTok', 'Twitter'].map((platform) => (
-                    <label key={platform} className="checkbox-label">
-                      <input
-                        type="checkbox"
-                        checked={formData.platforms.includes(platform)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setFormData({
-                              ...formData,
-                              platforms: [...formData.platforms, platform],
-                            });
-                          } else {
-                            setFormData({
-                              ...formData,
-                              platforms: formData.platforms.filter((p) => p !== platform),
-                            });
-                          }
-                        }}
-                      />
-                      {platform}
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">
+                      Campaign Name <span className="required">*</span>
                     </label>
-                  ))}
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      placeholder="e.g., Summer Product Launch 2025"
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">
+                      Industry <span className="required">*</span>
+                    </label>
+                    <select
+                      className="form-input"
+                      value={formData.industry}
+                      onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
+                      required
+                    >
+                      <option value="">Select industry...</option>
+                      <option value="fashion">Fashion & Beauty</option>
+                      <option value="tech">Technology & Gadgets</option>
+                      <option value="fitness">Health & Fitness</option>
+                      <option value="food">Food & Beverage</option>
+                      <option value="travel">Travel & Lifestyle</option>
+                      <option value="gaming">Gaming & Entertainment</option>
+                      <option value="finance">Finance & Business</option>
+                      <option value="education">Education & Learning</option>
+                      <option value="automotive">Automotive</option>
+                      <option value="home">Home & Living</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">
+                    Campaign Description <span className="required">*</span>
+                  </label>
+                  <textarea
+                    className="form-textarea"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    placeholder="Describe your campaign objectives, target audience, key messages, and what you're looking for in creators..."
+                    rows={4}
+                    required
+                  />
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">
+                      Budget Range <span className="required">*</span>
+                    </label>
+                    <select
+                      className="form-input"
+                      value={formData.budget}
+                      onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
+                      required
+                    >
+                      <option value="">Select budget range...</option>
+                      <option value="500-1000">$500 - $1,000</option>
+                      <option value="1000-5000">$1,000 - $5,000</option>
+                      <option value="5000-10000">$5,000 - $10,000</option>
+                      <option value="10000-25000">$10,000 - $25,000</option>
+                      <option value="25000-50000">$25,000 - $50,000</option>
+                      <option value="50000-100000">$50,000 - $100,000</option>
+                      <option value="100000+">$100,000+</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Number of Deliverables</label>
+                    <select
+                      className="form-input"
+                      value={formData.deliverables}
+                      onChange={(e) => setFormData({ ...formData, deliverables: e.target.value })}
+                    >
+                      <option value="">Select deliverables count...</option>
+                      <option value="1-3">1-3 posts per creator</option>
+                      <option value="4-6">4-6 posts per creator</option>
+                      <option value="7-10">7-10 posts per creator</option>
+                      <option value="10+">10+ posts per creator</option>
+                    </select>
+                  </div>
                 </div>
               </div>
 
+              {/* Section 2: Platform & Reach Requirements */}
+              <div className="form-section">
+                <div className="section-header">
+                  <div className="section-icon">
+                    <i className="fa-solid fa-globe"></i>
+                  </div>
+                  <div>
+                    <h3>Platform & Reach Requirements</h3>
+                    <p>Select platforms and audience size you want to target</p>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">
+                    Target Platforms <span className="required">*</span>
+                  </label>
+                  <div className="checkbox-group">
+                    {[
+                      { name: 'Instagram', icon: 'fa-instagram' },
+                      { name: 'YouTube', icon: 'fa-youtube' },
+                      { name: 'TikTok', icon: 'fa-tiktok' },
+                      { name: 'Twitter', icon: 'fa-twitter' },
+                      { name: 'LinkedIn', icon: 'fa-linkedin' },
+                      { name: 'Facebook', icon: 'fa-facebook' },
+                      { name: 'Twitch', icon: 'fa-twitch' },
+                      { name: 'Pinterest', icon: 'fa-pinterest' },
+                    ].map((platform) => (
+                      <label key={platform.name} className="checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={formData.platforms.includes(platform.name)}
+                          onChange={() => handleArrayToggle('platforms', platform.name)}
+                        />
+                        <i className={`fa-brands ${platform.icon}`}></i>
+                        {platform.name}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">
+                    Follower Range <span className="required">*</span>
+                  </label>
+                  <div className="radio-group">
+                    {[
+                      { value: 'nano', label: 'Nano (1K-10K)', desc: 'High engagement, niche audiences' },
+                      { value: 'micro', label: 'Micro (10K-50K)', desc: 'Strong community connection' },
+                      { value: 'mid', label: 'Mid-tier (50K-500K)', desc: 'Balanced reach & engagement' },
+                      { value: 'macro', label: 'Macro (500K-1M)', desc: 'Wide reach, brand awareness' },
+                      { value: 'mega', label: 'Mega (1M+)', desc: 'Celebrity-level influence' },
+                    ].map((tier) => (
+                      <label
+                        key={tier.value}
+                        className={`radio-option ${formData.followerRange === tier.value ? 'active' : ''}`}
+                      >
+                        <input
+                          type="radio"
+                          name="followerRange"
+                          value={tier.value}
+                          checked={formData.followerRange === tier.value}
+                          onChange={(e) => setFormData({ ...formData, followerRange: e.target.value })}
+                        />
+                        <div className="radio-content">
+                          <strong>{tier.label}</strong>
+                          <span>{tier.desc}</span>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">
+                    Minimum Engagement Rate <span className="required">*</span>
+                  </label>
+                  <select
+                    className="form-input"
+                    value={formData.engagementRate}
+                    onChange={(e) => setFormData({ ...formData, engagementRate: e.target.value })}
+                    required
+                  >
+                    <option value="">Select minimum engagement...</option>
+                    <option value="1">1%+ (Average)</option>
+                    <option value="2">2%+ (Good)</option>
+                    <option value="3">3%+ (Great)</option>
+                    <option value="5">5%+ (Excellent)</option>
+                    <option value="8">8%+ (Exceptional)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Section 3: Target Audience Demographics */}
+              <div className="form-section">
+                <div className="section-header">
+                  <div className="section-icon">
+                    <i className="fa-solid fa-users"></i>
+                  </div>
+                  <div>
+                    <h3>Target Audience Demographics</h3>
+                    <p>Define the audience you want creators to reach</p>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Audience Age Groups</label>
+                  <div className="checkbox-group">
+                    {[
+                      { value: '13-17', label: 'Gen Z (13-17)' },
+                      { value: '18-24', label: 'Young Adults (18-24)' },
+                      { value: '25-34', label: 'Millennials (25-34)' },
+                      { value: '35-44', label: 'Gen X (35-44)' },
+                      { value: '45-54', label: 'Middle Age (45-54)' },
+                      { value: '55+', label: 'Seniors (55+)' },
+                    ].map((age) => (
+                      <label key={age.value} className="checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={formData.audienceAge.includes(age.value)}
+                          onChange={() => handleArrayToggle('audienceAge', age.value)}
+                        />
+                        {age.label}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">Audience Gender</label>
+                    <select
+                      className="form-input"
+                      value={formData.audienceGender}
+                      onChange={(e) => setFormData({ ...formData, audienceGender: e.target.value })}
+                    >
+                      <option value="">Any gender...</option>
+                      <option value="female">Primarily Female (60%+)</option>
+                      <option value="male">Primarily Male (60%+)</option>
+                      <option value="balanced">Balanced Mix</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Target Locations</label>
+                  <div className="checkbox-group">
+                    {[
+                      { value: 'us', label: '🇺🇸 United States' },
+                      { value: 'uk', label: '🇬🇧 United Kingdom' },
+                      { value: 'ca', label: '🇨🇦 Canada' },
+                      { value: 'au', label: '🇦🇺 Australia' },
+                      { value: 'eu', label: '🇪🇺 Europe' },
+                      { value: 'in', label: '🇮🇳 India' },
+                      { value: 'latam', label: '🌎 Latin America' },
+                      { value: 'global', label: '🌍 Global' },
+                    ].map((loc) => (
+                      <label key={loc.value} className="checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={formData.audienceLocation.includes(loc.value)}
+                          onChange={() => handleArrayToggle('audienceLocation', loc.value)}
+                        />
+                        {loc.label}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 4: Content Requirements */}
+              <div className="form-section">
+                <div className="section-header">
+                  <div className="section-icon">
+                    <i className="fa-solid fa-video"></i>
+                  </div>
+                  <div>
+                    <h3>Content Requirements</h3>
+                    <p>Specify the type of content you need</p>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Content Types Needed</label>
+                  <div className="checkbox-group">
+                    {[
+                      { value: 'posts', label: 'Static Posts', icon: 'fa-image' },
+                      { value: 'stories', label: 'Stories', icon: 'fa-clock' },
+                      { value: 'reels', label: 'Reels/Shorts', icon: 'fa-film' },
+                      { value: 'videos', label: 'Long-form Videos', icon: 'fa-video' },
+                      { value: 'live', label: 'Live Streams', icon: 'fa-broadcast-tower' },
+                      { value: 'reviews', label: 'Product Reviews', icon: 'fa-star' },
+                      { value: 'tutorials', label: 'Tutorials/How-to', icon: 'fa-graduation-cap' },
+                      { value: 'unboxing', label: 'Unboxing', icon: 'fa-box-open' },
+                    ].map((content) => (
+                      <label key={content.value} className="checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={formData.contentType.includes(content.value)}
+                          onChange={() => handleArrayToggle('contentType', content.value)}
+                        />
+                        <i className={`fa-solid ${content.icon}`}></i>
+                        {content.label}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">Content Style</label>
+                    <select
+                      className="form-input"
+                      value={formData.contentStyle}
+                      onChange={(e) => setFormData({ ...formData, contentStyle: e.target.value })}
+                    >
+                      <option value="">Select content style...</option>
+                      <option value="polished">Polished & Professional</option>
+                      <option value="authentic">Raw & Authentic</option>
+                      <option value="educational">Educational & Informative</option>
+                      <option value="entertaining">Fun & Entertaining</option>
+                      <option value="lifestyle">Lifestyle & Aspirational</option>
+                      <option value="humorous">Comedy & Humor</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Posting Frequency</label>
+                    <select
+                      className="form-input"
+                      value={formData.postingFrequency}
+                      onChange={(e) => setFormData({ ...formData, postingFrequency: e.target.value })}
+                    >
+                      <option value="">Select frequency...</option>
+                      <option value="daily">Daily posters</option>
+                      <option value="3-5week">3-5 times per week</option>
+                      <option value="1-2week">1-2 times per week</option>
+                      <option value="weekly">Weekly</option>
+                      <option value="any">Any frequency</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 5: Brand Safety & Quality */}
+              <div className="form-section">
+                <div className="section-header">
+                  <div className="section-icon">
+                    <i className="fa-solid fa-shield-halved"></i>
+                  </div>
+                  <div>
+                    <h3>Brand Safety & Quality</h3>
+                    <p>Set trust and safety requirements for creator vetting</p>
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">
+                      Minimum Trust Score <span className="required">*</span>
+                    </label>
+                    <select
+                      className="form-input"
+                      value={formData.minTrustScore}
+                      onChange={(e) => setFormData({ ...formData, minTrustScore: e.target.value })}
+                      required
+                    >
+                      <option value="">Select minimum score...</option>
+                      <option value="90">90%+ (Premium quality)</option>
+                      <option value="80">80%+ (High quality)</option>
+                      <option value="70">70%+ (Good quality)</option>
+                      <option value="60">60%+ (Standard)</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">
+                      Maximum Risk Level <span className="required">*</span>
+                    </label>
+                    <select
+                      className="form-input"
+                      value={formData.maxRiskLevel}
+                      onChange={(e) => setFormData({ ...formData, maxRiskLevel: e.target.value })}
+                      required
+                    >
+                      <option value="">Select max risk level...</option>
+                      <option value="low">Low Risk Only</option>
+                      <option value="medium">Medium Risk & Below</option>
+                      <option value="high">Include High Risk</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Brand Values Alignment</label>
+                  <div className="checkbox-group">
+                    {[
+                      { value: 'sustainability', label: '🌱 Sustainability' },
+                      { value: 'diversity', label: '🌈 Diversity & Inclusion' },
+                      { value: 'authenticity', label: '✨ Authenticity' },
+                      { value: 'innovation', label: '🚀 Innovation' },
+                      { value: 'family', label: '👨‍👩‍👧‍👦 Family-friendly' },
+                      { value: 'luxury', label: '💎 Luxury & Premium' },
+                      { value: 'health', label: '💪 Health & Wellness' },
+                      { value: 'community', label: '🤝 Community Focus' },
+                    ].map((value) => (
+                      <label key={value.value} className="checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={formData.brandValues.includes(value.value)}
+                          onChange={() => handleArrayToggle('brandValues', value.value)}
+                        />
+                        {value.label}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Exclude Creators Who Post About</label>
+                  <div className="checkbox-group">
+                    {[
+                      { value: 'politics', label: '🏛️ Politics' },
+                      { value: 'controversy', label: '⚠️ Controversial Topics' },
+                      { value: 'adult', label: '🔞 Adult Content' },
+                      { value: 'gambling', label: '🎰 Gambling' },
+                      { value: 'alcohol', label: '🍺 Alcohol' },
+                      { value: 'tobacco', label: '🚬 Tobacco/Vaping' },
+                      { value: 'competitors', label: '🏢 Competitor Brands' },
+                      { value: 'crypto', label: '₿ Crypto/NFTs' },
+                    ].map((cat) => (
+                      <label key={cat.value} className="checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={formData.excludeCategories.includes(cat.value)}
+                          onChange={() => handleArrayToggle('excludeCategories', cat.value)}
+                        />
+                        {cat.label}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 6: Campaign Timeline */}
+              <div className="form-section">
+                <div className="section-header">
+                  <div className="section-icon">
+                    <i className="fa-solid fa-calendar"></i>
+                  </div>
+                  <div>
+                    <h3>Campaign Timeline</h3>
+                    <p>Set the duration for your campaign</p>
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">Start Date</label>
+                    <input
+                      type="date"
+                      className="form-input"
+                      value={formData.startDate}
+                      onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">End Date</label>
+                    <input
+                      type="date"
+                      className="form-input"
+                      value={formData.endDate}
+                      onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Form Actions */}
               <div className="form-actions">
-                <button type="button" onClick={handleCancel} className="btn-secondary">
+                <button type="button" onClick={() => router.back()} className="btn btn-secondary">
+                  <i className="fa-solid fa-arrow-left"></i>
                   Cancel
                 </button>
-                <button type="submit" className="btn-primary">
-                  Start AI Scanning
+                <button type="submit" className="btn btn-primary">
+                  <i className="fa-solid fa-rocket"></i>
+                  Find Matching Creators
                 </button>
               </div>
             </form>
