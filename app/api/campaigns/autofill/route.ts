@@ -7,7 +7,7 @@ const openai = new OpenAI({
 
 export async function POST(request: NextRequest) {
   try {
-    const { companyName, productName, websiteUrl } = await request.json();
+    const { companyName, productName, websiteUrl, customPrompt } = await request.json();
 
     if (!companyName || !productName) {
       return NextResponse.json(
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
 Company Name: ${companyName}
 Product Name: ${productName}
 Website: ${websiteUrl || 'Not provided'}
-
+${customPrompt ? `\nAdditional Requirements from User:\n${customPrompt}\n` : ''}
 Generate a JSON response with the following fields (use exact field names and valid values from the options provided):
 
 {

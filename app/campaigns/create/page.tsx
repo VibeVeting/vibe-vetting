@@ -1,6 +1,7 @@
 "use client";
 
 import { Sidebar } from '@/components/common/Sidebar';
+import { ProtectedRoute } from '@/components/common/ProtectedRoute';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -11,6 +12,7 @@ export default function CreateCampaignPage() {
     companyName: '',
     productName: '',
     websiteUrl: '',
+    customPrompt: '',
   });
   const [formData, setFormData] = useState({
     // Basic Info
@@ -91,10 +93,71 @@ export default function CreateCampaignPage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Creating campaign:', formData);
-    router.push('/campaigns/scanning');
+    
+    if (!formData.name) {
+      alert('Please enter a campaign name');
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please log in to create a campaign');
+        router.push('/login');
+        return;
+      }
+
+      // Parse budget to number (e.g., "5000-10000" -> 7500 average)
+      let budgetNum = 0;
+      if (formData.budget) {
+        if (formData.budget.includes('+')) {
+          budgetNum = parseInt(formData.budget.replace(/[^0-9]/g, ''));
+        } else if (formData.budget.includes('-')) {
+          const parts = formData.budget.split('-');
+          budgetNum = (parseInt(parts[0]) + parseInt(parts[1])) / 2;
+        }
+      }
+
+      const response = await fetch('/api/user/campaigns', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          description: formData.description,
+          status: 'active',
+          budget: budgetNum,
+          startDate: formData.startDate || new Date().toISOString(),
+          endDate: formData.endDate || null,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Store campaign data for the scanning page
+        sessionStorage.setItem('newCampaign', JSON.stringify({
+          ...formData,
+          id: data.campaign?.id,
+        }));
+        router.push('/campaigns/scanning');
+      } else {
+        alert(data.error || 'Failed to create campaign');
+      }
+    } catch (error) {
+      console.error('Error creating campaign:', error);
+      alert('Failed to create campaign. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleArrayToggle = (field: keyof typeof formData, value: string) => {
@@ -113,6 +176,7 @@ export default function CreateCampaignPage() {
   };
 
   return (
+    <ProtectedRoute>
     <div className="dashboard-wrapper">
       <Sidebar />
       <div className="main-content">
@@ -216,6 +280,30 @@ export default function CreateCampaignPage() {
                   }}
                 />
               </div>
+            </div>
+
+            {/* Custom Prompt Textarea */}
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.7)', marginBottom: '6px' }}>
+                Custom Instructions (optional)
+              </label>
+              <textarea
+                value={autoFillData.customPrompt}
+                onChange={(e) => setAutoFillData(prev => ({ ...prev, customPrompt: e.target.value }))}
+                placeholder="Add any specific requirements, e.g., 'Focus on Gen-Z audience in India', 'Budget-friendly micro-influencers only', 'Emphasize sustainability and eco-friendly messaging'..."
+                rows={3}
+                style={{
+                  width: '100%',
+                  padding: '12px 14px',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  background: 'rgba(0,0,0,0.3)',
+                  color: '#fff',
+                  fontSize: '14px',
+                  resize: 'vertical',
+                  fontFamily: 'inherit',
+                }}
+              />
             </div>
 
             <button
@@ -736,13 +824,22 @@ export default function CreateCampaignPage() {
 
               {/* Form Actions */}
               <div className="form-actions">
-                <button type="button" onClick={() => router.back()} className="btn btn-secondary">
+                <button type="button" onClick={() => router.back()} className="btn btn-secondary" disabled={isSubmitting}>
                   <i className="fa-solid fa-arrow-left"></i>
                   Cancel
                 </button>
-                <button type="submit" className="btn btn-primary">
-                  <i className="fa-solid fa-rocket"></i>
-                  Find Matching Creators
+                <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <>
+                      <i className="fa-solid fa-spinner fa-spin"></i>
+                      Creating Campaign...
+                    </>
+                  ) : (
+                    <>
+                      <i className="fa-solid fa-rocket"></i>
+                      Find Matching Creators
+                    </>
+                  )}
                 </button>
               </div>
             </form>
@@ -750,5 +847,6 @@ export default function CreateCampaignPage() {
         </div>
       </div>
     </div>
+    </ProtectedRoute>
   );
 }
