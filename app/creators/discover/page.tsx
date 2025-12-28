@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { ProtectedRoute } from '@/components/common/ProtectedRoute';
@@ -94,7 +94,7 @@ const defaultCreators: Creator[] = [
 ];
 
 export default function DiscoverCreatorsPage() {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const [creators, setCreators] = useState<Creator[]>(defaultCreators);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -103,6 +103,26 @@ export default function DiscoverCreatorsPage() {
   const [maxPage, setMaxPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('Loading creators...');
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const userInitials = user?.name
+    ?.split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2) || 'U';
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
   
   const [filters, setFilters] = useState<Filters>({
     handle_contains: '',
@@ -248,9 +268,34 @@ export default function DiscoverCreatorsPage() {
           <div className="nav-actions">
             <Link href="/dashboard" className="nav-link">Dashboard</Link>
             <Link href="/campaigns" className="nav-link">Campaigns</Link>
-            <button onClick={logout} className="nav-link logout-btn">
-              <i className="fa-solid fa-sign-out-alt"></i> Logout
-            </button>
+            <div className="user-profile" ref={dropdownRef} style={{ position: 'relative' }}>
+              <div 
+                className="user-avatar" 
+                onClick={() => setShowDropdown(!showDropdown)}
+                style={{ cursor: 'pointer', width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 600, fontSize: '14px' }}
+              >
+                {userInitials}
+              </div>
+              {showDropdown && (
+                <div className="user-dropdown" style={{ position: 'absolute', top: '50px', right: 0, background: 'white', borderRadius: '12px', boxShadow: '0 10px 40px rgba(0,0,0,0.15)', minWidth: '240px', zIndex: 1000, overflow: 'hidden' }}>
+                  <div className="user-dropdown-header" style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '1px solid #e2e8f0' }}>
+                    <div style={{ width: '44px', height: '44px', borderRadius: '50%', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 600 }}>{userInitials}</div>
+                    <div>
+                      <div style={{ fontWeight: 600, color: '#1a202c' }}>{user?.name || 'User'}</div>
+                      <div style={{ fontSize: '13px', color: '#718096' }}>{user?.email || ''}</div>
+                    </div>
+                  </div>
+                  <Link href="/settings" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 16px', color: '#4a5568', textDecoration: 'none', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = '#f7fafc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                    <i className="fa-solid fa-gear"></i>
+                    Settings
+                  </Link>
+                  <button onClick={logout} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 16px', color: '#e53e3e', background: 'none', border: 'none', width: '100%', cursor: 'pointer', fontSize: '14px', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = '#fff5f5'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                    <i className="fa-solid fa-sign-out-alt"></i>
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </nav>

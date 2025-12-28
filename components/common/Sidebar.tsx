@@ -10,7 +10,6 @@ const menuItems = [
   { icon: 'fa-users', label: 'Creators', href: '/creators' },
   { icon: 'fa-bullhorn', label: 'Campaigns', href: '/campaigns' },
   { icon: 'fa-chart-pie', label: 'Investor Metrics', href: '/investor-metrics' },
-  { icon: 'fa-cog', label: 'Settings', href: '/settings' },
 ];
 
 export function Sidebar() {

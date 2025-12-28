@@ -1,6 +1,7 @@
 "use client";
 
 import { Sidebar } from '@/components/common/Sidebar';
+import { TopBar } from '@/components/common/TopBar';
 import { ProtectedRoute } from '@/components/common/ProtectedRoute';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -181,13 +182,11 @@ export default function CreateCampaignPage() {
       <Sidebar />
       <div className="main-content">
         <div className="container">
-          {/* Page Header */}
-          <div className="page-header">
-            <div className="header-left">
-              <h1>Create New Campaign</h1>
-              <p>Set up your influencer vetting campaign with AI-powered creator matching</p>
-            </div>
-          </div>
+          <TopBar
+            title="Create New Campaign"
+            subtitle="Set up your influencer vetting campaign with AI-powered creator matching"
+            showSearch={false}
+          />
 
           {/* AI Auto-Fill Box */}
           <div className="ai-autofill-card" style={{

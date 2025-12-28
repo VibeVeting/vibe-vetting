@@ -1,6 +1,7 @@
 "use client";
 
 import { Sidebar } from '@/components/common/Sidebar';
+import { TopBar } from '@/components/common/TopBar';
 import { ProtectedRoute } from '@/components/common/ProtectedRoute';
 import { useEffect, useState } from 'react';
 
@@ -66,19 +67,10 @@ export default function AnalyticsPage() {
         <Sidebar />
         <div className="main-content">
           <div className="container">
-            {/* Page Header */}
-            <div className="page-header">
-              <div className="header-top">
-                <div className="header-left">
-                  <h1>Analytics Dashboard</h1>
-                  <p>Campaign performance and insights</p>
-                </div>
-                <div className="date-range">
-                  <i className="fa-solid fa-calendar"></i>
-                  Last 30 Days
-                </div>
-              </div>
-            </div>
+            <TopBar
+              title="Analytics Dashboard"
+              subtitle="Campaign performance and insights"
+            />
 
             {/* KPI Grid */}
             <div className="kpi-grid">

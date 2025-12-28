@@ -1,6 +1,7 @@
 "use client";
 
 import { Sidebar } from '@/components/common/Sidebar';
+import { TopBar } from '@/components/common/TopBar';
 import { ProtectedRoute } from '@/components/common/ProtectedRoute';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -60,19 +61,15 @@ export default function CampaignsPage() {
         <Sidebar />
         <div className="main-content">
           <div className="container">
-            {/* Page Header */}
-            <div className="page-header">
-              <div className="header-top">
-                <div className="header-left">
-                  <h1>Campaigns</h1>
-                  <p>Manage your influencer campaigns</p>
-                </div>
-                <button onClick={handleNewCampaign} className="btn btn-primary">
-                  <i className="fa-solid fa-plus"></i>
-                  New Campaign
-                </button>
-              </div>
-            </div>
+            <TopBar
+              title="Campaigns"
+              subtitle="Manage your influencer campaigns"
+              actionButton={{
+                label: 'New Campaign',
+                icon: 'fa-plus',
+                onClick: handleNewCampaign,
+              }}
+            />
 
             {/* Campaigns Grid */}
             <div className="campaigns-grid">

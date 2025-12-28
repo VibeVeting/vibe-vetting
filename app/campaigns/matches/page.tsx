@@ -1,6 +1,7 @@
 "use client";
 
 import { Sidebar } from '@/components/common/Sidebar';
+import { TopBar } from '@/components/common/TopBar';
 import { ProtectedRoute } from '@/components/common/ProtectedRoute';
 import Link from 'next/link';
 import { useState, useMemo } from 'react';
@@ -49,19 +50,10 @@ export default function MatchesPage() {
       <Sidebar />
       <div className="main-content">
         <div className="container">
-          {/* Page Header */}
-          <div className="page-header">
-            <div className="header-top">
-              <div className="header-left">
-                <h1>Influencer Matches</h1>
-                <p>AI-vetted creators aligned with your brand</p>
-              </div>
-              <div className="result-count">
-                <i className="fa-solid fa-users"></i>
-                {filteredInfluencers.length} creators found
-              </div>
-            </div>
-          </div>
+          <TopBar
+            title="Influencer Matches"
+            subtitle={`AI-vetted creators aligned with your brand • ${filteredInfluencers.length} creators found`}
+          />
 
           {/* Filters */}
           <div className="filters-section">

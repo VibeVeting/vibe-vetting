@@ -1,6 +1,7 @@
 "use client";
 
 import { Sidebar } from '@/components/common/Sidebar';
+import { TopBar } from '@/components/common/TopBar';
 import { ProtectedRoute } from '@/components/common/ProtectedRoute';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -45,6 +46,11 @@ export default function ScanningPage() {
       <Sidebar />
       <div className="main-content">
         <div className="container">
+          <TopBar
+            title="AI Scanning"
+            subtitle="Finding the best creator matches for your campaign"
+            showSearch={false}
+          />
           {/* Scan Header */}
           <div className="scan-header">
             <div className="scan-icon-wrapper">

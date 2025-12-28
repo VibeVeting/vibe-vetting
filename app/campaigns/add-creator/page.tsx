@@ -1,6 +1,7 @@
 "use client";
 
 import { Sidebar } from '@/components/common/Sidebar';
+import { TopBar } from '@/components/common/TopBar';
 import { ProtectedRoute } from '@/components/common/ProtectedRoute';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -24,15 +25,13 @@ export default function AddCreatorPage() {
     <ProtectedRoute>
       <div className="dashboard-wrapper">
         <Sidebar />
-      <div className="main-content">
-        <div className="container">
-          {/* Page Header */}
-          <div className="page-header">
-            <div className="header-left">
-              <h1>Add Creator to Campaign</h1>
-              <p>Configure partnership details</p>
-            </div>
-          </div>
+        <div className="main-content">
+          <div className="container">
+            <TopBar
+              title="Add Creator to Campaign"
+              subtitle="Configure partnership details"
+              showSearch={false}
+            />
 
           {/* Form Card */}
           <div className="form-card">
@@ -116,6 +115,7 @@ export default function AddCreatorPage() {
                 </button>
               </div>
             </form>
+          </div>
           </div>
         </div>
       </div>

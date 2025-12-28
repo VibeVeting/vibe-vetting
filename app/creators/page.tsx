@@ -1,6 +1,7 @@
 "use client";
 
 import { Sidebar } from '@/components/common/Sidebar';
+import { TopBar } from '@/components/common/TopBar';
 import { ProtectedRoute } from '@/components/common/ProtectedRoute';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
@@ -76,19 +77,10 @@ export default function CreatorsPage() {
         <Sidebar />
         <div className="main-content">
           <div className="container">
-            {/* Page Header */}
-            <div className="page-header">
-              <div className="header-top">
-                <div className="header-left">
-                  <h1>Analyzed Creators</h1>
-                  <p>Your AI-vetted creators</p>
-                </div>
-                <div className="result-count">
-                  <i className="fa-solid fa-users"></i>
-                  {filteredCreators.length} creators found
-                </div>
-              </div>
-            </div>
+            <TopBar
+              title="Analyzed Creators"
+              subtitle={`Your AI-vetted creators • ${filteredCreators.length} creators found`}
+            />
 
             {/* Filters */}
             <div className="filters-section">

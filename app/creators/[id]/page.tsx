@@ -1,6 +1,7 @@
 "use client";
 
 import { Sidebar } from '@/components/common/Sidebar';
+import { TopBar } from '@/components/common/TopBar';
 import { ProtectedRoute } from '@/components/common/ProtectedRoute';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -40,8 +41,13 @@ export default function CreatorProfilePage() {
     <ProtectedRoute>
       <div className="dashboard-wrapper">
         <Sidebar />
-      <div className="main-content">
-        <div className="container">
+        <div className="main-content">
+          <div className="container">
+            <TopBar
+              title="Creator Profile"
+              subtitle={creatorData.name}
+              showSearch={false}
+            />
           {/* Creator Header */}
           <div className="creator-header">
             <div className="creator-avatar-large">
@@ -174,6 +180,7 @@ export default function CreatorProfilePage() {
               <i className="fa-solid fa-plus"></i>
               Add to Campaign
             </button>
+          </div>
           </div>
         </div>
       </div>

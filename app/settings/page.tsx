@@ -1,6 +1,7 @@
 "use client";
 
 import { Sidebar } from '@/components/common/Sidebar';
+import { TopBar } from '@/components/common/TopBar';
 import { ProtectedRoute } from '@/components/common/ProtectedRoute';
 import { useAuth } from '@/lib/auth-context';
 import { useState } from 'react';
@@ -21,11 +22,11 @@ export default function SettingsPage() {
         <Sidebar />
         <div className="main-content">
           <div className="container" style={{ maxWidth: '1000px' }}>
-            {/* Page Header */}
-            <div className="page-header">
-              <h1>Settings</h1>
-              <p>Manage your account and preferences</p>
-            </div>
+            <TopBar
+              title="Settings"
+              subtitle="Manage your account and preferences"
+              showSearch={false}
+            />
 
             {/* Settings Layout */}
             <div className="settings-wrapper">

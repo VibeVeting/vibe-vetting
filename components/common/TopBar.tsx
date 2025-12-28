@@ -75,6 +75,10 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton }: Top
                 </div>
               </div>
               <div className="user-dropdown-divider"></div>
+              <a href="/settings" className="user-dropdown-item">
+                <i className="fa-solid fa-gear"></i>
+                Settings
+              </a>
               <button className="user-dropdown-item" onClick={logout}>
                 <i className="fa-solid fa-sign-out-alt"></i>
                 Logout

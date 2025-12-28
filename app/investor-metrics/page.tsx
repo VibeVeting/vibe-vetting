@@ -1,6 +1,7 @@
 "use client";
 
 import { Sidebar } from '@/components/common/Sidebar';
+import { TopBar } from '@/components/common/TopBar';
 import { ProtectedRoute } from '@/components/common/ProtectedRoute';
 import { useEffect, useState } from 'react';
 
@@ -52,11 +53,10 @@ export default function InvestorMetricsPage() {
         <Sidebar />
         <div className="main-content">
           <div className="container">
-            {/* Page Header */}
-            <div className="page-header">
-              <h1>Brand Compatibility & Risk</h1>
-              <p>Digital brand blueprint and risk assessment</p>
-            </div>
+            <TopBar
+              title="Brand Compatibility & Risk"
+              subtitle="Digital brand blueprint and risk assessment"
+            />
 
             {/* KPI Grid */}
             <div className="kpi-grid">
