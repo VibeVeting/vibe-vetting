@@ -6,6 +6,12 @@ import { useState } from 'react';
 
 export default function CreateCampaignPage() {
   const router = useRouter();
+  const [isAutoFilling, setIsAutoFilling] = useState(false);
+  const [autoFillData, setAutoFillData] = useState({
+    companyName: '',
+    productName: '',
+    websiteUrl: '',
+  });
   const [formData, setFormData] = useState({
     // Basic Info
     name: '',
@@ -34,6 +40,56 @@ export default function CreateCampaignPage() {
     endDate: '',
     deliverables: '',
   });
+
+  const handleAutoFill = async () => {
+    if (!autoFillData.companyName || !autoFillData.productName) {
+      alert('Please enter company name and product name');
+      return;
+    }
+
+    setIsAutoFilling(true);
+    try {
+      const response = await fetch('/api/campaigns/autofill', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(autoFillData),
+      });
+
+      const result = await response.json();
+      
+      if (result.success && result.data) {
+        const data = result.data;
+        setFormData(prev => ({
+          ...prev,
+          name: data.name || prev.name,
+          description: data.description || prev.description,
+          industry: data.industry || prev.industry,
+          budget: data.budget || prev.budget,
+          platforms: data.platforms || prev.platforms,
+          followerRange: data.followerRange || prev.followerRange,
+          engagementRate: data.engagementRate || prev.engagementRate,
+          audienceAge: data.audienceAge || prev.audienceAge,
+          audienceGender: data.audienceGender || prev.audienceGender,
+          audienceLocation: data.audienceLocation || prev.audienceLocation,
+          contentType: data.contentType || prev.contentType,
+          contentStyle: data.contentStyle || prev.contentStyle,
+          postingFrequency: data.postingFrequency || prev.postingFrequency,
+          minTrustScore: data.minTrustScore?.toString() || prev.minTrustScore,
+          maxRiskLevel: data.maxRiskLevel || prev.maxRiskLevel,
+          brandValues: data.brandValues || prev.brandValues,
+          excludeCategories: data.excludeCategories || prev.excludeCategories,
+          deliverables: data.deliverables || prev.deliverables,
+        }));
+      } else {
+        alert(result.error || 'Failed to auto-fill campaign data');
+      }
+    } catch (error) {
+      console.error('Auto-fill error:', error);
+      alert('Failed to connect to AI service');
+    } finally {
+      setIsAutoFilling(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,6 +123,134 @@ export default function CreateCampaignPage() {
               <h1>Create New Campaign</h1>
               <p>Set up your influencer vetting campaign with AI-powered creator matching</p>
             </div>
+          </div>
+
+          {/* AI Auto-Fill Box */}
+          <div className="ai-autofill-card" style={{
+            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%)',
+            border: '1px solid rgba(139, 92, 246, 0.3)',
+            borderRadius: '16px',
+            padding: '24px',
+            marginBottom: '24px',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '10px',
+                background: 'linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+                <i className="fa-solid fa-wand-magic-sparkles" style={{ color: '#fff', fontSize: '18px' }}></i>
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 600, color: '#fff' }}>
+                  ✨ AI Auto-Fill
+                </h3>
+                <p style={{ margin: 0, fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>
+                  Enter your company details and let AI fill the entire form for you
+                </p>
+              </div>
+            </div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '16px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.7)', marginBottom: '6px' }}>
+                  Company Name *
+                </label>
+                <input
+                  type="text"
+                  value={autoFillData.companyName}
+                  onChange={(e) => setAutoFillData(prev => ({ ...prev, companyName: e.target.value }))}
+                  placeholder="e.g., Nike, Apple, Spotify"
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    background: 'rgba(0,0,0,0.3)',
+                    color: '#fff',
+                    fontSize: '14px',
+                  }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.7)', marginBottom: '6px' }}>
+                  Product Name *
+                </label>
+                <input
+                  type="text"
+                  value={autoFillData.productName}
+                  onChange={(e) => setAutoFillData(prev => ({ ...prev, productName: e.target.value }))}
+                  placeholder="e.g., Running Shoes, iPhone 16"
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    background: 'rgba(0,0,0,0.3)',
+                    color: '#fff',
+                    fontSize: '14px',
+                  }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.7)', marginBottom: '6px' }}>
+                  Website URL (optional)
+                </label>
+                <input
+                  type="url"
+                  value={autoFillData.websiteUrl}
+                  onChange={(e) => setAutoFillData(prev => ({ ...prev, websiteUrl: e.target.value }))}
+                  placeholder="https://example.com"
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    background: 'rgba(0,0,0,0.3)',
+                    color: '#fff',
+                    fontSize: '14px',
+                  }}
+                />
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleAutoFill}
+              disabled={isAutoFilling}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '12px 24px',
+                borderRadius: '8px',
+                border: 'none',
+                background: isAutoFilling 
+                  ? 'rgba(139, 92, 246, 0.5)' 
+                  : 'linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%)',
+                color: '#fff',
+                fontSize: '14px',
+                fontWeight: 600,
+                cursor: isAutoFilling ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              {isAutoFilling ? (
+                <>
+                  <i className="fa-solid fa-spinner fa-spin"></i>
+                  Generating with AI...
+                </>
+              ) : (
+                <>
+                  <i className="fa-solid fa-wand-magic-sparkles"></i>
+                  Auto-Fill with AI
+                </>
+              )}
+            </button>
           </div>
 
           {/* Form Card */}

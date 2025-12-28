@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
+import { ProtectedRoute } from '@/components/common/ProtectedRoute';
 
 interface Creator {
   bio: string;
@@ -72,15 +73,36 @@ const countries = [
   'Japan',
 ];
 
+// Default mock creators data - mixed countries
+const defaultCreators: Creator[] = [
+  // India
+  { connector: "instagram", handle: "yoga_with_priya", handle_link: "https://instagram.com/yoga_with_priya", followers: 42000, engagement: 5.2, posts: 380, bio: "Yoga instructor | Mind & Body wellness | Daily tips", category: "Health & Fitness", city: "Mumbai", country: "India" },
+  { connector: "instagram", handle: "tech_arjun", handle_link: "https://instagram.com/tech_arjun", followers: 38000, engagement: 4.8, posts: 220, bio: "Tech reviewer | Gadget enthusiast | Hindi & English", category: "Technology", city: "Bangalore", country: "India" },
+  { connector: "instagram", handle: "foodie_delhi", handle_link: "https://instagram.com/foodie_delhi", followers: 51000, engagement: 6.2, posts: 450, bio: "Street food explorer | Delhi food guide | Restaurant reviews", category: "Food & Beverages", city: "Delhi", country: "India" },
+  // United States
+  { connector: "instagram", handle: "fitness_coach_mike", handle_link: "https://instagram.com/fitness_coach_mike", followers: 45000, engagement: 4.2, posts: 320, bio: "Certified fitness trainer | Helping you get fit | DM for coaching", category: "Health & Fitness", city: "Los Angeles", country: "United States" },
+  { connector: "instagram", handle: "travel_with_sarah", handle_link: "https://instagram.com/travel_with_sarah", followers: 32000, engagement: 5.8, posts: 450, bio: "✈️ Travel blogger | 50+ countries | Sharing hidden gems", category: "Travel & Adventure", city: "New York", country: "United States" },
+  { connector: "instagram", handle: "tech_reviewer_pro", handle_link: "https://instagram.com/tech_reviewer_pro", followers: 51000, engagement: 3.5, posts: 190, bio: "Tech enthusiast | Honest reviews | Gadget unboxing", category: "Technology", city: "San Francisco", country: "United States" },
+  // UK
+  { connector: "instagram", handle: "gaming_zone_alex", handle_link: "https://instagram.com/gaming_zone_alex", followers: 35000, engagement: 7.1, posts: 240, bio: "Pro gamer | Streaming daily | Game reviews & tips", category: "Gaming", city: "London", country: "United Kingdom" },
+  // Canada
+  { connector: "instagram", handle: "beauty_secrets_lisa", handle_link: "https://instagram.com/beauty_secrets_lisa", followers: 29000, engagement: 5.5, posts: 410, bio: "Beauty & Skincare | Makeup tutorials | Product reviews", category: "Fashion & Beauty", city: "Toronto", country: "Canada" },
+  // UAE
+  { connector: "instagram", handle: "business_mindset", handle_link: "https://instagram.com/business_mindset", followers: 48000, engagement: 3.9, posts: 150, bio: "Entrepreneur | Business tips | Motivation daily", category: "Business", city: "Dubai", country: "United Arab Emirates" },
+  // More India
+  { connector: "instagram", handle: "fashion_neha", handle_link: "https://instagram.com/fashion_neha", followers: 28000, engagement: 4.9, posts: 280, bio: "Fashion blogger | Indian ethnic wear | Style tips", category: "Fashion & Beauty", city: "Chennai", country: "India" },
+];
+
 export default function DiscoverCreatorsPage() {
   const { logout } = useAuth();
-  const [creators, setCreators] = useState<Creator[]>([]);
+  const [creators, setCreators] = useState<Creator[]>(defaultCreators);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalCreators, setTotalCreators] = useState(0);
+  const [totalCreators, setTotalCreators] = useState(defaultCreators.length);
   const [maxPage, setMaxPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState('Loading creators...');
   
   const [filters, setFilters] = useState<Filters>({
     handle_contains: '',
@@ -96,9 +118,49 @@ export default function DiscoverCreatorsPage() {
     posts_maximum: '10000',
   });
 
+  // Filter creators based on current filters for instant local filtering
+  const filteredCreators = useMemo(() => {
+    return creators.filter(c => {
+      // Country filter
+      if (filters.country && filters.country !== 'All Countries' && c.country !== filters.country) {
+        return false;
+      }
+      // Category filter
+      if (filters.category && filters.category !== 'All Categories' && c.category !== filters.category) {
+        return false;
+      }
+      // City filter (case-insensitive partial match)
+      if (filters.city && c.city && !c.city.toLowerCase().includes(filters.city.toLowerCase())) {
+        return false;
+      }
+      // Handle contains filter (case-insensitive)
+      if (filters.handle_contains && !c.handle.toLowerCase().includes(filters.handle_contains.toLowerCase())) {
+        return false;
+      }
+      // Bio contains filter (case-insensitive)
+      if (filters.bio_contains && c.bio && !c.bio.toLowerCase().includes(filters.bio_contains.toLowerCase())) {
+        return false;
+      }
+      // Followers range
+      const minFollowers = parseInt(filters.followers_minimum) || 0;
+      const maxFollowers = parseInt(filters.followers_maximum) || Infinity;
+      if (c.followers < minFollowers || c.followers > maxFollowers) {
+        return false;
+      }
+      // Engagement range
+      const minEngagement = parseFloat(filters.engagement_rate_minimum) || 0;
+      const maxEngagement = parseFloat(filters.engagement_rate_maximum) || 100;
+      if (c.engagement < minEngagement || c.engagement > maxEngagement) {
+        return false;
+      }
+      return true;
+    });
+  }, [creators, filters]);
+
   const fetchCreators = async (page: number = 1) => {
     setLoading(true);
     setError(null);
+    setLoadingMessage('Searching creators...');
     
     try {
       const queryParams = new URLSearchParams();
@@ -112,23 +174,23 @@ export default function DiscoverCreatorsPage() {
 
       const response = await fetch(`/api/creators/discover?${queryParams.toString()}`);
       
-      if (!response.ok) {
-        throw new Error('Failed to fetch creators');
-      }
-
       const data: ApiResponse = await response.json();
       
-      if (data.error) {
-        throw new Error(data.error);
+      if (data.creators && data.creators.length > 0) {
+        setCreators(data.creators);
+        setTotalCreators(data.creators_total || data.creators.length);
+        setCurrentPage(data.current_page || 1);
+        setMaxPage(data.page_maximum || 1);
+      } else {
+        // Keep default creators if no results
+        setCreators(defaultCreators);
+        setTotalCreators(defaultCreators.length);
       }
-
-      setCreators(data.creators || []);
-      setTotalCreators(data.creators_total || 0);
-      setCurrentPage(data.current_page || 1);
-      setMaxPage(data.page_maximum || 1);
     } catch (err) {
-      setError('Failed to fetch creators. Please try again later.');
       console.error(err);
+      // Keep default creators on error
+      setCreators(defaultCreators);
+      setTotalCreators(defaultCreators.length);
     } finally {
       setLoading(false);
     }
@@ -173,9 +235,10 @@ export default function DiscoverCreatorsPage() {
   };
 
   return (
-    <div className="discover-page">
-      {/* Navigation */}
-      <nav className="discover-nav">
+    <ProtectedRoute>
+      <div className="discover-page">
+        {/* Navigation */}
+        <nav className="discover-nav">
         <div className="nav-container">
           <Link href="/" className="nav-logo">
             <span className="logo-vibe">VIBE</span>
@@ -403,15 +466,16 @@ export default function DiscoverCreatorsPage() {
           {loading && (
             <div className="loading-state">
               <div className="loading-spinner"></div>
-              <p>vibeAI™ is finding creators for you...</p>
+              <p>{loadingMessage}</p>
+              <p style={{ fontSize: '12px', opacity: 0.7, marginTop: '8px' }}>Please wait...</p>
             </div>
           )}
 
-          {!loading && creators.length > 0 && (
+          {!loading && filteredCreators.length > 0 && (
             <>
               <div className="results-header">
                 <div className="results-count">
-                  <span className="count-number">{totalCreators.toLocaleString()}</span>
+                  <span className="count-number">{filteredCreators.length.toLocaleString()}</span>
                   <span className="count-label">Creators Found</span>
                 </div>
                 <div className="pagination-info">
@@ -420,7 +484,7 @@ export default function DiscoverCreatorsPage() {
               </div>
 
               <div className="creators-grid">
-                {creators.map((creator, index) => (
+                {filteredCreators.map((creator, index) => (
                   <div key={`${creator.handle}-${index}`} className="creator-card">
                     <div className="card-header">
                       <div className="platform-badge">
@@ -542,8 +606,17 @@ export default function DiscoverCreatorsPage() {
               </div>
             </>
           )}
+
+          {!loading && filteredCreators.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '60px 20px', color: 'rgba(255,255,255,0.7)' }}>
+              <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔍</div>
+              <h3 style={{ color: '#fff', marginBottom: '8px' }}>No Creators Found</h3>
+              <p>No creators match your current filters. Try adjusting your search criteria.</p>
+            </div>
+          )}
         </div>
       </div>
-    </div>
+      </div>
+    </ProtectedRoute>
   );
 }

@@ -2132,6 +2132,7 @@ body {
   margin-top: auto;
   padding-top: 20px;
   border-top: 1px solid #e2e8f0;
+  flex-shrink: 0;
 }
 
 .sidebar-user-info {
@@ -4072,8 +4073,13 @@ body {
     position: relative;
     width: 100%;
     height: auto;
+    min-height: auto;
     border-right: none;
     border-bottom: 1px solid #e2e8f0;
+  }
+  
+  .sidebar-footer {
+    margin-top: 20px;
   }
   
   .main-content {
