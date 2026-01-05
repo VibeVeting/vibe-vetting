@@ -2,7 +2,6 @@
 
 import { Sidebar } from '@/components/common/Sidebar';
 import { TopBar } from '@/components/common/TopBar';
-import { ProtectedRoute } from '@/components/common/ProtectedRoute';
 import Link from 'next/link';
 import { useState, useMemo } from 'react';
 
@@ -45,7 +44,6 @@ export default function MatchesPage() {
   }, [platformFilter, scoreFilter, riskFilter]);
 
   return (
-    <ProtectedRoute>
     <div className="dashboard-wrapper">
       <Sidebar />
       <div className="main-content">
@@ -161,6 +159,5 @@ export default function MatchesPage() {
         </div>
       </div>
     </div>
-    </ProtectedRoute>
   );
 }

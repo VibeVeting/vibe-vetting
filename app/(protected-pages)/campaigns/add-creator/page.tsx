@@ -22,7 +22,6 @@ export default function AddCreatorPage() {
   };
 
   return (
-    <ProtectedRoute>
       <div className="dashboard-wrapper">
         <Sidebar />
         <div className="main-content">
@@ -119,6 +118,5 @@ export default function AddCreatorPage() {
           </div>
         </div>
       </div>
-    </ProtectedRoute>
   );
 }

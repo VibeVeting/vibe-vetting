@@ -2,7 +2,6 @@
 
 import { Sidebar } from '@/components/common/Sidebar';
 import { TopBar } from '@/components/common/TopBar';
-import { ProtectedRoute } from '@/components/common/ProtectedRoute';
 import { useEffect, useState } from 'react';
 
 interface KPI {
@@ -62,7 +61,6 @@ export default function AnalyticsPage() {
   }, []);
 
   return (
-    <ProtectedRoute>
       <div className="dashboard-wrapper">
         <Sidebar />
         <div className="main-content">
@@ -154,6 +152,5 @@ export default function AnalyticsPage() {
           </div>
         </div>
       </div>
-    </ProtectedRoute>
   );
 }

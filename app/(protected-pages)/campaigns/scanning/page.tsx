@@ -2,7 +2,6 @@
 
 import { Sidebar } from '@/components/common/Sidebar';
 import { TopBar } from '@/components/common/TopBar';
-import { ProtectedRoute } from '@/components/common/ProtectedRoute';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -41,7 +40,6 @@ export default function ScanningPage() {
   }, [progress, steps.length]);
 
   return (
-    <ProtectedRoute>
     <div className="dashboard-wrapper">
       <Sidebar />
       <div className="main-content">
@@ -129,6 +127,5 @@ export default function ScanningPage() {
         </div>
       </div>
     </div>
-    </ProtectedRoute>
   );
 }
