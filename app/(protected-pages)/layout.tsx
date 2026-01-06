@@ -1,11 +1,6 @@
+import { ProtectedRoute } from "@/components/common/ProtectedRoute";
+import { ReactNode } from "react";
 
- 
- import {ProtectedRoute} from "@/components/common/ProtectedRoute";
- 
- export default function ProtectedLayout({children}: {children: ReactNode }) {
-  return <ProtectedRoute>
-{children}
-
-  </ProtectedRoute>
-
+export default function ProtectedLayout({ children }: { children: ReactNode }) {
+  return <ProtectedRoute>{children}</ProtectedRoute>;
 }
