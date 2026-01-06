@@ -2,7 +2,6 @@
 
 import { Sidebar } from '@/components/common/Sidebar';
 import { TopBar } from '@/components/common/TopBar';
-import { ProtectedRoute } from '@/components/common/ProtectedRoute';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -22,7 +21,6 @@ export default function AddCreatorPage() {
   };
 
   return (
-    <ProtectedRoute>
       <div className="dashboard-wrapper">
         <Sidebar />
         <div className="main-content">
@@ -119,6 +117,5 @@ export default function AddCreatorPage() {
           </div>
         </div>
       </div>
-    </ProtectedRoute>
   );
 }

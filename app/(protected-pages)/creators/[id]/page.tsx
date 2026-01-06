@@ -2,7 +2,6 @@
 
 import { Sidebar } from '@/components/common/Sidebar';
 import { TopBar } from '@/components/common/TopBar';
-import { ProtectedRoute } from '@/components/common/ProtectedRoute';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 
@@ -38,7 +37,6 @@ export default function CreatorProfilePage() {
   const params = useParams();
 
   return (
-    <ProtectedRoute>
       <div className="dashboard-wrapper">
         <Sidebar />
         <div className="main-content">
@@ -184,6 +182,5 @@ export default function CreatorProfilePage() {
           </div>
         </div>
       </div>
-    </ProtectedRoute>
   );
 }

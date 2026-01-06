@@ -5,7 +5,6 @@ import { TopBar } from '@/components/common/TopBar';
 import { StatsGrid } from './components/StatsGrid';
 import { ChartsSection } from './components/ChartsSection';
 import { RecentAnalysesTable } from './components/RecentAnalysesTable';
-import { ProtectedRoute } from '@/components/common/ProtectedRoute';
 import { useAuth } from '@/lib/auth-context';
 
 export default function DashboardPage() {
@@ -23,7 +22,6 @@ export default function DashboardPage() {
   });
 
   return (
-    <ProtectedRoute>
       <div className="dashboard-wrapper">
         <Sidebar />
         <div className="main-content">
@@ -44,6 +42,5 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
-    </ProtectedRoute>
   );
 }

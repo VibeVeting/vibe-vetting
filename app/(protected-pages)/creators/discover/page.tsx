@@ -3,7 +3,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
-import { ProtectedRoute } from '@/components/common/ProtectedRoute';
 
 interface Creator {
   bio: string;
@@ -255,7 +254,6 @@ export default function DiscoverCreatorsPage() {
   };
 
   return (
-    <ProtectedRoute>
       <div className="discover-page">
         {/* Navigation */}
         <nav className="discover-nav">
@@ -662,6 +660,5 @@ export default function DiscoverCreatorsPage() {
         </div>
       </div>
       </div>
-    </ProtectedRoute>
   );
 }

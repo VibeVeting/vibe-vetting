@@ -2,7 +2,6 @@
 
 import { Sidebar } from '@/components/common/Sidebar';
 import { TopBar } from '@/components/common/TopBar';
-import { ProtectedRoute } from '@/components/common/ProtectedRoute';
 import { useAuth } from '@/lib/auth-context';
 import { useState } from 'react';
 
@@ -17,7 +16,6 @@ export default function SettingsPage() {
   });
 
   return (
-    <ProtectedRoute>
       <div className="dashboard-wrapper">
         <Sidebar />
         <div className="main-content">
@@ -208,6 +206,5 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
-    </ProtectedRoute>
   );
 }
