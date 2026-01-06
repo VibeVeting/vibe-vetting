@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useAuth } from '@/lib/auth-context';
+import { useAuth } from '@/contexts/auth-context';
 
 const menuItems = [
   { icon: 'fa-home', label: 'Dashboard', href: '/dashboard' },

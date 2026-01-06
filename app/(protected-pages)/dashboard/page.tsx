@@ -5,7 +5,7 @@ import { TopBar } from '@/components/common/TopBar';
 import { StatsGrid } from './components/StatsGrid';
 import { ChartsSection } from './components/ChartsSection';
 import { RecentAnalysesTable } from './components/RecentAnalysesTable';
-import { useAuth } from '@/lib/auth-context';
+import { useAuth } from '@/contexts/auth-context';
 
 export default function DashboardPage() {
   const { user } = useAuth();
