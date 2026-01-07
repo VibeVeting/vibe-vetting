@@ -13,8 +13,10 @@ export class LinkedinLoginService {
         path: "/",
       }
 
-    await page.browserContext().setCookie(cookieData);
-    await page.reload({ waitUntil: "domcontentloaded", timeout: 45000 });
+    await page.setCookie(cookieData);
+    await page.reload({ waitUntil: "domcontentloaded", timeout: 30000 });
+    // Wait for the feed to fully load after login
+    await new Promise((resolve) => setTimeout(resolve, 2000));
   }
 
   async performLogin(page: Page) {

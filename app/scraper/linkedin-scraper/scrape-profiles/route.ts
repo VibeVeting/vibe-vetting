@@ -2,12 +2,14 @@ import { NextResponse } from "next/server";
 import { LinkedinScraperWorkflow } from "../linkedin-scraper-workflow";
 
 const profileUrls = [
-  "https://www.linkedin.com/in/luraelumpkin/",
-  "https://www.linkedin.com/in/abdulaziz-halabi-46379a398/",
-  "https://www.linkedin.com/in/georgiajuwono/",
-  "https://www.linkedin.com/in/sidney-lam/",
-  "https://www.linkedin.com/in/vinay-prajapati-076/",
-  "https://www.linkedin.com/in/itzsunny/",
+  // "https://www.linkedin.com/in/luraelumpkin/",
+  // "https://www.linkedin.com/in/abdulaziz-halabi-46379a398/",
+  // "https://www.linkedin.com/in/georgiajuwono/",
+  // "https://www.linkedin.com/in/sidney-lam/",
+  // "https://www.linkedin.com/in/vinay-prajapati-076/",
+  // "https://www.linkedin.com/in/itzsunny/",
+  "https://www.linkedin.com/in/udayanw",
+  "https://www.linkedin.com/in/pranav-bakre/"
   // Add more profile URLs as needed
 ];
 

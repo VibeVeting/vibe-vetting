@@ -31,10 +31,23 @@ function textOrNull(value?: string | null) {
 
 export class LinkedinProfileExtractionService {
   async extractProfile(page: Page, profileUrl: string): Promise<ProfileSummary> {
-    await page.goto(profileUrl, { waitUntil: "domcontentloaded", timeout: 45000 });
+    await page.goto(profileUrl, { waitUntil: "domcontentloaded", timeout: 30000 });
 
     // Wait for the main profile container; bail fast if it never renders
-    await page.waitForSelector("main", { timeout: 30000 });
+    await page.waitForSelector("main", { timeout: 15000 });
+    
+    // Extra wait for dynamic content to load
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    
+    // Scroll down to trigger lazy-loaded content
+    await page.evaluate(() => {
+      window.scrollTo(0, document.body.scrollHeight / 2);
+    });
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await page.evaluate(() => {
+      window.scrollTo(0, 0);
+    });
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     const name = await page.$eval("main h1", (el) => window.puppeteer.visibleText(el)).catch(() => null);
     const headline = await page
@@ -75,13 +88,16 @@ export class LinkedinProfileExtractionService {
       const seeAllExp = await page.$("#navigation-index-see-all-experiences");
       if (seeAllExp) {
         await Promise.all([
-          page.waitForNavigation({ waitUntil: "domcontentloaded", timeout: 45000 }).catch(() => null),
+          page.waitForNavigation({ waitUntil: "domcontentloaded", timeout: 30000 }).catch(() => null),
           seeAllExp.click(),
         ]);
 
         await page
           .waitForSelector("main div[data-view-name='profile-component-entity']", { timeout: 15000 })
           .catch(() => null);
+        
+        // Extra wait for experience items to fully load
+        await new Promise((resolve) => setTimeout(resolve, 1500));
 
         const expanded = await page.$$eval("main div[data-view-name='profile-component-entity']", (items) => {
           const results: Array<{ title: string; company: string; dateRange: string; location: string }> = [];
@@ -182,13 +198,16 @@ export class LinkedinProfileExtractionService {
       const seeAllEdu = await page.$("#navigation-index-see-all-education");
       if (seeAllEdu) {
         await Promise.all([
-          page.waitForNavigation({ waitUntil: "domcontentloaded", timeout: 45000 }).catch(() => null),
+          page.waitForNavigation({ waitUntil: "domcontentloaded", timeout: 30000 }).catch(() => null),
           seeAllEdu.click(),
         ]);
 
         await page
           .waitForSelector("main div[data-view-name='profile-component-entity']", { timeout: 15000 })
           .catch(() => null);
+        
+        // Extra wait for education items to fully load
+        await new Promise((resolve) => setTimeout(resolve, 1500));
 
         const expanded = await page.$$eval("main div[data-view-name='profile-component-entity']", (items) => {
           return items.map((item) => {

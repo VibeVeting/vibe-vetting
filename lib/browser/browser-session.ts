@@ -16,7 +16,7 @@ async function launchLocalBrowser(): Promise<BrowserSession> {
   puppeteer.default.use(StealthPlugin.default());
 
   const browser = await puppeteer.default.launch({
-    headless: true,
+    headless: false,
     executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
     args: [
       "--js-flags=--expose-gc",
