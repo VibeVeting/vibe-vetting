@@ -2,10 +2,10 @@ import fs from "fs";
 import path from "path";
 import ts from "typescript";
 
-import * as constants from "./constants";
+import * as utils from "./utils";
 
 const puppeteerHelpers = {
-  ...constants,
+  ...utils,
 };
 
 export type PuppeteerHelpersType = typeof puppeteerHelpers;
@@ -20,18 +20,14 @@ const HELPER_EXPORTS = Object.keys(puppeteerHelpers);
 function buildHelpersBundle(): string {
   const browserDir = path.join(process.cwd(), "lib", "browser");
 
-  const sourceFiles = [
-    path.join(browserDir, "constants.ts"),
-  ];
+  const sourceFiles = [path.join(browserDir, "utils.ts")];
 
   let combinedSource = "";
 
   for (const filePath of sourceFiles) {
     const content = fs.readFileSync(filePath, "utf-8");
     // Remove export/import keywords so functions become local declarations
-    const cleaned = content
-      .replace(/^export\s+/gm, "")
-      .replace(/^import\s+.*$/gm, "");
+    const cleaned = content.replace(/^export\s+/gm, "").replace(/^import\s+.*$/gm, "");
     combinedSource += cleaned + "\n";
   }
 
@@ -45,9 +41,7 @@ function buildHelpersBundle(): string {
   });
 
   // Generate exports to window.puppeteer
-  const exports = HELPER_EXPORTS.map(
-    (name) => `window.puppeteer.${name} = ${name};`,
-  ).join("\n");
+  const exports = HELPER_EXPORTS.map((name) => `window.puppeteer.${name} = ${name};`).join("\n");
 
   return `
     (function(){

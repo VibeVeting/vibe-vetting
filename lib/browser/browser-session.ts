@@ -1,22 +1,10 @@
-import {
-  type Browser,
-  connect,
-  type Page,
-  type PuppeteerLifeCycleEvent,
-} from "puppeteer-core";
+import { type Browser, connect, type Page } from "puppeteer-core";
 import { getInjectionScript } from "./helpers";
 
 interface BrowserSession {
   browser: Browser;
   disconnect: () => Promise<void>;
 }
-
-const strategies: { waitUntil: PuppeteerLifeCycleEvent; timeout: number }[] = [
-  { waitUntil: "load", timeout: 45000 },
-  { waitUntil: "domcontentloaded", timeout: 45000 },
-  { waitUntil: "networkidle2", timeout: 45000 },
-  { waitUntil: "networkidle0", timeout: 45000 },
-];
 
 /**
  * Launch a local browser for development using puppeteer-extra with stealth
@@ -63,11 +51,7 @@ async function connectBrowser(): Promise<BrowserSession> {
   };
 }
 
-async function closeSession(
-  page: Page,
-  url: string,
-  disconnect: () => Promise<void>,
-) {
+async function closeSession(page: Page, url: string, disconnect: () => Promise<void>) {
   try {
     try {
       const client = await page.createCDPSession();
@@ -87,9 +71,8 @@ async function closeSession(
 }
 
 export async function createBrowserSession(url: string) {
-  const { browser, disconnect } = process.env.NODE_ENV === "development"
-    ? await launchLocalBrowser()
-    : await connectBrowser();
+  const { browser, disconnect } =
+    process.env.NODE_ENV === "development" ? await launchLocalBrowser() : await connectBrowser();
 
   console.log(`🌐 Visiting: ${url}`);
 
@@ -100,33 +83,20 @@ export async function createBrowserSession(url: string) {
   await page.evaluateOnNewDocument(getInjectionScript());
 
   try {
-    for (const strategy of strategies) {
-      try {
-        const response = await page.goto(url, strategy);
-        const status = response?.status() ?? 0;
+    const response = await page.goto(url, { waitUntil: "domcontentloaded", timeout: 45000 });
+    const status = response?.status() ?? 0;
 
-        if (status >= 400) {
-          throw new Error(`HTTP ${status}`);
-        }
-
-        console.log(
-          `✓ Page loaded with ${strategy.waitUntil} (status: ${status})`,
-        );
-
-        return {
-          browser,
-          page,
-          closeSession: () => closeSession(page, url, disconnect),
-        };
-      } catch (err) {
-        console.log(
-          `✗ page.goto failed with ${strategy.waitUntil}:`,
-          err instanceof Error ? err.message : err,
-        );
-      }
+    if (status >= 400) {
+      throw new Error(`HTTP ${status}`);
     }
 
-    throw new Error(`Failed to load ${url} with all strategies`);
+    console.log(`✓ Page loaded with (status: ${status})`);
+
+    return {
+      browser,
+      page,
+      closeSession: () => closeSession(page, url, disconnect),
+    };
   } catch (err) {
     await closeSession(page, url, disconnect);
     throw err;
