@@ -73,6 +73,58 @@ const features = [
   },
 ];
 
+// NEW: Advanced Intelligence Features (USPs)
+const advancedFeatures = [
+  {
+    icon: "fa-binoculars",
+    title: "Competitor Intelligence",
+    description: "Discover which creators your competitors are partnering with and find untapped talent before they do.",
+    stat: "10x",
+    statLabel: "Faster Discovery",
+    gradient: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+  },
+  {
+    icon: "fa-shield-halved",
+    title: "Fake Engagement Shield",
+    description: "Our AI detects bot followers, purchased engagement, and inflated metrics with 99.2% accuracy.",
+    stat: "99.2%",
+    statLabel: "Bot Detection",
+    gradient: "linear-gradient(135deg, #ef4444 0%, #f97316 100%)",
+  },
+  {
+    icon: "fa-triangle-exclamation",
+    title: "Crisis Early Warning",
+    description: "Get alerts before a creator controversy goes viral. AI monitors sentiment shifts in real-time.",
+    stat: "48h",
+    statLabel: "Early Detection",
+    gradient: "linear-gradient(135deg, #f59e0b 0%, #eab308 100%)",
+  },
+  {
+    icon: "fa-chart-line",
+    title: "ROI Predictor",
+    description: "AI-powered pricing recommendations and ROI forecasts based on historical campaign data.",
+    stat: "3.2x",
+    statLabel: "Avg ROI Increase",
+    gradient: "linear-gradient(135deg, #22c55e 0%, #10b981 100%)",
+  },
+  {
+    icon: "fa-clock",
+    title: "Optimal Timing AI",
+    description: "Predict the best collaboration windows based on creator content patterns and audience activity.",
+    stat: "47%",
+    statLabel: "More Engagement",
+    gradient: "linear-gradient(135deg, #00f5ff 0%, #0099ff 100%)",
+  },
+  {
+    icon: "fa-dna",
+    title: "Brand DNA Matching",
+    description: "Create your unique brand fingerprint and find creators with matching content DNA automatically.",
+    stat: "95%",
+    statLabel: "Match Accuracy",
+    gradient: "linear-gradient(135deg, #ec4899 0%, #a855f7 100%)",
+  },
+];
+
 const matchingSteps = [
   { num: "01", name: "Deep Content Scan", info: "AI analyzes every post, story, comment for brand alignment" },
   { num: "02", name: "Voice Style Match", info: "Identifies creators whose style matches your brand voice" },
@@ -239,6 +291,7 @@ export default function LandingPage() {
           <div className="nav-links">
             <a href="#features" className="nav-link">Features</a>
             <a href="#how-it-works" className="nav-link">How it Works</a>
+            <a href="#advanced" className="nav-link">Advanced AI</a>
             <a href="#pricing" className="nav-link">Pricing</a>
             <a href="#faq" className="nav-link">FAQ</a>
           </div>
@@ -438,6 +491,68 @@ export default function LandingPage() {
                 Only creators who pass comprehensive AI screening and demonstrate consistent brand value 
                 enhancement potential are recommended. We guarantee 90.9% accuracy.
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Advanced Intelligence Section - NEW USPs */}
+      <section className="advanced-section" id="advanced">
+        <div className="section-container">
+          <div className="section-header">
+            <div className="section-badge glass">
+              <span className="badge-pulse" />
+              <span>🚀</span>
+              <span>Advanced Intelligence</span>
+            </div>
+            <h2 className="section-title">
+              <span className="title-gradient">Beyond Basic Analytics</span>
+              <span className="title-sub">Enterprise-Grade Intelligence</span>
+            </h2>
+            <p className="section-desc">
+              Gain unfair advantages with AI capabilities your competitors don&apos;t have access to yet
+            </p>
+          </div>
+
+          <div className="advanced-grid">
+            {advancedFeatures.map((feature, index) => (
+              <div key={index} className="advanced-card glass">
+                <div className="advanced-card-header">
+                  <div className="advanced-icon" style={{ background: feature.gradient }}>
+                    <i className={`fa-solid ${feature.icon}`} />
+                  </div>
+                  <div className="advanced-stat">
+                    <span className="stat-number">{feature.stat}</span>
+                    <span className="stat-text">{feature.statLabel}</span>
+                  </div>
+                </div>
+                <h3 className="advanced-title">{feature.title}</h3>
+                <p className="advanced-desc">{feature.description}</p>
+                <div className="advanced-card-line" style={{ background: feature.gradient }} />
+              </div>
+            ))}
+          </div>
+
+          {/* Social Proof Banner */}
+          <div className="social-proof-banner glass">
+            <div className="proof-item">
+              <i className="fa-solid fa-trophy" style={{ color: '#f59e0b' }} />
+              <span>Top 10 MarTech 2025</span>
+            </div>
+            <div className="proof-divider" />
+            <div className="proof-item">
+              <i className="fa-solid fa-lock" style={{ color: '#22c55e' }} />
+              <span>SOC 2 Compliant</span>
+            </div>
+            <div className="proof-divider" />
+            <div className="proof-item">
+              <i className="fa-solid fa-globe" style={{ color: '#00f5ff' }} />
+              <span>GDPR Ready</span>
+            </div>
+            <div className="proof-divider" />
+            <div className="proof-item">
+              <i className="fa-solid fa-bolt" style={{ color: '#a855f7' }} />
+              <span>99.9% Uptime</span>
             </div>
           </div>
         </div>

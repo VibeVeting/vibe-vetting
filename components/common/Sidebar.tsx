@@ -393,11 +393,71 @@ export function Sidebar() {
           border: 1px solid rgba(102, 126, 234, 0.2);
           border-radius: 16px;
           text-align: center;
+          position: relative;
+        }
+
+        .upgrade-sparkles {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 60px;
+          pointer-events: none;
+          z-index: 1;
+        }
+
+        .sparkle {
+          position: absolute;
+          color: #f59e0b;
+          font-size: 14px;
+          animation: sparkleFloat 3s ease-in-out infinite;
+        }
+
+        .sparkle-1 {
+          top: 15px;
+          left: 20px;
+          animation-delay: 0s;
+        }
+
+        .sparkle-2 {
+          top: 25px;
+          right: 25px;
+          animation-delay: 1s;
+          font-size: 12px;
+        }
+
+        .sparkle-3 {
+          top: 40px;
+          left: 40px;
+          animation-delay: 2s;
+          font-size: 10px;
+        }
+
+        @keyframes sparkleFloat {
+          0%, 100% {
+            opacity: 0.4;
+            transform: translateY(0) scale(1);
+          }
+          50% {
+            opacity: 1;
+            transform: translateY(-5px) scale(1.2);
+          }
         }
 
         .upgrade-icon {
-          font-size: 28px;
-          margin-bottom: 8px;
+          width: 50px;
+          height: 50px;
+          background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+          border-radius: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 12px;
+          font-size: 22px;
+          color: #fff;
+          box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+          position: relative;
+          z-index: 2;
         }
 
         .sidebar-upgrade-card h4 {
@@ -405,6 +465,8 @@ export function Sidebar() {
           font-weight: 700;
           color: #1a202c;
           margin-bottom: 6px;
+          position: relative;
+          z-index: 2;
         }
 
         .sidebar-upgrade-card p {
@@ -412,10 +474,15 @@ export function Sidebar() {
           color: #718096;
           line-height: 1.5;
           margin-bottom: 14px;
+          position: relative;
+          z-index: 2;
         }
 
         .upgrade-btn {
-          display: block;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
           padding: 10px 16px;
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           color: white;
@@ -424,6 +491,8 @@ export function Sidebar() {
           font-weight: 700;
           border-radius: 10px;
           transition: all 0.2s ease;
+          position: relative;
+          z-index: 2;
         }
 
         .upgrade-btn:hover {
