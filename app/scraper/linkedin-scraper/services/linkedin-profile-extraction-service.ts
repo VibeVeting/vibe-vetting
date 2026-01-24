@@ -21,6 +21,7 @@ export type ProfileSummary = {
   about: string | null;
   experiences: Experience[];
   education: Education[];
+  error?: string;
 };
 
 function textOrNull(value?: string | null) {
@@ -30,11 +31,45 @@ function textOrNull(value?: string | null) {
 }
 
 export class LinkedinProfileExtractionService {
-  async extractProfile(page: Page, profileUrl: string): Promise<ProfileSummary> {
-    await page.goto(profileUrl, { waitUntil: "domcontentloaded", timeout: 30000 });
+  async extractProfile(page: Page, profileUrl: string): Promise<ProfileSummary & { error?: string }> {
+    try {
+      const response = await page.goto(profileUrl, { waitUntil: "domcontentloaded", timeout: 30000 });
+      
+      // Check for HTTP error status codes
+      if (response && response.status() >= 400) {
+        console.log(`Profile returned HTTP ${response.status()}: ${profileUrl}`);
+        return this.getEmptyProfile(`HTTP error ${response.status()}`);
+      }
 
-    // Wait for the main profile container; bail fast if it never renders
-    await page.waitForSelector("main", { timeout: 15000 });
+      // Wait for the main profile container; bail fast if it never renders
+      try {
+        await page.waitForSelector("main", { timeout: 15000 });
+      } catch {
+        console.log(`Main container not found for: ${profileUrl}`);
+        return this.getEmptyProfile("Page structure not found");
+      }
+      
+      // Check if we're on a "page not found" or "profile unavailable" page
+      const pageContent = await page.content();
+      const invalidProfileIndicators = [
+        "Page not found",
+        "This page doesn't exist",
+        "profile is not available",
+        "Profile not found",
+        "This LinkedIn Page isn't available",
+        "couldn't find that page",
+        "member-unavailable",
+        "out-of-network"
+      ];
+      
+      const isInvalidProfile = invalidProfileIndicators.some(indicator => 
+        pageContent.toLowerCase().includes(indicator.toLowerCase())
+      );
+      
+      if (isInvalidProfile) {
+        console.log(`Invalid/unavailable profile detected: ${profileUrl}`);
+        return this.getEmptyProfile("Profile not available or not found");
+      }
     
     // Extra wait for dynamic content to load
     await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -316,6 +351,23 @@ export class LinkedinProfileExtractionService {
       about: textOrNull(about),
       experiences: cleanedExperiences,
       education,
+    };
+    } catch (error) {
+      console.error(`Error extracting profile ${profileUrl}:`, error);
+      return this.getEmptyProfile(`Extraction failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  private getEmptyProfile(errorMessage: string): ProfileSummary & { error: string } {
+    return {
+      name: null,
+      headline: null,
+      location: null,
+      followers: null,
+      about: null,
+      experiences: [],
+      education: [],
+      error: errorMessage,
     };
   }
 }

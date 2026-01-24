@@ -2,6 +2,7 @@
 
 import { Sidebar } from '@/components/common/Sidebar';
 import { TopBar } from '@/components/common/TopBar';
+import { CardMenu, MenuItem } from '@/components/common/CardMenu';
 import { useEffect, useState } from 'react';
 
 interface KPI {
@@ -91,9 +92,11 @@ export default function AnalyticsPage() {
             <div className="chart-card">
               <div className="chart-header">
                 <h3 className="chart-title">Creator Verification Trends</h3>
-                <button className="card-menu">
-                  <i className="fa-solid fa-ellipsis-vertical"></i>
-                </button>
+                <CardMenu items={[
+                  { label: 'Download Chart', icon: 'fa-download', onClick: () => alert('Download coming soon!') },
+                  { label: 'View Full Report', icon: 'fa-expand', onClick: () => alert('Full report coming soon!') },
+                  { label: 'Share', icon: 'fa-share-nodes', onClick: () => alert('Share coming soon!') },
+                ]} />
               </div>
               <div className="chart-placeholder">
                 <i className="fa-solid fa-chart-area" style={{ fontSize: '32px', marginBottom: '10px' }}></i>
@@ -105,9 +108,11 @@ export default function AnalyticsPage() {
             <div className="chart-card">
               <div className="chart-header">
                 <h3 className="chart-title">Platform Distribution</h3>
-                <button className="card-menu">
-                  <i className="fa-solid fa-ellipsis-vertical"></i>
-                </button>
+                <CardMenu items={[
+                  { label: 'Download Chart', icon: 'fa-download', onClick: () => alert('Download coming soon!') },
+                  { label: 'View Full Report', icon: 'fa-expand', onClick: () => alert('Full report coming soon!') },
+                  { label: 'Share', icon: 'fa-share-nodes', onClick: () => alert('Share coming soon!') },
+                ]} />
               </div>
               <div className="chart-placeholder">
                 <i className="fa-solid fa-chart-pie" style={{ fontSize: '32px', marginBottom: '10px' }}></i>

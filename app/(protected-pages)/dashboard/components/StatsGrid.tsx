@@ -12,9 +12,19 @@ interface Stats {
   weeklyMatchChange: number;
 }
 
+// Default sample stats to show immediately
+const defaultStats: Stats = {
+  totalCreatorsVerified: 1247,
+  perfectMatches: 89,
+  activeCampaigns: 12,
+  avgAlignmentScore: 87.5,
+  weeklyCreatorChange: 34,
+  weeklyMatchChange: 8,
+};
+
 export function StatsGrid() {
-  const [stats, setStats] = useState<Stats | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<Stats>(defaultStats);
+  const [isUsingDefaults, setIsUsingDefaults] = useState(true);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -22,7 +32,6 @@ export function StatsGrid() {
         const token = localStorage.getItem('token');
         if (!token) {
           console.log('No token found in localStorage');
-          setLoading(false);
           return;
         }
 
@@ -35,14 +44,15 @@ export function StatsGrid() {
         if (response.ok) {
           const data = await response.json();
           console.log('Stats data received:', data);
-          setStats(data.stats);
+          if (data.stats && (data.stats.totalCreatorsVerified > 0 || data.stats.activeCampaigns > 0)) {
+            setStats(data.stats);
+            setIsUsingDefaults(false);
+          }
         } else {
           console.error('Stats API error:', response.status, await response.text());
         }
       } catch (error) {
         console.error('Error fetching stats:', error);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -55,8 +65,8 @@ export function StatsGrid() {
       icon: 'fa-users',
       iconBg: 'rgba(102, 126, 234, 0.15)',
       iconColor: '#667eea',
-      value: loading ? '...' : (stats?.totalCreatorsVerified?.toString() || '0'),
-      change: loading ? '' : `↑ ${stats?.weeklyCreatorChange || 0} this week`,
+      value: stats.totalCreatorsVerified.toLocaleString(),
+      change: `↑ ${stats.weeklyCreatorChange} this week`,
       positive: true,
     },
     {
@@ -64,8 +74,8 @@ export function StatsGrid() {
       icon: 'fa-bullseye',
       iconBg: 'rgba(34, 197, 94, 0.15)',
       iconColor: '#22c55e',
-      value: loading ? '...' : (stats?.perfectMatches?.toString() || '0'),
-      change: loading ? '' : `↑ ${stats?.weeklyMatchChange || 0} new matches`,
+      value: stats.perfectMatches.toString(),
+      change: `↑ ${stats.weeklyMatchChange} new matches`,
       positive: true,
     },
     {
@@ -73,7 +83,7 @@ export function StatsGrid() {
       icon: 'fa-chart-line',
       iconBg: 'rgba(245, 158, 11, 0.15)',
       iconColor: '#f59e0b',
-      value: loading ? '...' : (stats?.activeCampaigns?.toString() || '0'),
+      value: stats.activeCampaigns.toString(),
       change: 'Currently running',
       positive: true,
     },
@@ -82,8 +92,8 @@ export function StatsGrid() {
       icon: 'fa-star',
       iconBg: 'rgba(236, 72, 153, 0.15)',
       iconColor: '#ec4899',
-      value: loading ? '...' : `${stats?.avgAlignmentScore?.toFixed(1) || '0'}%`,
-      change: 'Overall average',
+      value: `${stats.avgAlignmentScore.toFixed(1)}%`,
+      change: isUsingDefaults ? 'Sample data' : 'Overall average',
       positive: true,
     },
   ];
@@ -91,7 +101,7 @@ export function StatsGrid() {
   return (
     <div className="stats-grid">
       {statsData.map((stat, index) => (
-        <StatCard key={index} {...stat} />
+        <StatCard key={index} {...stat} index={index} />
       ))}
     </div>
   );

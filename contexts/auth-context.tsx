@@ -1,7 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { useRouter } from "next/navigation";
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
 
 interface User {
   id: string;
@@ -21,43 +20,70 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Helper to safely check if we're in browser
+const isBrowser = () => typeof window !== "undefined";
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
 
   useEffect(() => {
-    // Check for existing token on mount
-    const storedToken = localStorage.getItem("token");
-    const storedUser = localStorage.getItem("user");
+    // Only access localStorage in browser
+    if (!isBrowser()) {
+      setLoading(false);
+      return;
+    }
 
-    if (storedToken && storedUser) {
-      try {
+    try {
+      const storedToken = localStorage.getItem("token");
+      const storedUser = localStorage.getItem("user");
+
+      if (storedToken && storedUser) {
         setToken(storedToken);
         setUser(JSON.parse(storedUser));
-      } catch {
+      }
+    } catch {
+      // Silently handle localStorage errors
+      try {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
+      } catch {
+        // Ignore cleanup errors
       }
     }
     setLoading(false);
   }, []);
 
-  const login = (newToken: string, newUser: User) => {
+  const login = useCallback((newToken: string, newUser: User) => {
     setToken(newToken);
     setUser(newUser);
-    localStorage.setItem("token", newToken);
-    localStorage.setItem("user", JSON.stringify(newUser));
-  };
+    if (isBrowser()) {
+      try {
+        localStorage.setItem("token", newToken);
+        localStorage.setItem("user", JSON.stringify(newUser));
+      } catch {
+        // Ignore localStorage errors
+      }
+    }
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setToken(null);
     setUser(null);
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    router.push("/login");
-  };
+    if (isBrowser()) {
+      try {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+      } catch {
+        // Ignore localStorage errors
+      }
+    }
+    // Use window.location for navigation to avoid router issues
+    if (isBrowser()) {
+      window.location.href = "/login";
+    }
+  }, []);
 
   return (
     <AuthContext.Provider

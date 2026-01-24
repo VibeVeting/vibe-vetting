@@ -188,11 +188,12 @@ export default function CreateCampaignPage() {
 
           {/* AI Auto-Fill Box */}
           <div className="ai-autofill-card" style={{
-            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%)',
-            border: '1px solid rgba(139, 92, 246, 0.3)',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            border: 'none',
             borderRadius: '16px',
             padding: '24px',
             marginBottom: '24px',
+            boxShadow: '0 10px 40px rgba(102, 126, 234, 0.3)',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
               <div style={{
@@ -230,11 +231,12 @@ export default function CreateCampaignPage() {
                     width: '100%',
                     padding: '10px 14px',
                     borderRadius: '8px',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    background: 'rgba(0,0,0,0.3)',
+                    border: '1px solid rgba(255,255,255,0.25)',
+                    background: 'rgba(255,255,255,0.15)',
                     color: '#fff',
                     fontSize: '14px',
                   }}
+                  className="autofill-input"
                 />
               </div>
               <div>
@@ -250,11 +252,12 @@ export default function CreateCampaignPage() {
                     width: '100%',
                     padding: '10px 14px',
                     borderRadius: '8px',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    background: 'rgba(0,0,0,0.3)',
+                    border: '1px solid rgba(255,255,255,0.25)',
+                    background: 'rgba(255,255,255,0.15)',
                     color: '#fff',
                     fontSize: '14px',
                   }}
+                  className="autofill-input"
                 />
               </div>
               <div>
@@ -270,11 +273,12 @@ export default function CreateCampaignPage() {
                     width: '100%',
                     padding: '10px 14px',
                     borderRadius: '8px',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    background: 'rgba(0,0,0,0.3)',
+                    border: '1px solid rgba(255,255,255,0.25)',
+                    background: 'rgba(255,255,255,0.15)',
                     color: '#fff',
                     fontSize: '14px',
                   }}
+                  className="autofill-input"
                 />
               </div>
             </div>
@@ -293,13 +297,14 @@ export default function CreateCampaignPage() {
                   width: '100%',
                   padding: '12px 14px',
                   borderRadius: '8px',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  background: 'rgba(0,0,0,0.3)',
+                  border: '1px solid rgba(255,255,255,0.25)',
+                  background: 'rgba(255,255,255,0.15)',
                   color: '#fff',
                   fontSize: '14px',
                   resize: 'vertical',
                   fontFamily: 'inherit',
                 }}
+                className="autofill-input"
               />
             </div>
 

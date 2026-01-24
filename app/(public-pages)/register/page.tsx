@@ -1,11 +1,12 @@
 "use client";
 
 import Link from 'next/link';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -16,6 +17,54 @@ export default function RegisterPage() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState<string | null>(null);
+
+  // Redirect if already logged in or handle OAuth callback
+  useEffect(() => {
+    // Check for OAuth token in cookies
+    const cookies = document.cookie.split(';').reduce((acc, cookie) => {
+      const [key, value] = cookie.trim().split('=');
+      acc[key] = value;
+      return acc;
+    }, {} as Record<string, string>);
+
+    if (cookies.oauth_token) {
+      // Transfer OAuth data to localStorage
+      localStorage.setItem('token', cookies.oauth_token);
+      if (cookies.oauth_user) {
+        try {
+          localStorage.setItem('user', decodeURIComponent(cookies.oauth_user));
+        } catch (e) {
+          console.error('Error parsing oauth_user cookie:', e);
+        }
+      }
+      // Clear OAuth cookies
+      document.cookie = 'oauth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
+      document.cookie = 'oauth_user=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
+      window.location.href = '/dashboard';
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    if (token) {
+      window.location.href = '/dashboard';
+      return;
+    }
+
+    // Check for OAuth errors
+    const oauthError = searchParams.get('error');
+    if (oauthError) {
+      const errorMessages: Record<string, string> = {
+        oauth_failed: 'OAuth authentication failed. Please try again.',
+        oauth_denied: 'You denied the authentication request.',
+        no_code: 'No authorization code received.',
+        invalid_state: 'Invalid state. Please try again.',
+        callback_failed: 'Authentication callback failed. Please try again.',
+        email_required: 'Email is required for authentication. Please ensure your account has an email.',
+      };
+      setError(errorMessages[oauthError] || 'Authentication failed. Please try again.');
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -192,13 +241,37 @@ export default function RegisterPage() {
           </div>
 
           <div className="social-buttons">
-            <button type="button" className="social-btn">
-              <i className="fa-brands fa-google"></i>
+            <button 
+              type="button" 
+              className="social-btn"
+              onClick={() => {
+                setOauthLoading('google');
+                window.location.href = '/api/auth/google';
+              }}
+              disabled={oauthLoading !== null}
+            >
+              {oauthLoading === 'google' ? (
+                <i className="fa-solid fa-spinner fa-spin"></i>
+              ) : (
+                <i className="fa-brands fa-google"></i>
+              )}
               Google
             </button>
-            <button type="button" className="social-btn">
-              <i className="fa-brands fa-linkedin"></i>
-              LinkedIn
+            <button 
+              type="button" 
+              className="social-btn"
+              onClick={() => {
+                setOauthLoading('meta');
+                window.location.href = '/api/auth/meta';
+              }}
+              disabled={oauthLoading !== null}
+            >
+              {oauthLoading === 'meta' ? (
+                <i className="fa-solid fa-spinner fa-spin"></i>
+              ) : (
+                <i className="fa-brands fa-meta"></i>
+              )}
+              Meta
             </button>
           </div>
 

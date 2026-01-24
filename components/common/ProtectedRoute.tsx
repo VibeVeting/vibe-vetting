@@ -1,8 +1,7 @@
 "use client";
 
 import { useAuth } from "@/contexts/auth-context";
-import { useRouter } from "next/navigation";
-import { useEffect, ReactNode } from "react";
+import { useEffect, ReactNode, useState } from "react";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -10,15 +9,21 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { isAuthenticated, loading } = useAuth();
-  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      router.push("/login");
-    }
-  }, [isAuthenticated, loading, router]);
+    setMounted(true);
+  }, []);
 
-  if (loading) {
+  useEffect(() => {
+    if (mounted && !loading && !isAuthenticated) {
+      // Use window.location instead of router to avoid issues
+      window.location.href = "/login";
+    }
+  }, [isAuthenticated, loading, mounted]);
+
+  // Don't render until mounted to avoid hydration issues
+  if (!mounted || loading) {
     return (
       <div className="loading-screen">
         <div className="loading-spinner">
@@ -30,7 +35,14 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   }
 
   if (!isAuthenticated) {
-    return null;
+    return (
+      <div className="loading-screen">
+        <div className="loading-spinner">
+          <i className="fa-solid fa-spinner fa-spin"></i>
+        </div>
+        <p>Redirecting...</p>
+      </div>
+    );
   }
 
   return <>{children}</>;

@@ -22,11 +22,33 @@ export class LinkedinScraperWorkflow {
     try {
       await this.loginService.loginWithCookies(page);
 
-      const results: Array<ProfileSummary & { profileUrl: string }> = [];
+      const results: Array<ProfileSummary & { profileUrl: string; error?: string }> = [];
       for (const profileUrl of profileUrls) {
-        const profileData = await this.profileExtractionService.extractProfile(page, profileUrl);
-        onProfileScraped(profileUrl, profileData);
-        results.push({ profileUrl, ...profileData });
+        try {
+          console.log(`Processing profile: ${profileUrl}`);
+          const profileData = await this.profileExtractionService.extractProfile(page, profileUrl);
+          
+          if (profileData.error) {
+            console.log(`Skipping invalid profile: ${profileUrl} - ${profileData.error}`);
+          }
+          
+          onProfileScraped(profileUrl, profileData);
+          results.push({ profileUrl, ...profileData });
+        } catch (error) {
+          console.error(`Failed to scrape profile ${profileUrl}:`, error);
+          const errorData = {
+            name: null,
+            headline: null,
+            location: null,
+            followers: null,
+            about: null,
+            experiences: [],
+            education: [],
+            error: `Failed to scrape: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          };
+          onProfileScraped(profileUrl, errorData);
+          results.push({ profileUrl, ...errorData });
+        }
       }
 
       return results;

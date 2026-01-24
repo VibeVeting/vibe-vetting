@@ -330,6 +330,41 @@ export default function DiscoverCreatorsPage() {
               {showFilters ? 'Hide Filters' : 'Show Filters'} 
               <span className="arrow">{showFilters ? '▲' : '▼'}</span>
             </button>
+            <div className="search-actions">
+              <button className="search-btn" onClick={handleSearch} disabled={loading}>
+                {loading ? (
+                  <>
+                    <span className="spinner"></span>
+                    Searching...
+                  </>
+                ) : (
+                  <>
+                    <span className="search-icon">🔍</span>
+                    Discover Creators
+                  </>
+                )}
+              </button>
+              <button 
+                className="reset-btn"
+                onClick={() => {
+                  setFilters({
+                    handle_contains: '',
+                    followers_minimum: '1000',
+                    followers_maximum: '50000',
+                    engagement_rate_minimum: '0',
+                    engagement_rate_maximum: '100',
+                    category: '',
+                    city: '',
+                    country: '',
+                    bio_contains: '',
+                    posts_minimum: '1',
+                    posts_maximum: '10000',
+                  });
+                }}
+              >
+                Reset Filters
+              </button>
+            </div>
           </div>
 
           {showFilters && (
@@ -448,42 +483,6 @@ export default function DiscoverCreatorsPage() {
               </div>
             </div>
           )}
-
-          <div className="search-actions">
-            <button className="search-btn" onClick={handleSearch} disabled={loading}>
-              {loading ? (
-                <>
-                  <span className="spinner"></span>
-                  Searching...
-                </>
-              ) : (
-                <>
-                  <span className="search-icon">🔍</span>
-                  Discover Creators
-                </>
-              )}
-            </button>
-            <button 
-              className="reset-btn"
-              onClick={() => {
-                setFilters({
-                  handle_contains: '',
-                  followers_minimum: '1000',
-                  followers_maximum: '50000',
-                  engagement_rate_minimum: '0',
-                  engagement_rate_maximum: '100',
-                  category: '',
-                  city: '',
-                  country: '',
-                  bio_contains: '',
-                  posts_minimum: '1',
-                  posts_maximum: '10000',
-                });
-              }}
-            >
-              Reset Filters
-            </button>
-          </div>
         </div>
 
         {/* Results Section */}
@@ -549,7 +548,15 @@ export default function DiscoverCreatorsPage() {
                         <div className="avatar-ring"></div>
                       </div>
                       <div className="creator-info">
-                        <h3 className="creator-handle">@{creator.handle}</h3>
+                        <a 
+                          href={creator.handle_link} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="creator-handle creator-handle-link"
+                        >
+                          @{creator.handle}
+                          <i className="fa-solid fa-arrow-up-right-from-square external-icon"></i>
+                        </a>
                         <div className="creator-location">
                           📍 {creator.city && <span>{creator.city}, </span>}
                           {creator.country && <span>{creator.country}</span>}

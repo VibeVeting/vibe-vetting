@@ -9,15 +9,30 @@ interface Creator {
   id: string;
   name: string;
   handle: string;
+  username: string;
   platform: string;
   followers: string;
   alignmentScore: number;
   riskLevel: string;
 }
 
+// Helper function to get profile URL based on platform
+const getProfileUrl = (platform: string, username: string) => {
+  const urls: Record<string, string> = {
+    instagram: `https://instagram.com/${username}`,
+    twitter: `https://twitter.com/${username}`,
+    youtube: `https://youtube.com/@${username}`,
+    tiktok: `https://tiktok.com/@${username}`,
+    linkedin: `https://linkedin.com/in/${username}`,
+    facebook: `https://facebook.com/${username}`,
+  };
+  return urls[platform.toLowerCase()] || '#';
+};
+
 export default function CreatorsPage() {
   const [creators, setCreators] = useState<Creator[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
   const [platformFilter, setPlatformFilter] = useState('all');
   const [scoreFilter, setScoreFilter] = useState('all');
   const [riskFilter, setRiskFilter] = useState('all');
@@ -34,15 +49,19 @@ export default function CreatorsPage() {
 
         if (response.ok) {
           const data = await response.json();
-          setCreators(data.analyses.map((a: any) => ({
-            id: a.id,
-            name: a.name,
-            handle: a.handle || `@${a.name.toLowerCase().replace(' ', '')}`,
-            platform: a.platform || 'Instagram',
-            followers: a.followers,
-            alignmentScore: a.alignmentScore,
-            riskLevel: a.riskLevel?.toLowerCase() || 'medium',
-          })));
+          setCreators(data.analyses.map((a: any) => {
+            const username = a.handle?.replace('@', '') || a.name.toLowerCase().replace(' ', '');
+            return {
+              id: a.id,
+              name: a.name,
+              handle: a.handle || `@${username}`,
+              username: username,
+              platform: a.platform || 'Instagram',
+              followers: a.followers,
+              alignmentScore: a.alignmentScore,
+              riskLevel: a.riskLevel?.toLowerCase() || 'medium',
+            };
+          }));
         }
       } catch (error) {
         console.error('Error fetching creators:', error);
@@ -55,6 +74,13 @@ export default function CreatorsPage() {
   }, []);
 
   const filteredCreators = creators.filter((creator) => {
+    // Search filter - check name and handle
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const matchesName = creator.name.toLowerCase().includes(query);
+      const matchesHandle = creator.handle.toLowerCase().includes(query);
+      if (!matchesName && !matchesHandle) return false;
+    }
     if (platformFilter !== 'all' && creator.platform.toLowerCase() !== platformFilter.toLowerCase()) {
       return false;
     }
@@ -82,8 +108,29 @@ export default function CreatorsPage() {
 
             {/* Filters */}
             <div className="filters-section">
+              <div className="filter-group search-filter">
+                <span className="filter-label">Search</span>
+                <div className="search-input-wrapper">
+                  <i className="fa-solid fa-search"></i>
+                  <input
+                    type="text"
+                    placeholder="Search creators..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="search-filter-input"
+                  />
+                  {searchQuery && (
+                    <button 
+                      className="search-clear-btn"
+                      onClick={() => setSearchQuery('')}
+                    >
+                      <i className="fa-solid fa-times"></i>
+                    </button>
+                  )}
+                </div>
+              </div>
               <div className="filter-group">
-                <span className="filter-label">Platform:</span>
+                <span className="filter-label">Platform</span>
                 <select 
                   className="filter-select"
                   value={platformFilter}
@@ -97,7 +144,7 @@ export default function CreatorsPage() {
                 </select>
               </div>
               <div className="filter-group">
-                <span className="filter-label">Score:</span>
+                <span className="filter-label">Score</span>
                 <select 
                   className="filter-select"
                   value={scoreFilter}
@@ -111,7 +158,7 @@ export default function CreatorsPage() {
                 </select>
               </div>
               <div className="filter-group">
-                <span className="filter-label">Risk:</span>
+                <span className="filter-label">Risk</span>
                 <select 
                   className="filter-select"
                   value={riskFilter}
@@ -141,10 +188,16 @@ export default function CreatorsPage() {
                       </div>
                       <div className="influencer-name">
                         <h3>{creator.name}</h3>
-                        <span className="platform-badge">
+                        <a 
+                          href={getProfileUrl(creator.platform, creator.username)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="platform-badge platform-badge-link"
+                        >
                           <i className={`fa-brands fa-${creator.platform.toLowerCase()}`}></i>
                           {creator.handle}
-                        </span>
+                          <i className="fa-solid fa-arrow-up-right-from-square" style={{ fontSize: '10px', marginLeft: '4px', opacity: 0.7 }}></i>
+                        </a>
                       </div>
                     </div>
 
