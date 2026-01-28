@@ -3,22 +3,82 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/auth-context';
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 const menuItems = [
   { icon: 'fa-gauge-high', label: 'Dashboard', href: '/dashboard', badge: null },
   { icon: 'fa-chart-line', label: 'Analytics', href: '/analytics', badge: null },
   { icon: 'fa-users', label: 'Creators', href: '/creators', badge: 'NEW' },
   { icon: 'fa-bullhorn', label: 'Campaigns', href: '/campaigns', badge: null },
+  { icon: 'fa-file-contract', label: 'Contracts', href: '/contracts', badge: 'NEW' },
   { icon: 'fa-compass', label: 'Discover', href: '/creators/discover', badge: 'AI' },
+  { icon: 'fa-bell', label: 'Notifications', href: '/notifications', badge: null },
   { icon: 'fa-chart-pie', label: 'Investor Metrics', href: '/investor-metrics', badge: null },
   { icon: 'fa-gear', label: 'Settings', href: '/settings', badge: null },
+  { icon: 'fa-circle-question', label: 'Help & Support', href: '/help-support', badge: null },
 ];
+
+interface SidebarStats {
+  creatorsCount: number;
+  campaignsCount: number;
+  avgScore: number;
+}
 
 export function Sidebar() {
   const pathname = usePathname();
   const { logout, user } = useAuth();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const sidebarRef = useRef<HTMLElement>(null);
+  const [stats, setStats] = useState<SidebarStats>({ creatorsCount: 0, campaignsCount: 0, avgScore: 0 });
+
+  // Fetch sidebar stats from database
+  const fetchStats = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const response = await fetch('/api/user/stats', {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.stats) {
+          setStats({
+            creatorsCount: data.stats.totalCreatorsVerified || 0,
+            campaignsCount: data.stats.activeCampaigns || 0,
+            avgScore: data.stats.avgAlignmentScore || 0,
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching sidebar stats:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
+
+  // Preserve sidebar scroll position across navigations
+  useEffect(() => {
+    const sidebar = sidebarRef.current;
+    if (!sidebar) return;
+
+    // Restore scroll position from sessionStorage
+    const savedScrollPos = sessionStorage.getItem('sidebarScrollPos');
+    if (savedScrollPos) {
+      sidebar.scrollTop = parseInt(savedScrollPos, 10);
+    }
+
+    // Save scroll position on scroll
+    const handleScroll = () => {
+      sessionStorage.setItem('sidebarScrollPos', sidebar.scrollTop.toString());
+    };
+
+    sidebar.addEventListener('scroll', handleScroll);
+    return () => sidebar.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const userInitials = user?.name
     ?.split(' ')
@@ -27,10 +87,16 @@ export function Sidebar() {
     .toUpperCase()
     .slice(0, 2) || 'U';
 
+  // Calculate progress ring offsets (circumference = 97.4)
+  const circumference = 97.4;
+  const creatorsOffset = circumference - (Math.min(stats.creatorsCount, 50) / 50) * circumference;
+  const campaignsOffset = circumference - (Math.min(stats.campaignsCount, 10) / 10) * circumference;
+  const scoreOffset = circumference - (stats.avgScore / 100) * circumference;
+
   return (
-    <aside className="sidebar">
+    <aside className="sidebar" ref={sidebarRef}>
       {/* Logo Section */}
-      <Link href="/dashboard" className="sidebar-logo">
+      <Link href="/dashboard" scroll={false} className="sidebar-logo">
         <div className="sidebar-logo-icon">
           <i className="fa-solid fa-bolt"></i>
         </div>
@@ -60,9 +126,9 @@ export function Sidebar() {
             <svg className="progress-ring" viewBox="0 0 36 36">
               <circle className="progress-bg" cx="18" cy="18" r="15.5" />
               <circle className="progress-fill" cx="18" cy="18" r="15.5" 
-                strokeDasharray="97.4" strokeDashoffset="24.4" style={{ stroke: 'url(#gradient-blue)' }} />
+                strokeDasharray="97.4" strokeDashoffset={creatorsOffset} style={{ stroke: 'url(#gradient-blue)' }} />
             </svg>
-            <span className="circular-value">12</span>
+            <span className="circular-value">{stats.creatorsCount}</span>
           </div>
           <span className="circular-label">Creators</span>
         </div>
@@ -71,9 +137,9 @@ export function Sidebar() {
             <svg className="progress-ring" viewBox="0 0 36 36">
               <circle className="progress-bg" cx="18" cy="18" r="15.5" />
               <circle className="progress-fill" cx="18" cy="18" r="15.5" 
-                strokeDasharray="97.4" strokeDashoffset="53.6" style={{ stroke: 'url(#gradient-blue)' }} />
+                strokeDasharray="97.4" strokeDashoffset={campaignsOffset} style={{ stroke: 'url(#gradient-blue)' }} />
             </svg>
-            <span className="circular-value">3</span>
+            <span className="circular-value">{stats.campaignsCount}</span>
           </div>
           <span className="circular-label">Campaigns</span>
         </div>
@@ -82,9 +148,9 @@ export function Sidebar() {
             <svg className="progress-ring" viewBox="0 0 36 36">
               <circle className="progress-bg" cx="18" cy="18" r="15.5" />
               <circle className="progress-fill score" cx="18" cy="18" r="15.5" 
-                strokeDasharray="97.4" strokeDashoffset="10.7" style={{ stroke: 'url(#gradient-green)' }} />
+                strokeDasharray="97.4" strokeDashoffset={scoreOffset} style={{ stroke: 'url(#gradient-green)' }} />
             </svg>
-            <span className="circular-value">89%</span>
+            <span className="circular-value">{stats.avgScore > 0 ? `${Math.round(stats.avgScore)}%` : '0%'}</span>
           </div>
           <span className="circular-label">Score</span>
         </div>
@@ -93,13 +159,14 @@ export function Sidebar() {
       {/* Navigation */}
       <nav className="sidebar-menu">
         <div className="sidebar-section-label">MAIN MENU</div>
-        {menuItems.slice(0, 4).map((item) => {
+        {menuItems.slice(0, 5).map((item) => {
           const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
 
           return (
             <Link
               key={item.href}
               href={item.href}
+              scroll={false}
               className={`sidebar-item ${isActive ? 'active' : ''}`}
               onMouseEnter={() => setHoveredItem(item.href)}
               onMouseLeave={() => setHoveredItem(null)}
@@ -121,13 +188,14 @@ export function Sidebar() {
         })}
 
         <div className="sidebar-section-label">TOOLS</div>
-        {menuItems.slice(4).map((item) => {
+        {menuItems.slice(5).map((item) => {
           const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
 
           return (
             <Link
               key={item.href}
               href={item.href}
+              scroll={false}
               className={`sidebar-item ${isActive ? 'active' : ''}`}
               onMouseEnter={() => setHoveredItem(item.href)}
               onMouseLeave={() => setHoveredItem(null)}
@@ -149,23 +217,39 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Pro Upgrade Card - Creative */}
-      <div className="sidebar-upgrade-card">
-        <div className="upgrade-sparkles">
-          <span className="sparkle sparkle-1">✦</span>
-          <span className="sparkle sparkle-2">✧</span>
-          <span className="sparkle sparkle-3">✦</span>
+      {/* Pro Upgrade Card - Show Premium Badge for paid users */}
+      {user?.currentPlan && user.currentPlan !== 'starter' ? (
+        <div className="sidebar-premium-card">
+          <div className="premium-crown">
+            <i className="fa-solid fa-crown"></i>
+          </div>
+          <div className="premium-content">
+            <h4>{user.currentPlan === 'enterprise' ? 'Enterprise' : 'Growth'}</h4>
+            <p>Premium Account</p>
+          </div>
+          <div className="premium-badge">
+            <i className="fa-solid fa-check-circle"></i>
+            <span>Active</span>
+          </div>
         </div>
-        <div className="upgrade-icon">
-          <i className="fa-solid fa-crown"></i>
-        </div>
-        <h4>Upgrade to Pro</h4>
-        <p>Unlock unlimited AI analyses and premium features</p>
-        <Link href="/pricing" className="upgrade-btn">
-          <span>Upgrade Now</span>
-          <i className="fa-solid fa-arrow-right"></i>
+      ) : (
+        <Link href="/settings?tab=billing" scroll={false} className="sidebar-upgrade-card">
+          <div className="upgrade-sparkles">
+            <span className="sparkle sparkle-1">✦</span>
+            <span className="sparkle sparkle-2">✧</span>
+            <span className="sparkle sparkle-3">✦</span>
+          </div>
+          <div className="upgrade-icon">
+            <i className="fa-solid fa-crown"></i>
+          </div>
+          <h4>Upgrade to Pro</h4>
+          <p>Unlock unlimited AI analyses</p>
+          <div className="upgrade-btn">
+            <span>Upgrade Now</span>
+            <i className="fa-solid fa-arrow-right"></i>
+          </div>
         </Link>
-      </div>
+      )}
 
       {/* Footer */}
       <div className="sidebar-footer">
@@ -287,11 +371,12 @@ export function Sidebar() {
         }
 
         .circular-value {
-          font-size: 12px;
+          font-size: 11px;
           font-weight: 800;
           color: #1a202c;
           z-index: 1;
           text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+          white-space: nowrap;
         }
 
         .circular-label {
@@ -394,6 +479,7 @@ export function Sidebar() {
           border-radius: 16px;
           text-align: center;
           position: relative;
+          flex-shrink: 0;
         }
 
         .upgrade-sparkles {
@@ -498,6 +584,89 @@ export function Sidebar() {
         .upgrade-btn:hover {
           transform: translateY(-2px);
           box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Premium Card Styles */
+        .sidebar-premium-card {
+          margin: 16px;
+          padding: 16px 14px;
+          background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
+          border: 1px solid rgba(34, 197, 94, 0.3);
+          border-radius: 16px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+          position: relative;
+          text-align: center;
+          flex-shrink: 0;
+        }
+
+        .sidebar-premium-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg, transparent 0%, rgba(34, 197, 94, 0.05) 100%);
+          pointer-events: none;
+          border-radius: 16px;
+        }
+
+        .premium-crown {
+          width: 44px;
+          height: 44px;
+          background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 20px;
+          color: #fff;
+          box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+          flex-shrink: 0;
+          position: relative;
+          z-index: 1;
+        }
+
+        .premium-content {
+          position: relative;
+          z-index: 1;
+        }
+
+        .premium-content h4 {
+          font-size: 15px;
+          font-weight: 700;
+          color: #1a202c;
+          margin: 0 0 2px 0;
+          text-transform: capitalize;
+        }
+
+        .premium-content p {
+          font-size: 11px;
+          color: #059669;
+          margin: 0;
+          font-weight: 600;
+        }
+
+        .premium-badge {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          padding: 6px 14px;
+          background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+          color: white;
+          font-size: 11px;
+          font-weight: 700;
+          border-radius: 20px;
+          box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+          position: relative;
+          z-index: 1;
+        }
+
+        .premium-badge i {
+          font-size: 11px;
         }
 
         .sidebar-user-info {

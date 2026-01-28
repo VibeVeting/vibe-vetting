@@ -3,8 +3,10 @@
 import { Sidebar } from '@/components/common/Sidebar';
 import { TopBar } from '@/components/common/TopBar';
 import { StatsGrid } from './components/StatsGrid';
-import { ChartsSection } from './components/ChartsSection';
 import { RecentAnalysesTable } from './components/RecentAnalysesTable';
+import { CompanyInfoSection } from './components/CompanyInfoSection';
+import { AIQuickAction } from '@/components/common/AIButton';
+import { LinkedInSearch } from '@/components/common/LinkedInSearch';
 import { useAuth } from '@/contexts/auth-context';
 
 export default function DashboardPage() {
@@ -37,7 +39,9 @@ export default function DashboardPage() {
             />
 
             <StatsGrid />
-            <ChartsSection />
+
+            <CompanyInfoSection />
+            
             <RecentAnalysesTable />
           </div>
         </div>

@@ -7,6 +7,9 @@ interface User {
   name: string;
   email: string;
   company?: string;
+  twoFactorEnabled?: boolean;
+  currentPlan?: string;
+  planUpdatedAt?: string;
 }
 
 interface AuthContextType {
@@ -15,6 +18,7 @@ interface AuthContextType {
   loading: boolean;
   login: (token: string, user: User) => void;
   logout: () => void;
+  refreshUser: () => Promise<void>;
   isAuthenticated: boolean;
 }
 
@@ -85,6 +89,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const refreshUser = useCallback(async () => {
+    if (!user?.email) return;
+    
+    try {
+      const response = await fetch('/api/user/settings', {
+        headers: { 'x-user-id': user.email },
+      });
+      const data = await response.json();
+      
+      if (data.success && data.user) {
+        const updatedUser = {
+          ...user,
+          name: data.user.name,
+          company: data.user.company,
+          twoFactorEnabled: data.user.twoFactorEnabled,
+          currentPlan: data.user.currentPlan,
+          planUpdatedAt: data.user.planUpdatedAt,
+        };
+        setUser(updatedUser);
+        if (isBrowser()) {
+          try {
+            localStorage.setItem("user", JSON.stringify(updatedUser));
+          } catch {
+            // Ignore localStorage errors
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error refreshing user:', error);
+    }
+  }, [user]);
+
   return (
     <AuthContext.Provider
       value={{
@@ -93,6 +129,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loading,
         login,
         logout,
+        refreshUser,
         isAuthenticated: !!token,
       }}
     >

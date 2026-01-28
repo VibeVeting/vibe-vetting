@@ -1,10 +1,10 @@
 "use client";
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [formData, setFormData] = useState({
@@ -14,6 +14,9 @@ export default function LoginPage() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [requires2fa, setRequires2fa] = useState(false);
+  const [twoFaCode, setTwoFaCode] = useState('');
+  const [twoFaInfo, setTwoFaInfo] = useState('');
   const [oauthLoading, setOauthLoading] = useState<string | null>(null);
 
   // Redirect if already logged in or handle OAuth callback
@@ -77,6 +80,7 @@ export default function LoginPage() {
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
+          code: requires2fa ? twoFaCode : undefined,
         }),
       });
 
@@ -84,6 +88,14 @@ export default function LoginPage() {
 
       if (!response.ok) {
         setError(data.error || 'Login failed');
+        setLoading(false);
+        return;
+      }
+
+      if (data.requires2fa) {
+        setRequires2fa(true);
+        setTwoFaInfo(data.message || 'Enter the verification code sent to your email.');
+        if (data.devCode) setTwoFaInfo(prev => `${prev} (Dev code: ${data.devCode})`);
         setLoading(false);
         return;
       }
@@ -114,8 +126,8 @@ export default function LoginPage() {
         {/* Auth Card */}
         <div className="auth-card">
           <div className="auth-header">
-            <h2>Welcome Back</h2>
-            <p>Sign in to your account to continue</p>
+            <h2>{requires2fa ? 'Two-Factor Verification' : 'Welcome Back'}</h2>
+            <p>{requires2fa ? 'Enter the 6-digit code sent to your email' : 'Sign in to your account to continue'}</p>
           </div>
 
           <form onSubmit={handleSubmit}>
@@ -125,35 +137,57 @@ export default function LoginPage() {
               </div>
             )}
 
-            <div className="form-group">
-              <label className="form-label">Email Address</label>
-              <div className="input-with-icon">
-                <i className="fa-solid fa-envelope"></i>
-                <input
-                  type="email"
-                  className="form-input"
-                  placeholder="Enter your email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  required
-                />
-              </div>
-            </div>
+            {!requires2fa && (
+              <>
+                <div className="form-group">
+                  <label className="form-label">Email Address</label>
+                  <div className="input-with-icon">
+                    <i className="fa-solid fa-envelope"></i>
+                    <input
+                      type="email"
+                      className="form-input"
+                      placeholder="Enter your email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      required
+                    />
+                  </div>
+                </div>
 
-            <div className="form-group">
-              <label className="form-label">Password</label>
-              <div className="input-with-icon">
-                <i className="fa-solid fa-lock"></i>
-                <input
-                  type="password"
-                  className="form-input"
-                  placeholder="Enter your password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  required
-                />
+                <div className="form-group">
+                  <label className="form-label">Password</label>
+                  <div className="input-with-icon">
+                    <i className="fa-solid fa-lock"></i>
+                    <input
+                      type="password"
+                      className="form-input"
+                      placeholder="Enter your password"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      required
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+
+            {requires2fa && (
+              <div className="form-group">
+                <label className="form-label">Verification Code</label>
+                <div className="input-with-icon">
+                  <i className="fa-solid fa-shield"></i>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="123456"
+                    value={twoFaCode}
+                    onChange={(e) => setTwoFaCode(e.target.value)}
+                    required
+                  />
+                </div>
+                {twoFaInfo && <div className="helper-text" style={{ marginTop: '6px', color: '#4a5568', fontSize: '12px' }}>{twoFaInfo}</div>}
               </div>
-            </div>
+            )}
 
             <div className="auth-options">
               <label className="checkbox-label">
@@ -171,7 +205,7 @@ export default function LoginPage() {
 
             <button type="submit" className="btn btn-primary auth-btn" disabled={loading}>
               <i className={loading ? "fa-solid fa-spinner fa-spin" : "fa-solid fa-arrow-right-to-bracket"}></i>
-              {loading ? 'Signing In...' : 'Sign In'}
+              {loading ? (requires2fa ? 'Verifying...' : 'Signing In...') : (requires2fa ? 'Verify Code' : 'Sign In')}
             </button>
           </form>
 
@@ -199,18 +233,12 @@ export default function LoginPage() {
             <button 
               type="button" 
               className="social-btn"
-              onClick={() => {
-                setOauthLoading('meta');
-                window.location.href = '/api/auth/meta';
-              }}
-              disabled={oauthLoading !== null}
+              disabled={true}
+              style={{ opacity: 0.6, cursor: 'not-allowed' }}
+              title="Coming Soon"
             >
-              {oauthLoading === 'meta' ? (
-                <i className="fa-solid fa-spinner fa-spin"></i>
-              ) : (
-                <i className="fa-brands fa-meta"></i>
-              )}
-              Meta
+              <i className="fa-brands fa-facebook"></i>
+              Meta <span style={{ fontSize: '10px', marginLeft: '4px' }}>(Soon)</span>
             </button>
           </div>
 
@@ -220,5 +248,23 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="auth-page">
+        <div className="auth-container">
+          <div className="auth-box">
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
+              <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: '24px', color: '#667eea' }}></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   );
 }

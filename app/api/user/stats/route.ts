@@ -24,6 +24,81 @@ async function getStatsCollection(): Promise<Collection<UserStats>> {
   return client.db(DB_NAME).collection<UserStats>("user_stats");
 }
 
+async function getCampaignsCollection(): Promise<Collection<any>> {
+  const client = await clientPromise;
+  return client.db(DB_NAME).collection("campaigns");
+}
+
+async function getCampaignCreatorsCollection(): Promise<Collection<any>> {
+  const client = await clientPromise;
+  return client.db(DB_NAME).collection("campaign_creators");
+}
+
+async function getAnalysesCollection(): Promise<Collection<any>> {
+  const client = await clientPromise;
+  return client.db(DB_NAME).collection("creator_analyses");
+}
+
+// Calculate real stats from database
+async function calculateRealStats(userId: string): Promise<Partial<UserStats>> {
+  const campaignsCol = await getCampaignsCollection();
+  const creatorsCol = await getCampaignCreatorsCollection();
+  const analysesCol = await getAnalysesCollection();
+  
+  const userObjectId = new ObjectId(userId);
+  
+  // Count active campaigns
+  const activeCampaigns = await campaignsCol.countDocuments({ 
+    userId: userObjectId,
+    status: "active"
+  });
+  
+  // Get all user's campaigns
+  const userCampaigns = await campaignsCol.find({ userId: userObjectId }).toArray();
+  const campaignIds = userCampaigns.map(c => c._id);
+  
+  // Count total creators in all pipelines (unique by creatorId)
+  const totalCreatorsInPipeline = campaignIds.length > 0 
+    ? await creatorsCol.countDocuments({ campaignId: { $in: campaignIds } })
+    : 0;
+  
+  // Count matched creators (not declined/no_response)
+  const matchedCreators = campaignIds.length > 0
+    ? await creatorsCol.countDocuments({ 
+        campaignId: { $in: campaignIds },
+        currentStage: { $nin: ["declined", "no_response"] }
+      })
+    : 0;
+  
+  // Count creators analyzed by this user
+  const creatorsAnalyzed = await analysesCol.countDocuments({ userId: userObjectId });
+  
+  // Calculate average alignment score from analyses
+  const analysesWithScore = await analysesCol.find({ 
+    userId: userObjectId,
+    alignmentScore: { $exists: true }
+  }).toArray();
+  
+  const avgAlignmentScore = analysesWithScore.length > 0
+    ? analysesWithScore.reduce((sum, a) => sum + (a.alignmentScore || 0), 0) / analysesWithScore.length
+    : 0;
+  
+  // Count high risk detected
+  const highRiskDetected = await analysesCol.countDocuments({ 
+    userId: userObjectId,
+    riskLevel: "high"
+  });
+  
+  return {
+    activeCampaigns,
+    creatorsAnalyzed,
+    totalCreatorsVerified: totalCreatorsInPipeline,
+    perfectMatches: matchedCreators,
+    avgAlignmentScore: Math.round(avgAlignmentScore),
+    highRiskDetected,
+  };
+}
+
 // Initialize default stats for a new user
 async function initializeUserStats(userId: string): Promise<UserStats> {
   const collection = await getStatsCollection();
@@ -68,7 +143,7 @@ export async function GET(request: NextRequest) {
 
     const collection = await getStatsCollection();
     
-    // Find user stats
+    // Find user stats (for weekly changes)
     let stats = await collection.findOne({ userId: new ObjectId(payload.userId) });
     
     // If no stats exist, initialize them
@@ -77,23 +152,19 @@ export async function GET(request: NextRequest) {
       stats = await collection.findOne({ userId: new ObjectId(payload.userId) });
     }
 
-    if (!stats) {
-      return NextResponse.json(
-        { error: "Failed to initialize stats" },
-        { status: 500 }
-      );
-    }
+    // Calculate real stats from database
+    const realStats = await calculateRealStats(payload.userId);
 
     return NextResponse.json({
       stats: {
-        totalCreatorsVerified: stats.totalCreatorsVerified,
-        perfectMatches: stats.perfectMatches,
-        activeCampaigns: stats.activeCampaigns,
-        avgAlignmentScore: stats.avgAlignmentScore,
-        creatorsAnalyzed: stats.creatorsAnalyzed,
-        highRiskDetected: stats.highRiskDetected,
-        weeklyCreatorChange: stats.weeklyCreatorChange,
-        weeklyMatchChange: stats.weeklyMatchChange,
+        totalCreatorsVerified: realStats.totalCreatorsVerified || 0,
+        perfectMatches: realStats.perfectMatches || 0,
+        activeCampaigns: realStats.activeCampaigns || 0,
+        avgAlignmentScore: realStats.avgAlignmentScore || 0,
+        creatorsAnalyzed: realStats.creatorsAnalyzed || 0,
+        highRiskDetected: realStats.highRiskDetected || 0,
+        weeklyCreatorChange: stats?.weeklyCreatorChange || 0,
+        weeklyMatchChange: stats?.weeklyMatchChange || 0,
       },
     });
   } catch (error) {

@@ -6,6 +6,7 @@ import { exchangeMetaCode, getMetaUserInfo } from "@/lib/oauth";
 
 const DB_NAME = "vibe-vetting";
 const COLLECTION_NAME = "users";
+const SESSIONS_COLLECTION = "sessions";
 
 interface UserDocument {
   _id?: any;
@@ -16,6 +17,7 @@ interface UserDocument {
   image?: string;
   provider?: string;
   providerId?: string;
+  twoFactorEnabled?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -23,6 +25,11 @@ interface UserDocument {
 async function getCollection(): Promise<Collection<UserDocument>> {
   const client = await clientPromise;
   return client.db(DB_NAME).collection<UserDocument>(COLLECTION_NAME);
+}
+
+async function getSessionsCollection(): Promise<Collection<any>> {
+  const client = await clientPromise;
+  return client.db(DB_NAME).collection(SESSIONS_COLLECTION);
 }
 
 export async function GET(request: NextRequest) {
@@ -96,10 +103,30 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Generate JWT token
-    const token = generateToken({
+    // Generate JWT token with jti
+    const { token, jti } = generateToken({
       userId: user._id.toString(),
       email: user.email,
+    });
+
+    // Record session - delete any existing sessions from same user agent first
+    const sessions = await getSessionsCollection();
+    const ua = request.headers.get("user-agent") || "Unknown device";
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "";
+    
+    // Remove old sessions from same device/browser to avoid duplicates
+    await sessions.deleteMany({
+      userId: user._id,
+      userAgent: ua,
+    });
+    
+    await sessions.insertOne({
+      userId: user._id,
+      jti,
+      userAgent: ua,
+      ip,
+      createdAt: new Date(),
+      lastActive: new Date(),
     });
 
     // Create response with redirect
@@ -123,6 +150,8 @@ export async function GET(request: NextRequest) {
       name: user.name,
       email: user.email,
       image: user.image,
+      company: user.company || '',
+      twoFactorEnabled: user.twoFactorEnabled || false,
     }), {
       httpOnly: false,
       secure: process.env.NODE_ENV === 'production',

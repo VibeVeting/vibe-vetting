@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import { Sidebar } from '@/components/common/Sidebar';
 import { TopBar } from '@/components/common/TopBar';
+import { AIButton } from '@/components/common/AIButton';
 
 interface Creator {
   bio: string;
@@ -61,25 +62,14 @@ const countries = [
   'Japan',
 ];
 
-const defaultCreators: Creator[] = [
-  { connector: "instagram", handle: "yoga_with_priya", handle_link: "https://instagram.com/yoga_with_priya", followers: 42000, engagement: 5.2, posts: 380, bio: "Yoga instructor | Mind & Body wellness | Daily tips", category: "Health & Fitness", city: "Mumbai", country: "India" },
-  { connector: "instagram", handle: "tech_arjun", handle_link: "https://instagram.com/tech_arjun", followers: 38000, engagement: 4.8, posts: 220, bio: "Tech reviewer | Gadget enthusiast | Hindi & English", category: "Technology", city: "Bangalore", country: "India" },
-  { connector: "instagram", handle: "foodie_delhi", handle_link: "https://instagram.com/foodie_delhi", followers: 51000, engagement: 6.2, posts: 450, bio: "Street food explorer | Delhi food guide | Restaurant reviews", category: "Food & Cooking", city: "Delhi", country: "India" },
-  { connector: "instagram", handle: "fitness_coach_mike", handle_link: "https://instagram.com/fitness_coach_mike", followers: 45000, engagement: 4.2, posts: 320, bio: "Certified fitness trainer | Helping you get fit | DM for coaching", category: "Health & Fitness", city: "Los Angeles", country: "United States" },
-  { connector: "instagram", handle: "travel_with_sarah", handle_link: "https://instagram.com/travel_with_sarah", followers: 32000, engagement: 5.8, posts: 450, bio: "✈️ Travel blogger | 50+ countries | Sharing hidden gems", category: "Travel & Adventure", city: "New York", country: "United States" },
-  { connector: "instagram", handle: "tech_reviewer_pro", handle_link: "https://instagram.com/tech_reviewer_pro", followers: 51000, engagement: 3.5, posts: 190, bio: "Tech enthusiast | Honest reviews | Gadget unboxing", category: "Technology", city: "San Francisco", country: "United States" },
-  { connector: "instagram", handle: "gaming_zone_alex", handle_link: "https://instagram.com/gaming_zone_alex", followers: 35000, engagement: 7.1, posts: 240, bio: "Pro gamer | Streaming daily | Game reviews & tips", category: "Gaming", city: "London", country: "United Kingdom" },
-  { connector: "instagram", handle: "beauty_secrets_lisa", handle_link: "https://instagram.com/beauty_secrets_lisa", followers: 29000, engagement: 5.5, posts: 410, bio: "Beauty & Skincare | Makeup tutorials | Product reviews", category: "Fashion & Beauty", city: "Toronto", country: "Canada" },
-  { connector: "instagram", handle: "business_mindset", handle_link: "https://instagram.com/business_mindset", followers: 48000, engagement: 3.9, posts: 150, bio: "Entrepreneur | Business tips | Motivation daily", category: "Business", city: "Dubai", country: "United Arab Emirates" },
-  { connector: "instagram", handle: "fashion_neha", handle_link: "https://instagram.com/fashion_neha", followers: 28000, engagement: 4.9, posts: 280, bio: "Fashion blogger | Indian ethnic wear | Style tips", category: "Fashion & Beauty", city: "Chennai", country: "India" },
-  { connector: "tiktok", handle: "dance_queen_amy", handle_link: "https://tiktok.com/@dance_queen_amy", followers: 89000, engagement: 8.2, posts: 520, bio: "Professional dancer | Choreographer | Dance tutorials", category: "Entertainment", city: "Miami", country: "United States" },
-  { connector: "youtube", handle: "cooking_with_raj", handle_link: "https://youtube.com/@cooking_with_raj", followers: 125000, engagement: 4.5, posts: 340, bio: "Home chef | Indian recipes | Easy cooking videos", category: "Food & Cooking", city: "Hyderabad", country: "India" },
-];
+// Empty default - creators will be fetched from API or discovered
+const defaultCreators: Creator[] = [];
 
 export default function DiscoverCreatorsPage() {
-  const [creators] = useState<Creator[]>(defaultCreators);
+  const [creators, setCreators] = useState<Creator[]>(defaultCreators);
   const [loading, setLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
+  const [hasSearched, setHasSearched] = useState(false);
   
   const [filters, setFilters] = useState<Filters>({
     handle_contains: '',
@@ -114,9 +104,33 @@ export default function DiscoverCreatorsPage() {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     setLoading(true);
-    setTimeout(() => setLoading(false), 500);
+    setHasSearched(true);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      // Build query params from filters
+      const params = new URLSearchParams();
+      if (filters.handle_contains) params.append('handle', filters.handle_contains);
+      if (filters.category && filters.category !== 'All Categories') params.append('category', filters.category);
+      if (filters.country && filters.country !== 'All Countries') params.append('country', filters.country);
+      if (filters.followers_minimum) params.append('followersMin', filters.followers_minimum);
+      if (filters.followers_maximum) params.append('followersMax', filters.followers_maximum);
+
+      // Try to fetch from API (this would connect to a real creator discovery service)
+      // For now, show empty results since we don't have a real discovery API
+      // In production, this would call an external API like Phyllo, Modash, etc.
+      setCreators([]);
+    } catch (error) {
+      console.error('Error searching creators:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const resetFilters = () => {
@@ -378,6 +392,12 @@ export default function DiscoverCreatorsPage() {
                 </div>
 
                 <div className="creator-actions">
+                  <AIButton 
+                    type="analyze-bio" 
+                    data={{ bio: creator.bio || '' }}
+                    label="Analyze"
+                    icon="fa-brain"
+                  />
                   <a 
                     href={creator.handle_link} 
                     target="_blank" 
@@ -389,7 +409,7 @@ export default function DiscoverCreatorsPage() {
                   </a>
                   <button className="add-btn">
                     <i className="fa-solid fa-plus"></i>
-                    Add to Campaign
+                    Add
                   </button>
                 </div>
               </div>
@@ -401,11 +421,20 @@ export default function DiscoverCreatorsPage() {
               <div className="empty-icon">
                 <i className="fa-solid fa-search"></i>
               </div>
-              <h3>No Creators Found</h3>
-              <p>Try adjusting your filters to find more creators</p>
-              <button className="reset-btn" onClick={resetFilters}>
-                Reset Filters
-              </button>
+              {!hasSearched ? (
+                <>
+                  <h3>Discover Creators</h3>
+                  <p>Use the filters above and click &quot;Search&quot; to find creators matching your criteria</p>
+                </>
+              ) : (
+                <>
+                  <h3>No Creators Found</h3>
+                  <p>No creators match your search criteria. Try adjusting your filters or connect an external creator discovery service.</p>
+                  <button className="reset-btn" onClick={resetFilters}>
+                    Reset Filters
+                  </button>
+                </>
+              )}
             </div>
           )}
         </div>
@@ -762,6 +791,29 @@ export default function DiscoverCreatorsPage() {
         .creator-actions {
           display: flex;
           gap: 10px;
+        }
+
+        .creator-actions :global(button) {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          padding: 10px 14px !important;
+          border-radius: 10px !important;
+          font-size: 13px !important;
+          font-weight: 600 !important;
+          cursor: pointer;
+          transition: all 0.2s;
+          text-decoration: none;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+          border: none !important;
+          color: #fff !important;
+        }
+
+        .creator-actions :global(button:hover) {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
         }
 
         .view-btn,

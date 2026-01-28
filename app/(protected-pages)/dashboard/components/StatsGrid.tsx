@@ -12,14 +12,14 @@ interface Stats {
   weeklyMatchChange: number;
 }
 
-// Default sample stats to show immediately
+// Default stats - shows actual zeros when no data exists
 const defaultStats: Stats = {
-  totalCreatorsVerified: 1247,
-  perfectMatches: 89,
-  activeCampaigns: 12,
-  avgAlignmentScore: 87.5,
-  weeklyCreatorChange: 34,
-  weeklyMatchChange: 8,
+  totalCreatorsVerified: 0,
+  perfectMatches: 0,
+  activeCampaigns: 0,
+  avgAlignmentScore: 0,
+  weeklyCreatorChange: 0,
+  weeklyMatchChange: 0,
 };
 
 export function StatsGrid() {
@@ -44,7 +44,7 @@ export function StatsGrid() {
         if (response.ok) {
           const data = await response.json();
           console.log('Stats data received:', data);
-          if (data.stats && (data.stats.totalCreatorsVerified > 0 || data.stats.activeCampaigns > 0)) {
+          if (data.stats) {
             setStats(data.stats);
             setIsUsingDefaults(false);
           }

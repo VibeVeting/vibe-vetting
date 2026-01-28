@@ -45,18 +45,18 @@ export function Button({
         }
 
         .btn-sm {
-          padding: 8px 16px;
-          font-size: 12px;
+          padding: 6px 12px;
+          font-size: 11px;
         }
 
         .btn-md {
-          padding: 12px 24px;
-          font-size: 14px;
+          padding: 8px 16px;
+          font-size: 13px;
         }
 
         .btn-lg {
-          padding: 14px 32px;
-          font-size: 16px;
+          padding: 10px 20px;
+          font-size: 14px;
         }
 
         .btn-primary {

@@ -2,9 +2,12 @@
 
 import { Sidebar } from '@/components/common/Sidebar';
 import { TopBar } from '@/components/common/TopBar';
+import { AIButton } from '@/components/common/AIButton';
+import { AddToPipelineModal } from '@/components/pipeline/AddToPipelineModal';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useState } from 'react';
+import { exportCreatorReport } from '@/lib/export-utils';
 
 // Creator Data - Enhanced
 const creatorData = {
@@ -156,6 +159,7 @@ const concerns = [
 export default function CreatorProfilePage() {
   const params = useParams();
   const [activeTab, setActiveTab] = useState('overview');
+  const [showPipelineModal, setShowPipelineModal] = useState(false);
 
   return (
     <div className="dashboard-wrapper">
@@ -294,8 +298,29 @@ export default function CreatorProfilePage() {
               <p>This creator aligns exceptionally well with your brand values, target audience, and campaign objectives. vibeAI™ analysis indicates high probability of successful partnership.</p>
             </div>
             <div className="rec-actions">
-              <button className="btn btn-primary">
-                <i className="fa-solid fa-plus"></i> Add to Campaign
+              <AIButton 
+                type="outreach-email" 
+                data={{ 
+                  creatorName: creatorData.name, 
+                  niche: creatorData.niche, 
+                  brandName: 'Your Brand', 
+                  campaignGoal: 'Brand awareness campaign' 
+                }}
+                label="Draft Outreach"
+                icon="fa-envelope"
+              />
+              <AIButton 
+                type="rate-negotiation" 
+                data={{ 
+                  followers: creatorData.followers, 
+                  engagement: creatorData.engagement, 
+                  deliverables: '2 posts, 4 stories, 1 reel' 
+                }}
+                label="Suggest Rate"
+                icon="fa-calculator"
+              />
+              <button className="btn btn-primary" onClick={() => setShowPipelineModal(true)}>
+                <i className="fa-solid fa-diagram-project"></i> Add to Pipeline
               </button>
             </div>
           </div>
@@ -850,7 +875,26 @@ export default function CreatorProfilePage() {
               <i className="fa-solid fa-arrow-left"></i>
               Back to Results
             </Link>
-            <button className="btn btn-secondary">
+            <button 
+              className="btn btn-secondary"
+              onClick={() => {
+                exportCreatorReport({
+                  name: creatorData.name,
+                  handle: creatorData.handle,
+                  platform: creatorData.platform,
+                  followers: creatorData.followers,
+                  engagement: creatorData.engagement,
+                  trustScore: creatorData.score,
+                  categories: [creatorData.niche],
+                  metrics: {
+                    avgLikes: creatorData.avgLikes,
+                    avgComments: creatorData.avgComments,
+                    postsPerWeek: contentAnalysis.avgPostsPerWeek,
+                    growthRate: creatorData.growthRate,
+                  }
+                });
+              }}
+            >
               <i className="fa-solid fa-download"></i>
               Export Report
             </button>
@@ -858,12 +902,26 @@ export default function CreatorProfilePage() {
               <i className="fa-solid fa-share-nodes"></i>
               Share Report
             </button>
-            <button className="btn btn-primary">
-              <i className="fa-solid fa-plus"></i>
-              Add to Campaign
+            <button className="btn btn-primary" onClick={() => setShowPipelineModal(true)}>
+              <i className="fa-solid fa-diagram-project"></i>
+              Add to Pipeline
             </button>
           </div>
         </div>
+
+        {/* Add to Pipeline Modal */}
+        <AddToPipelineModal
+          isOpen={showPipelineModal}
+          onClose={() => setShowPipelineModal(false)}
+          creator={{
+            creatorId: params.id as string,
+            creatorName: creatorData.name,
+            creatorHandle: creatorData.handle,
+            platform: creatorData.platform,
+            followers: creatorData.followers,
+            engagementRate: parseFloat(creatorData.engagement.replace('%', ''))
+          }}
+        />
       </div>
     </div>
   );

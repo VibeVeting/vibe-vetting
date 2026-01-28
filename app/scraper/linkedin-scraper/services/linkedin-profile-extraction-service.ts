@@ -323,9 +323,9 @@ export class LinkedinProfileExtractionService {
       experiences.forEach((exp) => {
         const key = `${exp.title}::${exp.company}`;
         // Drop employment-type companies when a real company exists for same title
-        if (EMPLOYMENT_TYPES.test(exp.company)) {
+        if (exp.company && EMPLOYMENT_TYPES.test(exp.company)) {
           const nonType = Array.from(seen.values()).find(
-            (e) => e.title === exp.title && !EMPLOYMENT_TYPES.test(e.company)
+            (e) => e.title === exp.title && e.company && !EMPLOYMENT_TYPES.test(e.company)
           );
           if (nonType) return;
         }

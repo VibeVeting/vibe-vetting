@@ -1,10 +1,10 @@
 "use client";
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function RegisterPage() {
+function RegisterContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [formData, setFormData] = useState({
@@ -260,18 +260,12 @@ export default function RegisterPage() {
             <button 
               type="button" 
               className="social-btn"
-              onClick={() => {
-                setOauthLoading('meta');
-                window.location.href = '/api/auth/meta';
-              }}
-              disabled={oauthLoading !== null}
+              disabled={true}
+              style={{ opacity: 0.6, cursor: 'not-allowed' }}
+              title="Coming Soon"
             >
-              {oauthLoading === 'meta' ? (
-                <i className="fa-solid fa-spinner fa-spin"></i>
-              ) : (
-                <i className="fa-brands fa-meta"></i>
-              )}
-              Meta
+              <i className="fa-brands fa-facebook"></i>
+              Meta <span style={{ fontSize: '10px', marginLeft: '4px' }}>(Soon)</span>
             </button>
           </div>
 
@@ -281,5 +275,23 @@ export default function RegisterPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={
+      <div className="auth-page">
+        <div className="auth-container">
+          <div className="auth-box">
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
+              <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: '24px', color: '#667eea' }}></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    }>
+      <RegisterContent />
+    </Suspense>
   );
 }

@@ -3,9 +3,12 @@
 import { Sidebar } from '@/components/common/Sidebar';
 import { TopBar } from '@/components/common/TopBar';
 import { CardMenu } from '@/components/common/CardMenu';
+import { AIButton, AIQuickAction } from '@/components/common/AIButton';
+import { AddToPipelineModal } from '@/components/pipeline/AddToPipelineModal';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { exportAsCSV } from '@/lib/export-utils';
 
 interface Campaign {
   id: string;
@@ -16,72 +19,123 @@ interface Campaign {
   matchedCreators: number;
 }
 
-// Default sample campaigns to show immediately
-const defaultCampaigns: Campaign[] = [
-  {
-    id: 'sample-1',
-    name: 'Summer Fashion Launch',
-    status: 'active',
-    creatorsCount: 25,
-    budget: 50000,
-    matchedCreators: 18,
-  },
-  {
-    id: 'sample-2',
-    name: 'Tech Product Review',
-    status: 'active',
-    creatorsCount: 15,
-    budget: 30000,
-    matchedCreators: 12,
-  },
-  {
-    id: 'sample-3',
-    name: 'Holiday Special',
-    status: 'draft',
-    creatorsCount: 30,
-    budget: 75000,
-    matchedCreators: 0,
-  },
-  {
-    id: 'sample-4',
-    name: 'Q3 Brand Awareness',
-    status: 'completed',
-    creatorsCount: 20,
-    budget: 45000,
-    matchedCreators: 20,
-  },
-];
+// Empty campaigns state - no sample data
+const defaultCampaigns: Campaign[] = [];
 
 export default function CampaignsPage() {
   const router = useRouter();
   const [campaigns, setCampaigns] = useState<Campaign[]>(defaultCampaigns);
-  const [isUsingDefaults, setIsUsingDefaults] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showPipelineModal, setShowPipelineModal] = useState(false);
+  const [selectedCampaignForPipeline, setSelectedCampaignForPipeline] = useState<string | null>(null);
+
+  const handleAddCreatorsToPipeline = (campaignId: string) => {
+    setSelectedCampaignForPipeline(campaignId);
+    setShowPipelineModal(true);
+  };
   const [statusFilter, setStatusFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('newest');
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchCampaigns = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) return;
+  const handleUpdateStatus = async (campaignId: string, newStatus: string) => {
+    setUpdatingStatusId(campaignId);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
 
-        const response = await fetch('/api/user/campaigns', {
-          headers: { 'Authorization': `Bearer ${token}` },
-        });
+      const response = await fetch(`/api/user/campaigns?id=${campaignId}`, {
+        method: 'PATCH',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
 
-        if (response.ok) {
-          const data = await response.json();
-          if (data.campaigns && data.campaigns.length > 0) {
-            setCampaigns(data.campaigns);
-            setIsUsingDefaults(false);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching campaigns:', error);
+      if (response.ok) {
+        setCampaigns(campaigns.map(c => 
+          c.id === campaignId ? { ...c, status: newStatus } : c
+        ));
+      } else {
+        const data = await response.json();
+        alert(data.error || 'Failed to update status');
       }
-    };
+    } catch (error) {
+      console.error('Error updating status:', error);
+      alert('Failed to update status');
+    } finally {
+      setUpdatingStatusId(null);
+    }
+  };
 
+  const handleDeleteCampaign = async (campaignId: string, campaignName: string) => {
+    if (!confirm(`Are you sure you want to move "${campaignName}" to trash? You can restore it later from settings.`)) {
+      return;
+    }
+
+    setDeletingId(campaignId);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const response = await fetch(`/api/user/campaigns?id=${campaignId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+
+      if (response.ok) {
+        setCampaigns(campaigns.filter(c => c.id !== campaignId));
+      } else {
+        const data = await response.json();
+        alert(data.error || 'Failed to delete campaign');
+      }
+    } catch (error) {
+      console.error('Error deleting campaign:', error);
+      alert('Failed to delete campaign');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const fetchCampaigns = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      const response = await fetch('/api/user/campaigns', {
+        headers: { 'Authorization': `Bearer ${token}` },
+        cache: 'no-store', // Prevent caching to always get fresh data
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setCampaigns(data.campaigns || []);
+      }
+    } catch (error) {
+      console.error('Error fetching campaigns:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch campaigns on mount and when returning to the page
+  useEffect(() => {
     fetchCampaigns();
+    
+    // Refetch when window regains focus (user returns from another page)
+    const handleFocus = () => {
+      fetchCampaigns();
+    };
+    window.addEventListener('focus', handleFocus);
+    
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []);
 
   const handleNewCampaign = () => {
@@ -108,7 +162,37 @@ export default function CampaignsPage() {
       return false;
     }
     return true;
+  }).sort((a, b) => {
+    // Sorting
+    switch (sortBy) {
+      case 'newest':
+        return b.id.localeCompare(a.id); // Assuming newer IDs are greater
+      case 'oldest':
+        return a.id.localeCompare(b.id);
+      case 'name-asc':
+        return a.name.localeCompare(b.name);
+      case 'name-desc':
+        return b.name.localeCompare(a.name);
+      case 'budget-high':
+        return (b.budget || 0) - (a.budget || 0);
+      case 'budget-low':
+        return (a.budget || 0) - (b.budget || 0);
+      case 'creators-high':
+        return (b.creatorsCount || 0) - (a.creatorsCount || 0);
+      case 'creators-low':
+        return (a.creatorsCount || 0) - (b.creatorsCount || 0);
+      default:
+        return 0;
+    }
   });
+
+  // Get counts for tabs
+  const statusCounts = {
+    all: campaigns.length,
+    active: campaigns.filter(c => c.status === 'active').length,
+    draft: campaigns.filter(c => c.status === 'draft').length,
+    completed: campaigns.filter(c => c.status === 'completed').length,
+  };
 
   return (
       <div className="dashboard-wrapper">
@@ -117,13 +201,66 @@ export default function CampaignsPage() {
           <div className="container">
             <TopBar
               title="Campaigns"
-              subtitle={isUsingDefaults ? `Manage your influencer campaigns (Sample Data) • ${filteredCampaigns.length} campaigns` : `Manage your influencer campaigns • ${filteredCampaigns.length} campaigns`}
+              subtitle={`Manage your influencer campaigns • ${filteredCampaigns.length} campaigns`}
               actionButton={{
                 label: 'New Campaign',
                 icon: 'fa-plus',
                 onClick: handleNewCampaign,
               }}
+              secondaryButton={{
+                label: 'Export CSV',
+                icon: 'fa-file-csv',
+                onClick: () => {
+                  if (campaigns.length === 0) {
+                    alert('No campaigns to export');
+                    return;
+                  }
+                  const exportData = campaigns.map(c => ({
+                    'Campaign Name': c.name,
+                    'Status': c.status,
+                    'Creators': c.creatorsCount,
+                    'Budget': `$${c.budget?.toLocaleString() || 0}`,
+                    'Matched Creators': c.matchedCreators || 0
+                  }));
+                  exportAsCSV(exportData, `campaigns-${new Date().toISOString().split('T')[0]}`);
+                },
+              }}
             />
+
+            {/* Status Tabs */}
+            <div className="status-tabs">
+              <button 
+                className={`status-tab ${statusFilter === 'all' ? 'active' : ''}`}
+                onClick={() => setStatusFilter('all')}
+              >
+                <span>All</span>
+                <span className="tab-count">{statusCounts.all}</span>
+              </button>
+              <button 
+                className={`status-tab ${statusFilter === 'active' ? 'active' : ''}`}
+                onClick={() => setStatusFilter('active')}
+              >
+                <i className="fa-solid fa-circle-play"></i>
+                <span>Active</span>
+                <span className="tab-count">{statusCounts.active}</span>
+              </button>
+              <button 
+                className={`status-tab ${statusFilter === 'draft' ? 'active' : ''}`}
+                onClick={() => setStatusFilter('draft')}
+              >
+                <i className="fa-solid fa-file-pen"></i>
+                <span>Draft</span>
+                <span className="tab-count">{statusCounts.draft}</span>
+              </button>
+              <button 
+                className={`status-tab ${statusFilter === 'completed' ? 'active' : ''}`}
+                onClick={() => setStatusFilter('completed')}
+              >
+                <i className="fa-solid fa-circle-check"></i>
+                <span>Completed</span>
+                <span className="tab-count">{statusCounts.completed}</span>
+              </button>
+            </div>
 
             {/* Filters */}
             <div className="filters-section">
@@ -149,23 +286,57 @@ export default function CampaignsPage() {
                 </div>
               </div>
               <div className="filter-group">
-                <span className="filter-label">Status</span>
+                <span className="filter-label">Sort By</span>
                 <select 
                   className="filter-select"
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
                 >
-                  <option value="all">All Status</option>
-                  <option value="active">Active</option>
-                  <option value="draft">Draft</option>
-                  <option value="completed">Completed</option>
+                  <option value="newest">Newest First</option>
+                  <option value="oldest">Oldest First</option>
+                  <option value="name-asc">Name (A-Z)</option>
+                  <option value="name-desc">Name (Z-A)</option>
+                  <option value="budget-high">Budget (High-Low)</option>
+                  <option value="budget-low">Budget (Low-High)</option>
+                  <option value="creators-high">Creators (Most)</option>
+                  <option value="creators-low">Creators (Least)</option>
                 </select>
               </div>
             </div>
 
+            {/* AI Quick Actions */}
+            {/* <div className="ai-quick-actions-row">
+              <AIQuickAction 
+                title="Find Matching Creators"
+                description="AI finds creators perfect for this campaign"
+                icon="fa-user-plus"
+                type="find-creators"
+                defaultData={{ goal: 'Brand awareness', target: 'Gen Z and Millennials', budget: '$50,000' }}
+              />
+              <AIQuickAction 
+                title="Compare Creators"
+                description="Compare shortlisted creators side-by-side"
+                icon="fa-code-compare"
+                type="compare-creators"
+                defaultData={{ creators: 'Selected creators' }}
+              />
+              <AIQuickAction 
+                title="Bulk Outreach"
+                description="Generate emails for multiple creators"
+                icon="fa-paper-plane"
+                type="outreach-email"
+                defaultData={{ creatorName: 'Creator', niche: 'Fashion', brandName: 'Your Brand', campaignGoal: 'Summer campaign' }}
+              />
+            </div> */}
+
             {/* Campaigns Grid */}
             <div className="campaigns-grid">
-              {filteredCampaigns.length > 0 ? (
+              {loading ? (
+                <div style={{ gridColumn: 'span 3', padding: '60px', textAlign: 'center', color: '#718096' }}>
+                  <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: '32px', marginBottom: '16px' }}></i>
+                  <p>Loading campaigns...</p>
+                </div>
+              ) : filteredCampaigns.length > 0 ? (
                 filteredCampaigns.map((campaign) => (
                   <div key={campaign.id} className="campaign-card">
                     <div className="campaign-header">
@@ -176,18 +347,36 @@ export default function CampaignsPage() {
                         </span>
                       </div>
                       <CardMenu items={[
-                        { label: 'Edit Campaign', icon: 'fa-pen', onClick: () => router.push(`/campaigns/create?edit=${campaign.id}`) },
-                        { label: 'View Matches', icon: 'fa-users', onClick: () => router.push('/campaigns/matches') },
-                        { label: 'Duplicate', icon: 'fa-copy', onClick: () => alert('Duplicate coming soon!') },
-                        { label: 'Delete', icon: 'fa-trash', onClick: () => alert('Delete coming soon!'), danger: true },
+                        { label: 'Edit Campaign', icon: 'fa-pen', onClick: () => router.push(`/campaigns/${campaign.id}/edit`) },
+                        { label: 'View Pipeline', icon: 'fa-users', onClick: () => router.push(`/campaigns/${campaign.id}/pipeline`) },
+                        // Status change options
+                        ...(campaign.status !== 'active' ? [{ 
+                          label: updatingStatusId === campaign.id ? 'Updating...' : 'Mark as Active', 
+                          icon: updatingStatusId === campaign.id ? 'fa-spinner fa-spin' : 'fa-circle-play', 
+                          onClick: () => handleUpdateStatus(campaign.id, 'active'),
+                          disabled: updatingStatusId === campaign.id 
+                        }] : []),
+                        ...(campaign.status !== 'draft' ? [{ 
+                          label: updatingStatusId === campaign.id ? 'Updating...' : 'Mark as Draft', 
+                          icon: updatingStatusId === campaign.id ? 'fa-spinner fa-spin' : 'fa-file-pen', 
+                          onClick: () => handleUpdateStatus(campaign.id, 'draft'),
+                          disabled: updatingStatusId === campaign.id 
+                        }] : []),
+                        ...(campaign.status !== 'completed' ? [{ 
+                          label: updatingStatusId === campaign.id ? 'Updating...' : 'Mark as Completed', 
+                          icon: updatingStatusId === campaign.id ? 'fa-spinner fa-spin' : 'fa-circle-check', 
+                          onClick: () => handleUpdateStatus(campaign.id, 'completed'),
+                          disabled: updatingStatusId === campaign.id 
+                        }] : []),
+                        { label: deletingId === campaign.id ? 'Moving...' : 'Move to Trash', icon: deletingId === campaign.id ? 'fa-spinner fa-spin' : 'fa-trash-can', onClick: () => handleDeleteCampaign(campaign.id, campaign.name), danger: true, disabled: deletingId === campaign.id },
                       ]} />
                     </div>
 
                     <div className="card-metrics">
-                      <div className="metric">
+                      <Link href={`/campaigns/${campaign.id}/pipeline`} className="metric" style={{ cursor: 'pointer', textDecoration: 'none' }}>
                         <div className="metric-label">Creators</div>
                         <div className="metric-value">{campaign.creatorsCount}</div>
-                      </div>
+                      </Link>
                       <div className="metric">
                         <div className="metric-label">Budget</div>
                         <div className="metric-value">${campaign.budget?.toLocaleString() || 0}</div>
@@ -203,12 +392,18 @@ export default function CampaignsPage() {
                     </div>
 
                     <div className="campaign-actions">
-                      <Link href={`/campaigns/matches`} className="btn btn-secondary">
+                      <Link href={`/campaigns/${campaign.id}/pipeline`} className="btn btn-primary">
+                        <i className="fa-solid fa-diagram-project"></i> Pipeline
+                      </Link>
+                      <Link href={`/campaigns/${campaign.id}/pipeline`} className="btn btn-secondary">
                         View Details
                       </Link>
-                      <Link href={`/campaigns/add-creator`} className="btn btn-primary">
-                        Add Creators
-                      </Link>
+                      <button 
+                        className="btn btn-secondary"
+                        onClick={() => handleAddCreatorsToPipeline(campaign.id)}
+                      >
+                        <i className="fa-solid fa-user-plus"></i> Add Creators
+                      </button>
                     </div>
                   </div>
               ))
@@ -222,6 +417,19 @@ export default function CampaignsPage() {
             </div>
           </div>
         </div>
+
+        {/* Add to Pipeline Modal */}
+        <AddToPipelineModal
+          isOpen={showPipelineModal}
+          onClose={() => {
+            setShowPipelineModal(false);
+            setSelectedCampaignForPipeline(null);
+          }}
+          preSelectedCampaignId={selectedCampaignForPipeline || undefined}
+          onSuccess={(campaignId) => {
+            router.push(`/campaigns/${campaignId}/pipeline`);
+          }}
+        />
       </div>
   );
 }

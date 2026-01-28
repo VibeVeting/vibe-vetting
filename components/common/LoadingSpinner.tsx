@@ -17,8 +17,6 @@ export function LoadingSpinner({ size = 'md', text, fullScreen = false }: Loadin
     <div className={`loading-spinner-container ${fullScreen ? 'fullscreen' : ''}`}>
       <div className={`spinner ${sizeClasses[size]}`}>
         <div className="spinner-ring" />
-        <div className="spinner-ring" />
-        <div className="spinner-ring" />
         <div className="spinner-center">
           <i className="fa-solid fa-bolt" />
         </div>
@@ -54,28 +52,14 @@ export function LoadingSpinner({ size = 'md', text, fullScreen = false }: Loadin
           position: absolute;
           inset: 0;
           border-radius: 50%;
-          border: 3px solid transparent;
-          animation: spin 1.5s linear infinite;
+          border: 3px solid rgba(0, 245, 255, 0.2);
+          border-top-color: #00f5ff;
+          animation: spin 1s linear infinite;
         }
 
         .spinner.w-6 .spinner-ring { border-width: 2px; }
         .spinner.w-10 .spinner-ring { border-width: 3px; }
         .spinner.w-16 .spinner-ring { border-width: 4px; }
-
-        .spinner-ring:nth-child(1) {
-          border-top-color: #00f5ff;
-          animation-delay: 0s;
-        }
-
-        .spinner-ring:nth-child(2) {
-          border-right-color: #a855f7;
-          animation-delay: -0.5s;
-        }
-
-        .spinner-ring:nth-child(3) {
-          border-bottom-color: #ec4899;
-          animation-delay: -1s;
-        }
 
         @keyframes spin {
           to { transform: rotate(360deg); }

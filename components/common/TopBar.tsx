@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/auth-context';
+import { useTheme } from '@/contexts/theme-context';
 import { useRouter } from 'next/navigation';
 
 interface SearchResult {
@@ -13,6 +14,15 @@ interface SearchResult {
   url: string;
 }
 
+interface Notification {
+  _id: string;
+  title: string;
+  body: string;
+  type?: string;
+  read: boolean;
+  createdAt: string;
+}
+
 interface TopBarProps {
   title: string;
   subtitle?: string;
@@ -22,13 +32,21 @@ interface TopBarProps {
     icon?: string;
     onClick: () => void;
   };
+  secondaryButton?: {
+    label: string;
+    icon?: string;
+    onClick: () => void;
+  };
 }
 
-export function TopBar({ title, subtitle, showSearch = true, actionButton }: TopBarProps) {
-  const { user, logout } = useAuth();
+export function TopBar({ title, subtitle, showSearch = true, actionButton, secondaryButton }: TopBarProps) {
+  const { user, logout, token } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const router = useRouter();
   const [showDropdown, setShowDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notificationsLoading, setNotificationsLoading] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
@@ -175,6 +193,63 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton }: Top
     return () => clearTimeout(timer);
   }, [searchQuery, performSearch]);
 
+  // Fetch notifications from API
+  const fetchNotifications = useCallback(async () => {
+    if (!token) return;
+    setNotificationsLoading(true);
+    try {
+      const res = await fetch('/api/notifications', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (data.success) {
+        setNotifications(data.notifications || []);
+      }
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    } finally {
+      setNotificationsLoading(false);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    fetchNotifications();
+  }, [fetchNotifications]);
+
+  const handleMarkRead = async (id: string) => {
+    if (!token) return;
+    try {
+      const res = await fetch(`/api/notifications/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ read: true }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setNotifications((prev) => prev.map((n) => (n._id === id ? { ...n, read: true } : n)));
+      }
+    } catch (error) {
+      console.error('Error marking notification read:', error);
+    }
+  };
+
+  const handleMarkAllRead = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch('/api/notifications', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ markAllRead: true }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+      }
+    } catch (error) {
+      console.error('Error marking all notifications read:', error);
+    }
+  };
+
   const handleSearchResultClick = (result: SearchResult) => {
     router.push(result.url);
     setSearchQuery('');
@@ -188,13 +263,20 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton }: Top
     .toUpperCase()
     .slice(0, 2) || 'U';
 
-  const notifications = [
-    { id: 1, type: 'match', title: 'New perfect match found', desc: '@sarah_lifestyle matched 96%', time: '2m ago', unread: true },
-    { id: 2, type: 'alert', title: 'Risk alert detected', desc: 'Review @tech_guru profile', time: '1h ago', unread: true },
-    { id: 3, type: 'campaign', title: 'Campaign completed', desc: 'Summer Collection campaign ended', time: '3h ago', unread: false },
-  ];
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
-  const unreadCount = notifications.filter(n => n.unread).length;
+  const formatTimeAgo = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    const diffHrs = Math.floor(diffMins / 60);
+    if (diffHrs < 24) return `${diffHrs}h ago`;
+    const diffDays = Math.floor(diffHrs / 24);
+    return `${diffDays}d ago`;
+  };
 
   return (
     <div className="top-bar-enhanced">
@@ -272,6 +354,13 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton }: Top
           </div>
         )}
 
+        {secondaryButton && (
+          <button onClick={secondaryButton.onClick} className="action-btn-secondary">
+            {secondaryButton.icon && <i className={`fa-solid ${secondaryButton.icon}`}></i>}
+            <span>{secondaryButton.label}</span>
+          </button>
+        )}
+
         {actionButton && (
           <button onClick={actionButton.onClick} className="action-btn-primary">
             {actionButton.icon && <i className={`fa-solid ${actionButton.icon}`}></i>}
@@ -293,26 +382,38 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton }: Top
             <div className="notification-dropdown">
               <div className="notification-header">
                 <h4>Notifications</h4>
-                <button className="mark-all-btn">Mark all read</button>
+                <button className="mark-all-btn" onClick={handleMarkAllRead} disabled={unreadCount === 0}>Mark all read</button>
               </div>
               <div className="notification-list">
-                {notifications.map(notif => (
-                  <div key={notif.id} className={`notification-item ${notif.unread ? 'unread' : ''}`}>
-                    <div className={`notification-icon ${notif.type}`}>
-                      <i className={`fa-solid ${
-                        notif.type === 'match' ? 'fa-heart' :
-                        notif.type === 'alert' ? 'fa-triangle-exclamation' :
-                        'fa-bullhorn'
-                      }`}></i>
+                {notificationsLoading ? (
+                  <div className="notification-item"><i className="fa-solid fa-spinner fa-spin"></i> Loading...</div>
+                ) : notifications.length === 0 ? (
+                  <div className="notification-item">No notifications</div>
+                ) : (
+                  notifications.slice(0, 5).map((notif) => (
+                    <div
+                      key={notif._id}
+                      className={`notification-item ${!notif.read ? 'unread' : ''}`}
+                      onClick={() => !notif.read && handleMarkRead(notif._id)}
+                      style={{ cursor: !notif.read ? 'pointer' : 'default' }}
+                    >
+                      <div className={`notification-icon ${notif.type || 'info'}`}>
+                        <i className={`fa-solid ${
+                          notif.type === 'match' ? 'fa-heart' :
+                          notif.type === 'alert' ? 'fa-triangle-exclamation' :
+                          notif.type === 'campaign' ? 'fa-bullhorn' :
+                          'fa-bell'
+                        }`}></i>
+                      </div>
+                      <div className="notification-content">
+                        <p className="notification-title">{notif.title}</p>
+                        <p className="notification-desc">{notif.body}</p>
+                        <span className="notification-time">{formatTimeAgo(notif.createdAt)}</span>
+                      </div>
+                      {!notif.read && <div className="unread-dot"></div>}
                     </div>
-                    <div className="notification-content">
-                      <p className="notification-title">{notif.title}</p>
-                      <p className="notification-desc">{notif.desc}</p>
-                      <span className="notification-time">{notif.time}</span>
-                    </div>
-                    {notif.unread && <div className="unread-dot"></div>}
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
               <a href="/notifications" className="view-all-notifications">
                 View all notifications
@@ -352,7 +453,7 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton }: Top
                   <i className="fa-solid fa-gear"></i>
                   Settings
                 </a>
-                <a href="/help" className="dropdown-item">
+                <a href="/help-support" className="dropdown-item">
                   <i className="fa-solid fa-circle-question"></i>
                   Help & Support
                 </a>
@@ -605,13 +706,13 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton }: Top
         .action-btn-primary {
           display: flex;
           align-items: center;
-          gap: 8px;
-          padding: 12px 20px;
+          gap: 6px;
+          padding: 10px 16px;
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           color: white;
           border: none;
-          border-radius: 12px;
-          font-size: 14px;
+          border-radius: 10px;
+          font-size: 13px;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.2s ease;
@@ -625,23 +726,31 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton }: Top
 
         .icon-btn {
           position: relative;
-          width: 44px;
-          height: 44px;
+          width: 38px;
+          height: 38px;
           display: flex;
           align-items: center;
           justify-content: center;
-          background: white;
-          border: 2px solid #edf2f7;
-          border-radius: 12px;
-          color: #718096;
+          background: var(--bg-input, rgba(255, 255, 255, 0.05));
+          border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+          border-radius: 10px;
+          color: var(--text-secondary, #9ca3af);
           cursor: pointer;
           transition: all 0.2s ease;
         }
 
         .icon-btn:hover {
-          border-color: #667eea;
-          color: #667eea;
-          background: rgba(102, 126, 234, 0.05);
+          border-color: var(--primary, #667eea);
+          color: var(--primary, #667eea);
+          background: rgba(102, 126, 234, 0.1);
+        }
+
+        .theme-btn i {
+          transition: transform 0.3s ease;
+        }
+
+        .theme-btn:hover i {
+          transform: rotate(20deg);
         }
 
         .notification-badge {

@@ -137,6 +137,25 @@ export default function CreateCampaignPage() {
           budget: budgetNum,
           startDate: formData.startDate || new Date().toISOString(),
           endDate: formData.endDate || null,
+          // Platform & Reach
+          industry: formData.industry,
+          platforms: formData.platforms,
+          followerRange: formData.followerRange,
+          engagementRate: formData.engagementRate,
+          // Audience Demographics
+          audienceAge: formData.audienceAge,
+          audienceGender: formData.audienceGender,
+          audienceLocation: formData.audienceLocation,
+          // Content Requirements
+          contentType: formData.contentType,
+          contentStyle: formData.contentStyle,
+          postingFrequency: formData.postingFrequency,
+          deliverables: formData.deliverables,
+          // Brand Safety
+          minTrustScore: formData.minTrustScore,
+          maxRiskLevel: formData.maxRiskLevel,
+          brandValues: formData.brandValues,
+          excludeCategories: formData.excludeCategories,
         }),
       });
 
@@ -474,7 +493,7 @@ export default function CreateCampaignPage() {
                       { name: 'LinkedIn', icon: 'fa-linkedin' },
                       { name: 'Facebook', icon: 'fa-facebook' },
                       { name: 'Twitch', icon: 'fa-twitch' },
-                      { name: 'Pinterest', icon: 'fa-pinterest' },
+                      // { name: 'Pinterest', icon: 'fa-pinterest' },
                     ].map((platform) => (
                       <label key={platform.name} className="checkbox-label">
                         <input

@@ -2,8 +2,11 @@
 
 import { Sidebar } from '@/components/common/Sidebar';
 import { TopBar } from '@/components/common/TopBar';
+import { AIButton } from '@/components/common/AIButton';
+import { AddToPipelineModal } from '@/components/pipeline/AddToPipelineModal';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { exportAsCSV } from '@/lib/export-utils';
 
 interface Creator {
   id: string;
@@ -36,6 +39,44 @@ export default function CreatorsPage() {
   const [platformFilter, setPlatformFilter] = useState('all');
   const [scoreFilter, setScoreFilter] = useState('all');
   const [riskFilter, setRiskFilter] = useState('all');
+  const [selectedCreators, setSelectedCreators] = useState<Set<string>>(new Set());
+  const [showPipelineModal, setShowPipelineModal] = useState(false);
+  const [creatorForPipeline, setCreatorForPipeline] = useState<Creator | null>(null);
+
+  const toggleCreatorSelection = (creatorId: string) => {
+    setSelectedCreators(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(creatorId)) {
+        newSet.delete(creatorId);
+      } else {
+        newSet.add(creatorId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleAddSingleToPipeline = (creator: Creator) => {
+    setCreatorForPipeline(creator);
+    setShowPipelineModal(true);
+  };
+
+  const handleAddSelectedToPipeline = () => {
+    setCreatorForPipeline(null);
+    setShowPipelineModal(true);
+  };
+
+  const getSelectedCreatorsData = () => {
+    return creators
+      .filter(c => selectedCreators.has(c.id))
+      .map(c => ({
+        creatorId: c.id,
+        creatorName: c.name,
+        creatorHandle: c.handle,
+        platform: c.platform,
+        followers: c.followers,
+        engagementRate: 0
+      }));
+  };
 
   useEffect(() => {
     const fetchCreators = async () => {
@@ -104,6 +145,25 @@ export default function CreatorsPage() {
             <TopBar
               title="Analyzed Creators"
               subtitle={`Your AI-vetted creators • ${filteredCreators.length} creators found`}
+              secondaryButton={{
+                label: 'Export CSV',
+                icon: 'fa-file-csv',
+                onClick: () => {
+                  if (filteredCreators.length === 0) {
+                    alert('No creators to export');
+                    return;
+                  }
+                  const exportData = filteredCreators.map(c => ({
+                    'Name': c.name,
+                    'Handle': c.handle || c.username,
+                    'Platform': c.platform,
+                    'Followers': c.followers,
+                    'Alignment Score': `${c.alignmentScore}%`,
+                    'Risk Level': c.riskLevel
+                  }));
+                  exportAsCSV(exportData, `creators-${new Date().toISOString().split('T')[0]}`);
+                },
+              }}
             />
 
             {/* Filters */}
@@ -172,6 +232,30 @@ export default function CreatorsPage() {
               </div>
             </div>
 
+            {/* Selection Action Bar */}
+            {selectedCreators.size > 0 && (
+              <div className="selection-action-bar">
+                <div className="selection-info">
+                  <i className="fa-solid fa-check-circle"></i>
+                  <span>{selectedCreators.size} creator{selectedCreators.size > 1 ? 's' : ''} selected</span>
+                </div>
+                <div className="selection-actions">
+                  <button 
+                    className="btn btn-secondary btn-sm"
+                    onClick={() => setSelectedCreators(new Set())}
+                  >
+                    <i className="fa-solid fa-times"></i> Clear
+                  </button>
+                  <button 
+                    className="btn btn-primary btn-sm"
+                    onClick={handleAddSelectedToPipeline}
+                  >
+                    <i className="fa-solid fa-diagram-project"></i> Add to Pipeline
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Creators Grid */}
             <div className="influencers-grid">
               {loading ? (
@@ -181,7 +265,14 @@ export default function CreatorsPage() {
                 </div>
               ) : filteredCreators.length > 0 ? (
                 filteredCreators.map((creator) => (
-                  <div key={creator.id} className="influencer-card">
+                  <div key={creator.id} className={`influencer-card ${selectedCreators.has(creator.id) ? 'selected' : ''}`}>
+                    <div className="card-select-checkbox" onClick={() => toggleCreatorSelection(creator.id)}>
+                      {selectedCreators.has(creator.id) ? (
+                        <i className="fa-solid fa-square-check"></i>
+                      ) : (
+                        <i className="fa-regular fa-square"></i>
+                      )}
+                    </div>
                     <div className="card-header-section">
                       <div className="influencer-avatar">
                         {creator.name.split(' ').map(n => n[0]).join('')}
@@ -219,14 +310,38 @@ export default function CreatorsPage() {
                       ></div>
                     </div>
 
+                    <div className="ai-actions">
+                      <AIButton 
+                        type="outreach-email" 
+                        data={{ creatorName: creator.name, niche: 'Lifestyle', brandName: 'Your Brand', campaignGoal: 'Brand awareness' }}
+                        label="Draft Email"
+                        icon="fa-envelope"
+                      />
+                      <AIButton 
+                        type="risk-assessment" 
+                        data={{ creatorData: `${creator.name}, ${creator.followers} followers, ${creator.platform}` }}
+                        label="AI Risk Check"
+                        icon="fa-shield-halved"
+                      />
+                    </div>
+
                     <div className="card-footer">
                       <span className={`risk-level risk-${creator.riskLevel}`}>
                         <i className="fa-solid fa-shield"></i>
                         {creator.riskLevel} Risk
                       </span>
-                      <Link href={`/creators/${creator.id}`} className="btn btn-primary btn-sm">
-                        View Report
-                      </Link>
+                      <div className="card-footer-actions">
+                        <button 
+                          className="btn btn-secondary btn-sm"
+                          onClick={() => handleAddSingleToPipeline(creator)}
+                          title="Add to Pipeline"
+                        >
+                          <i className="fa-solid fa-diagram-project"></i>
+                        </button>
+                        <Link href={`/creators/${creator.id}`} className="btn btn-primary btn-sm">
+                          View Report
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 ))
@@ -240,6 +355,27 @@ export default function CreatorsPage() {
             </div>
           </div>
         </div>
+
+        {/* Add to Pipeline Modal */}
+        <AddToPipelineModal
+          isOpen={showPipelineModal}
+          onClose={() => {
+            setShowPipelineModal(false);
+            setCreatorForPipeline(null);
+          }}
+          creator={creatorForPipeline ? {
+            creatorId: creatorForPipeline.id,
+            creatorName: creatorForPipeline.name,
+            creatorHandle: creatorForPipeline.handle,
+            platform: creatorForPipeline.platform,
+            followers: creatorForPipeline.followers,
+            engagementRate: 0
+          } : undefined}
+          creators={!creatorForPipeline ? getSelectedCreatorsData() : undefined}
+          onSuccess={() => {
+            setSelectedCreators(new Set());
+          }}
+        />
       </div>
   );
 }

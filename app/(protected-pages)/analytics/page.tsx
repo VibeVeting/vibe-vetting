@@ -4,6 +4,7 @@ import { Sidebar } from '@/components/common/Sidebar';
 import { TopBar } from '@/components/common/TopBar';
 import { CardMenu, MenuItem } from '@/components/common/CardMenu';
 import { useEffect, useState } from 'react';
+import { exportAsCSV } from '@/lib/export-utils';
 
 interface KPI {
   label: string;
@@ -93,9 +94,11 @@ export default function AnalyticsPage() {
               <div className="chart-header">
                 <h3 className="chart-title">Creator Verification Trends</h3>
                 <CardMenu items={[
-                  { label: 'Download Chart', icon: 'fa-download', onClick: () => alert('Download coming soon!') },
-                  { label: 'View Full Report', icon: 'fa-expand', onClick: () => alert('Full report coming soon!') },
-                  { label: 'Share', icon: 'fa-share-nodes', onClick: () => alert('Share coming soon!') },
+                  { label: 'Download Data', icon: 'fa-download', onClick: () => {
+                    exportAsCSV(kpis.map(k => ({ Metric: k.label, Value: k.value, Change: k.change })), 'analytics-kpis');
+                  }},
+                  { label: 'View Full Report', icon: 'fa-expand', onClick: () => window.location.href = '/analytics' },
+                  { label: 'Share', icon: 'fa-share-nodes', onClick: () => { navigator.clipboard.writeText(window.location.href); alert('Link copied!'); } },
                 ]} />
               </div>
               <div className="chart-placeholder">
@@ -109,9 +112,11 @@ export default function AnalyticsPage() {
               <div className="chart-header">
                 <h3 className="chart-title">Platform Distribution</h3>
                 <CardMenu items={[
-                  { label: 'Download Chart', icon: 'fa-download', onClick: () => alert('Download coming soon!') },
-                  { label: 'View Full Report', icon: 'fa-expand', onClick: () => alert('Full report coming soon!') },
-                  { label: 'Share', icon: 'fa-share-nodes', onClick: () => alert('Share coming soon!') },
+                  { label: 'Download Data', icon: 'fa-download', onClick: () => {
+                    exportAsCSV(tableData.map(t => ({ Platform: t.platform, Creators: t.creators, 'Avg Score': `${t.avgScore}%`, Performance: `${t.performance}%` })), 'platform-distribution');
+                  }},
+                  { label: 'View Full Report', icon: 'fa-expand', onClick: () => window.location.href = '/analytics' },
+                  { label: 'Share', icon: 'fa-share-nodes', onClick: () => { navigator.clipboard.writeText(window.location.href); alert('Link copied!'); } },
                 ]} />
               </div>
               <div className="chart-placeholder">
@@ -126,6 +131,16 @@ export default function AnalyticsPage() {
           <div className="stats-table-card">
             <div className="table-header">
               <h3 className="table-title">Platform Performance</h3>
+              <CardMenu items={[
+                { label: 'Export to CSV', icon: 'fa-file-csv', onClick: () => {
+                  exportAsCSV(tableData.map(t => ({ 
+                    Platform: t.platform, 
+                    Creators: t.creators, 
+                    'Avg Score': `${t.avgScore}%`, 
+                    Performance: `${t.performance}%` 
+                  })), 'platform-performance');
+                }},
+              ]} />
             </div>
             <table className="stats-table">
               <thead>

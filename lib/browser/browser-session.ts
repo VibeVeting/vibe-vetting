@@ -26,7 +26,7 @@ async function launchLocalBrowser(): Promise<BrowserSession> {
       "--disable-features=IsolateOrigins,site-per-process",
       "--window-size=1440,900",
     ],
-  });
+  }) as unknown as Browser;
 
   return {
     browser,

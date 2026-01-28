@@ -7,6 +7,7 @@ export interface MenuItem {
   icon: string;
   onClick: () => void;
   danger?: boolean;
+  disabled?: boolean;
 }
 
 interface CardMenuProps {
@@ -43,11 +44,13 @@ export function CardMenu({ items }: CardMenuProps) {
           {items.map((item, index) => (
             <button
               key={index}
-              className={`menu-item ${item.danger ? 'danger' : ''}`}
+              className={`menu-item ${item.danger ? 'danger' : ''} ${item.disabled ? 'disabled' : ''}`}
               onClick={() => {
+                if (item.disabled) return;
                 item.onClick();
                 setIsOpen(false);
               }}
+              disabled={item.disabled}
             >
               <i className={`fa-solid ${item.icon}`}></i>
               <span>{item.label}</span>
@@ -89,10 +92,11 @@ export function CardMenu({ items }: CardMenuProps) {
           border: 1px solid #e2e8f0;
           border-radius: 12px;
           box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-          min-width: 180px;
-          z-index: 100;
-          overflow: hidden;
+          min-width: 200px;
+          z-index: 9999;
+          overflow: visible;
           animation: slideDown 0.15s ease;
+          padding: 6px 0;
         }
 
         @keyframes slideDown {
@@ -134,6 +138,16 @@ export function CardMenu({ items }: CardMenuProps) {
         .menu-item.danger:hover {
           background: #fff5f5;
           color: #c53030;
+        }
+
+        .menu-item.disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        .menu-item.disabled:hover {
+          background: none;
+          color: inherit;
         }
 
         .menu-item i {

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CardMenu, MenuItem } from '@/components/common/CardMenu';
+import { exportAsCSV } from '@/lib/export-utils';
 
 interface CreatorAnalysis {
   id: string;
@@ -14,54 +15,8 @@ interface CreatorAnalysis {
   riskLevel: string;
 }
 
-// Default sample data to show when no real data exists
-const defaultAnalyses: CreatorAnalysis[] = [
-  {
-    id: '1',
-    name: 'Sarah Johnson',
-    avatar: 'https://ui-avatars.com/api/?name=Sarah+Johnson&background=667eea&color=fff',
-    followers: '2.4M',
-    status: 'verified',
-    alignmentScore: 94,
-    riskLevel: 'Low',
-  },
-  {
-    id: '2',
-    name: 'Alex Chen',
-    avatar: 'https://ui-avatars.com/api/?name=Alex+Chen&background=22c55e&color=fff',
-    followers: '1.8M',
-    status: 'verified',
-    alignmentScore: 91,
-    riskLevel: 'Low',
-  },
-  {
-    id: '3',
-    name: 'Mike Rivera',
-    avatar: 'https://ui-avatars.com/api/?name=Mike+Rivera&background=f59e0b&color=fff',
-    followers: '890K',
-    status: 'pending',
-    alignmentScore: 76,
-    riskLevel: 'Medium',
-  },
-  {
-    id: '4',
-    name: 'Emma Wilson',
-    avatar: 'https://ui-avatars.com/api/?name=Emma+Wilson&background=ec4899&color=fff',
-    followers: '3.2M',
-    status: 'verified',
-    alignmentScore: 88,
-    riskLevel: 'Low',
-  },
-  {
-    id: '5',
-    name: 'James Taylor',
-    avatar: 'https://ui-avatars.com/api/?name=James+Taylor&background=ef4444&color=fff',
-    followers: '520K',
-    status: 'risk',
-    alignmentScore: 45,
-    riskLevel: 'High',
-  },
-];
+// Empty default state - no sample data
+const defaultAnalyses: CreatorAnalysis[] = [];
 
 function StatusBadge({ status }: { status: 'verified' | 'pending' | 'risk' }) {
   const classMap = {
@@ -100,10 +55,8 @@ export function RecentAnalysesTable() {
 
         if (response.ok) {
           const data = await response.json();
-          if (data.analyses && data.analyses.length > 0) {
-            setAnalyses(data.analyses);
-            setIsUsingDefaults(false);
-          }
+          setAnalyses(data.analyses || []);
+          setIsUsingDefaults(false);
         }
       } catch (error) {
         console.error('Error fetching analyses:', error);
@@ -123,8 +76,18 @@ export function RecentAnalysesTable() {
       label: 'Export to CSV',
       icon: 'fa-file-csv',
       onClick: () => {
-        // Export functionality
-        alert('Export feature coming soon!');
+        if (analyses.length === 0) {
+          alert('No data to export');
+          return;
+        }
+        const exportData = analyses.map(a => ({
+          'Creator Name': a.name,
+          'Followers': a.followers,
+          'Status': a.status,
+          'Alignment Score': `${a.alignmentScore}%`,
+          'Risk Level': a.riskLevel
+        }));
+        exportAsCSV(exportData, `creator-analyses-${new Date().toISOString().split('T')[0]}`);
       },
     },
     {
@@ -143,11 +106,17 @@ export function RecentAnalysesTable() {
       <div className="card-header">
         <h3 className="card-title">
           Recent Creator Analyses
-          {isUsingDefaults && <span style={{ fontSize: '11px', color: '#a0aec0', fontWeight: 400, marginLeft: '8px' }}>(Sample Data)</span>}
         </h3>
         <CardMenu items={menuItems} />
       </div>
       <div style={{ overflowX: 'auto' }}>
+        {analyses.length === 0 ? (
+          <div style={{ padding: '40px', textAlign: 'center', color: '#718096' }}>
+            <i className="fa-solid fa-users" style={{ fontSize: '32px', marginBottom: '12px', opacity: 0.5 }}></i>
+            <p>No creators analyzed yet</p>
+            <p style={{ fontSize: '13px', marginTop: '4px' }}>Start analyzing creators to see them here</p>
+          </div>
+        ) : (
         <table className="analytics-table">
           <thead>
             <tr>
@@ -190,6 +159,7 @@ export function RecentAnalysesTable() {
               ))}
             </tbody>
           </table>
+        )}
       </div>
     </div>
   );
