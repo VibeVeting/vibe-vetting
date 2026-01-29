@@ -377,7 +377,24 @@ export default function CreatorDashboard() {
     if (!selectedOffer) return;
     
     const token = localStorage.getItem('token');
-    if (!token) return;
+    if (!token) {
+      alert('Please login again to apply');
+      router.push('/login-barter');
+      return;
+    }
+
+    // Check if it's a mock offer (for demo purposes)
+    if (selectedOffer._id.startsWith('mock-')) {
+      // Simulate successful application for demo
+      alert('🎉 Application submitted successfully! (Demo Mode)\n\nThis is a demo product. In production, your application would be sent to the brand for review.');
+      setShowApplyModal(false);
+      setSelectedOffer(null);
+      // Remove the applied offer from the list for demo
+      setOffers(prev => prev.map(o => 
+        o._id === selectedOffer._id ? { ...o, hasApplied: true } : o
+      ));
+      return;
+    }
 
     setApplyLoading(true);
     try {
@@ -798,26 +815,8 @@ export default function CreatorDashboard() {
                 ) : (
                   getFilteredOffers().map((offer) => (
                     <div key={offer._id} className="offer-card">
-                      {/* Urgency Badge */}
-                      {getDaysRemaining(offer.deadline) <= 3 && (
-                        <div className="offer-urgency-badge urgent">
-                          <i className="fa-solid fa-fire"></i> Ends in {getDaysRemaining(offer.deadline)} days
-                        </div>
-                      )}
-                      {getDaysRemaining(offer.deadline) > 3 && getDaysRemaining(offer.deadline) <= 7 && (
-                        <div className="offer-urgency-badge warning">
-                          <i className="fa-solid fa-clock"></i> {getDaysRemaining(offer.deadline)} days left
-                        </div>
-                      )}
-                      
-                      <div className="offer-card-header">
-                        <div className="brand-info">
-                          <span className="brand-logo">{offer.brandLogo || categoryIcons[offer.productCategory] || '🏢'}</span>
-                          <div>
-                            <h3>{offer.brandName}</h3>
-                            <span className="brand-category">{offer.productCategory}</span>
-                          </div>
-                        </div>
+                      {/* Badges Row - Absolute positioned at top */}
+                      <div className="offer-badges-row">
                         <div 
                           className="content-type-badge" 
                           style={{ 
@@ -827,6 +826,26 @@ export default function CreatorDashboard() {
                         >
                           <i className={`fa-solid ${contentTypeIcons[offer.contentType]?.icon || 'fa-file'}`}></i>
                           {contentTypeIcons[offer.contentType]?.label || offer.contentType}
+                        </div>
+                        {getDaysRemaining(offer.deadline) <= 3 && (
+                          <div className="offer-urgency-badge urgent">
+                            <i className="fa-solid fa-fire"></i> {getDaysRemaining(offer.deadline)}d left
+                          </div>
+                        )}
+                        {getDaysRemaining(offer.deadline) > 3 && getDaysRemaining(offer.deadline) <= 7 && (
+                          <div className="offer-urgency-badge warning">
+                            <i className="fa-solid fa-clock"></i> {getDaysRemaining(offer.deadline)}d left
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="offer-card-header">
+                        <div className="brand-info">
+                          <span className="brand-logo">{offer.brandLogo || categoryIcons[offer.productCategory] || '🏢'}</span>
+                          <div className="brand-info-text">
+                            <h3>{offer.brandName}</h3>
+                            <span className="brand-category">{offer.productCategory}</span>
+                          </div>
                         </div>
                       </div>
 
@@ -1416,22 +1435,24 @@ export default function CreatorDashboard() {
             </button>
 
             <div className="modal-header">
+              <div className="modal-header-top">
+                <div 
+                  className="content-type-badge" 
+                  style={{ 
+                    background: `${contentTypeIcons[selectedOffer.contentType]?.color || '#666'}20`, 
+                    color: contentTypeIcons[selectedOffer.contentType]?.color || '#666' 
+                  }}
+                >
+                  <i className={`fa-solid ${contentTypeIcons[selectedOffer.contentType]?.icon || 'fa-file'}`}></i>
+                  {contentTypeIcons[selectedOffer.contentType]?.label || selectedOffer.contentType}
+                </div>
+              </div>
               <div className="brand-info-large">
                 <span className="brand-logo-large">{selectedOffer.brandLogo || categoryIcons[selectedOffer.productCategory] || '🏢'}</span>
                 <div>
                   <h2>{selectedOffer.brandName}</h2>
                   <p>{selectedOffer.productCategory}</p>
                 </div>
-              </div>
-              <div 
-                className="content-type-badge large" 
-                style={{ 
-                  background: `${contentTypeIcons[selectedOffer.contentType]?.color || '#666'}20`, 
-                  color: contentTypeIcons[selectedOffer.contentType]?.color || '#666' 
-                }}
-              >
-                <i className={`fa-solid ${contentTypeIcons[selectedOffer.contentType]?.icon || 'fa-file'}`}></i>
-                {contentTypeIcons[selectedOffer.contentType]?.label || selectedOffer.contentType}
               </div>
             </div>
 

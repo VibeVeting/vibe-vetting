@@ -780,11 +780,18 @@
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
 }
 
+/* Badges Row - Top of card */
+.offer-badges-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
 /* Urgency Badge */
 .offer-urgency-badge {
-  position: absolute;
-  top: 16px;
-  right: 16px;
   padding: 6px 12px;
   border-radius: 20px;
   font-size: 11px;
@@ -792,7 +799,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  z-index: 2;
+  white-space: nowrap;
 }
 
 .offer-urgency-badge.urgent {
@@ -815,9 +822,8 @@
 /* Card Header */
 .offer-card-header {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
+  align-items: center;
+  gap: 14px;
   margin-bottom: 18px;
 }
 
@@ -825,6 +831,7 @@
   display: flex;
   align-items: center;
   gap: 14px;
+  flex: 1;
   min-width: 0;
 }
 
@@ -839,6 +846,13 @@
   background: var(--barter-card);
   border: 1px solid var(--barter-border);
   border-radius: 14px;
+  flex-shrink: 0;
+}
+
+.offer-card .brand-info-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .offer-card .brand-info h3 {
@@ -854,15 +868,15 @@
 }
 
 .content-type-badge {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 14px;
+  padding: 6px 12px;
   border-radius: 20px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
   white-space: nowrap;
-  flex-shrink: 0;
+  width: fit-content;
 }
 
 /* Product Section */
@@ -2160,7 +2174,12 @@
 
 .modal-header {
   padding: 28px 28px 24px;
+  padding-top: 70px; /* Space for close button */
   border-bottom: 1px solid var(--barter-border);
+}
+
+.modal-header-top {
+  margin-bottom: 16px;
 }
 
 .modal-header h2 {
@@ -2168,7 +2187,6 @@
   font-weight: 700;
   margin-bottom: 8px;
   color: white;
-  padding-right: 50px;
   line-height: 1.3;
 }
 
@@ -3866,4 +3884,311 @@ label {
 .settings-form input {
   color: #ffffff !important;
   -webkit-text-fill-color: #ffffff !important;
+}
+
+/* ============================================
+   OVERLAPPING FIXES - Z-INDEX & POSITIONING
+   ============================================ */
+
+/* Fix sidebar not overlapping content */
+.creator-sidebar {
+  z-index: 100;
+}
+
+/* Fix mobile header above everything except modals */
+.creator-mobile-header {
+  z-index: 200;
+}
+
+/* Mobile menu overlay above header */
+.mobile-menu-overlay {
+  z-index: 250;
+}
+
+/* Modals always on top */
+.modal-overlay {
+  z-index: 1000;
+}
+
+/* Modal content above overlay */
+.modal-content {
+  z-index: 1001;
+  position: relative;
+}
+
+/* Modal close button clickable */
+.modal-close {
+  z-index: 1002;
+}
+
+/* Fix content area to not overlap sidebar */
+.creator-main {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+}
+
+/* Prevent text/elements from overlapping in cards */
+.offer-card,
+.application-card,
+.stat-card,
+.settings-form .form-section {
+  overflow: hidden;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Fix badge positioning */
+.offer-urgency-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 5;
+}
+
+/* Fix content-type-badge not overlapping brand name */
+.offer-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+  flex-wrap: nowrap;
+}
+
+.offer-card .brand-info {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.offer-card .brand-info h3 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.content-type-badge {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* Fix product details overflow */
+.offer-product .product-details {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.offer-product .product-details h4 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Fix requirement preview text */
+.offer-requirement-preview {
+  overflow: hidden;
+}
+
+.offer-requirement-preview span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Fix quick stats banner */
+.offers-quick-stats {
+  position: relative;
+  z-index: 1;
+  flex-wrap: wrap;
+}
+
+.quick-stat {
+  flex-shrink: 0;
+}
+
+/* Fix header filters not overlapping title */
+.content-header {
+  position: relative;
+  z-index: 2;
+}
+
+.header-filters {
+  flex-shrink: 0;
+}
+
+/* Fix stats bar cards */
+.creator-stats-bar .stat-card {
+  overflow: hidden;
+}
+
+.creator-stats-bar .stat-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Fix nav items text overflow */
+.nav-item-label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Fix profile info in sidebar */
+.creator-profile-mini .profile-info {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Fix modal body content */
+.modal-body {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* Fix modal header text not overlapping close button */
+.modal-header h2 {
+  padding-right: 60px;
+}
+
+/* Fix settings form sections */
+.settings-form .form-section {
+  position: relative;
+  z-index: 1;
+}
+
+.settings-form .form-group {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+/* Fix social input group icon positioning */
+.settings-form .social-input-group {
+  position: relative;
+}
+
+.settings-form .social-input-group .platform-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.settings-form .social-input-group .form-input {
+  padding-left: 48px;
+}
+
+/* Fix niche chips overlap */
+.niche-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.niche-chip {
+  flex-shrink: 0;
+}
+
+/* Fix empty state centering */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  grid-column: 1 / -1;
+}
+
+/* Fix applications list overlap */
+.applications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.application-card {
+  position: relative;
+}
+
+/* Mobile specific overlapping fixes */
+@media (max-width: 768px) {
+  /* Fix content not going under mobile header */
+  .creator-main {
+    padding-top: calc(var(--header-height) + 20px);
+  }
+  
+  /* Fix filters wrapping properly */
+  .header-filters {
+    width: 100%;
+  }
+  
+  .filter-select {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  /* Fix card header on mobile */
+  .offer-card-header {
+    flex-wrap: wrap;
+  }
+  
+  .content-type-badge {
+    order: -1;
+    margin-bottom: 8px;
+  }
+  
+  /* Fix stats bar overlap */
+  .creator-stats-bar {
+    gap: 12px;
+  }
+  
+  /* Fix modal on mobile */
+  .modal-content {
+    max-height: 85vh;
+    margin: auto 10px;
+  }
+  
+  /* Fix sidebar overlap on mobile when closed */
+  .creator-sidebar {
+    transform: translateX(-100%);
+  }
+  
+  .creator-sidebar.open {
+    transform: translateX(0);
+    z-index: 300;
+  }
+}
+
+/* Small mobile overlapping fixes */
+@media (max-width: 480px) {
+  .offer-card {
+    padding: 18px;
+  }
+  
+  .offer-product {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .offer-product .product-details h4 {
+    white-space: normal;
+  }
+  
+  .offer-meta {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  .offers-quick-stats {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .quick-stat {
+    width: 100%;
+  }
 }

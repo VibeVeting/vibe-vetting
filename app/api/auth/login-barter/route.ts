@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate JWT token
-    const token = generateToken({
+    const { token } = generateToken({
       userId: user._id!.toString(),
       email: user.email,
       userType: 'barter_creator',
