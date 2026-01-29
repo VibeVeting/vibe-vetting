@@ -65,7 +65,7 @@ const faqData: FAQItem[] = [
   {
     category: 'Technical',
     question: 'Which social platforms do you support?',
-    answer: 'We currently support Instagram, Twitter/X, LinkedIn, YouTube, and TikTok. We\'re continuously adding support for more platforms based on user demand.'
+    answer: 'We currently support Instagram, Twitter/X, LinkedIn, YouTube, Facebook, and Twitch. We\'re continuously adding support for more platforms based on user demand.'
   },
   {
     category: 'Technical',

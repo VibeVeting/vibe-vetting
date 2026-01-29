@@ -138,7 +138,7 @@ function LoginBarterContent() {
             </div>
 
             <div className="auth-options" style={{ justifyContent: 'flex-end' }}>
-              <Link href="/forgot-password" className="auth-link">Forgot password?</Link>
+              <Link href="/forgot-password-barter" className="auth-link">Forgot password?</Link>
             </div>
 
             <button type="submit" className="barter-btn-primary" disabled={loading}>

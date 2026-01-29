@@ -4,9 +4,17 @@ import Link from 'next/link';
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
+const benefits = [
+  { icon: "fa-brain", text: "AI-Powered Creator Vetting" },
+  { icon: "fa-shield-check", text: "Brand Safety Protection" },
+  { icon: "fa-chart-line", text: "Campaign Analytics" },
+  { icon: "fa-robot", text: "Auto-Negotiation Bot" },
+];
+
 function RegisterContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [success, setSuccess] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -19,9 +27,26 @@ function RegisterContent() {
   const [loading, setLoading] = useState(false);
   const [oauthLoading, setOauthLoading] = useState<string | null>(null);
 
+  // Password strength calculator
+  const getPasswordStrength = (password: string) => {
+    if (!password) return { score: 0, label: '', color: '' };
+    let score = 0;
+    if (password.length >= 6) score++;
+    if (password.length >= 8) score++;
+    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++;
+    if (/\d/.test(password)) score++;
+    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) score++;
+    
+    if (score <= 1) return { score: 1, label: 'Weak', color: '#ef4444' };
+    if (score <= 2) return { score: 2, label: 'Fair', color: '#f59e0b' };
+    if (score <= 3) return { score: 3, label: 'Good', color: '#22c55e' };
+    return { score: 4, label: 'Strong', color: '#10b981' };
+  };
+
+  const passwordStrength = getPasswordStrength(formData.password);
+
   // Redirect if already logged in or handle OAuth callback
   useEffect(() => {
-    // Check for OAuth token in cookies
     const cookies = document.cookie.split(';').reduce((acc, cookie) => {
       const [key, value] = cookie.trim().split('=');
       acc[key] = value;
@@ -29,7 +54,6 @@ function RegisterContent() {
     }, {} as Record<string, string>);
 
     if (cookies.oauth_token) {
-      // Transfer OAuth data to localStorage
       localStorage.setItem('token', cookies.oauth_token);
       if (cookies.oauth_user) {
         try {
@@ -38,7 +62,6 @@ function RegisterContent() {
           console.error('Error parsing oauth_user cookie:', e);
         }
       }
-      // Clear OAuth cookies
       document.cookie = 'oauth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
       document.cookie = 'oauth_user=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
       window.location.href = '/dashboard';
@@ -51,7 +74,6 @@ function RegisterContent() {
       return;
     }
 
-    // Check for OAuth errors
     const oauthError = searchParams.get('error');
     if (oauthError) {
       const errorMessages: Record<string, string> = {
@@ -60,7 +82,7 @@ function RegisterContent() {
         no_code: 'No authorization code received.',
         invalid_state: 'Invalid state. Please try again.',
         callback_failed: 'Authentication callback failed. Please try again.',
-        email_required: 'Email is required for authentication. Please ensure your account has an email.',
+        email_required: 'Email is required for authentication.',
       };
       setError(errorMessages[oauthError] || 'Authentication failed. Please try again.');
     }
@@ -77,6 +99,11 @@ function RegisterContent() {
 
     if (formData.password.length < 6) {
       setError('Password must be at least 6 characters');
+      return;
+    }
+
+    if (!formData.agreeTerms) {
+      setError('Please agree to the terms');
       return;
     }
 
@@ -104,11 +131,13 @@ function RegisterContent() {
         return;
       }
 
-      // Store token in localStorage
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
 
-      router.push('/dashboard');
+      setSuccess(true);
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 1500);
     } catch (err) {
       setError('Something went wrong. Please try again.');
       setLoading(false);
@@ -116,161 +145,297 @@ function RegisterContent() {
   };
 
   return (
-    <div className="auth-wrapper">
-      <div className="auth-container">
-        {/* Logo */}
-        <div className="auth-logo">
-          <div className="auth-logo-icon">
-            <i className="fa-solid fa-check"></i>
+    <div className="brand-register-wrapper">
+      {/* Floating Elements */}
+      <div className="brand-floating-elements">
+        <div className="brand-float-icon" style={{ top: '10%', left: '5%', animationDelay: '0s' }}>🎯</div>
+        <div className="brand-float-icon" style={{ top: '20%', right: '8%', animationDelay: '1s' }}>🚀</div>
+        <div className="brand-float-icon" style={{ bottom: '25%', left: '3%', animationDelay: '2s' }}>📊</div>
+        <div className="brand-float-icon" style={{ bottom: '15%', right: '5%', animationDelay: '0.5s' }}>✨</div>
+        <div className="brand-float-icon" style={{ top: '45%', left: '8%', animationDelay: '1.5s' }}>🔍</div>
+        <div className="brand-float-icon" style={{ top: '60%', right: '10%', animationDelay: '2.5s' }}>💎</div>
+      </div>
+
+      <div className="brand-register-split">
+        {/* Left Side - Value Proposition */}
+        <div className="brand-info-panel">
+          <div className="brand-panel-content">
+            <Link href="/" className="brand-back-link">
+              <i className="fa-solid fa-arrow-left"></i>
+              Back to Home
+            </Link>
+
+            <div className="brand-hero">
+              <div className="brand-logo-section">
+                <div className="brand-logo-hex">
+                  <div className="hex-glow"></div>
+                  <span className="hex-letter">V</span>
+                </div>
+              </div>
+              <h1>Find Your Perfect<br /><span className="gradient-text-brand">Creator Match</span></h1>
+              <p>AI-powered influencer vetting platform trusted by leading brands</p>
+            </div>
+
+            {/* Benefits */}
+            <div className="brand-benefits">
+              <h3>🚀 What You Get</h3>
+              <div className="benefits-list">
+                {benefits.map((benefit, index) => (
+                  <div key={index} className="benefit-item" style={{ animationDelay: `${index * 0.1}s` }}>
+                    <div className="benefit-icon">
+                      <i className={`fa-solid ${benefit.icon}`}></i>
+                    </div>
+                    <span>{benefit.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Stats Preview */}
+            <div className="brand-stats-preview">
+              <div className="stat-preview-item">
+                <span className="stat-icon">🎯</span>
+                <div className="stat-text">
+                  <span className="stat-number">6</span>
+                  <span className="stat-desc">Platforms</span>
+                </div>
+              </div>
+              <div className="stat-preview-item">
+                <span className="stat-icon">🤖</span>
+                <div className="stat-text">
+                  <span className="stat-number">AI</span>
+                  <span className="stat-desc">Powered</span>
+                </div>
+              </div>
+              <div className="stat-preview-item">
+                <span className="stat-icon">⚡</span>
+                <div className="stat-text">
+                  <span className="stat-number">10s</span>
+                  <span className="stat-desc">Analysis</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="brand-trust-badges">
+              <div className="trust-badge">
+                <i className="fa-solid fa-shield-check"></i>
+                <span>Secure & Private</span>
+              </div>
+              <div className="trust-badge">
+                <i className="fa-solid fa-bolt"></i>
+                <span>Instant Setup</span>
+              </div>
+              <div className="trust-badge">
+                <i className="fa-solid fa-credit-card"></i>
+                <span>No Credit Card</span>
+              </div>
+            </div>
           </div>
-          <h1>VibeVetting</h1>
         </div>
 
-        {/* Auth Card */}
-        <div className="auth-card">
-          <div className="auth-header">
-            <h2>Create Account</h2>
-            <p>Start vetting influencers with AI</p>
-          </div>
-
-          <form onSubmit={handleSubmit}>
-            {error && (
-              <div className="auth-error" style={{ color: '#ef4444', backgroundColor: '#fef2f2', padding: '12px', borderRadius: '8px', marginBottom: '16px', fontSize: '14px' }}>
-                {error}
-              </div>
-            )}
-
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Full Name</label>
-                <div className="input-with-icon">
-                  <i className="fa-solid fa-user"></i>
-                  <input
-                    type="text"
-                    className="form-input"
-                    placeholder="Vinay Prajapati"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Company</label>
-                <div className="input-with-icon">
-                  <i className="fa-solid fa-building"></i>
-                  <input
-                    type="text"
-                    className="form-input"
-                    placeholder="VibeVetting Inc."
-                    value={formData.company}
-                    onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                  />
-                </div>
-              </div>
+        {/* Right Side - Registration Form */}
+        <div className="brand-form-panel">
+          <div className="brand-form-container">
+            <div className="mobile-brand-logo">
+              <div className="mobile-hex">V</div>
+              <span className="mobile-logo-text">VibeVetting</span>
             </div>
 
-            <div className="form-group">
-              <label className="form-label">Email Address</label>
-              <div className="input-with-icon">
-                <i className="fa-solid fa-envelope"></i>
-                <input
-                  type="email"
-                  className="form-input"
-                  placeholder="vinay91098@gmail.com"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Password</label>
-                <div className="input-with-icon">
-                  <i className="fa-solid fa-lock"></i>
-                  <input
-                    type="password"
-                    className="form-input"
-                    placeholder="Create password"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    required
-                  />
+            <div className="brand-register-card">
+              {/* Success State */}
+              {success && (
+                <div className="brand-success-state">
+                  <div className="success-icon">🎉</div>
+                  <h2>Welcome to VibeVetting!</h2>
+                  <p>Your account has been created. Redirecting to dashboard...</p>
+                  <div className="success-loader">
+                    <i className="fa-solid fa-spinner fa-spin"></i>
+                  </div>
                 </div>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Confirm Password</label>
-                <div className="input-with-icon">
-                  <i className="fa-solid fa-lock"></i>
-                  <input
-                    type="password"
-                    className="form-input"
-                    placeholder="Confirm password"
-                    value={formData.confirmPassword}
-                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="auth-options">
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={formData.agreeTerms}
-                  onChange={(e) => setFormData({ ...formData, agreeTerms: e.target.checked })}
-                  required
-                />
-                I agree to the <Link href="/terms" className="auth-link">Terms of Service</Link> and <Link href="/privacy" className="auth-link">Privacy Policy</Link>
-              </label>
-            </div>
-
-            <button type="submit" className="btn btn-primary auth-btn" disabled={loading}>
-              <i className={loading ? "fa-solid fa-spinner fa-spin" : "fa-solid fa-user-plus"}></i>
-              {loading ? 'Creating Account...' : 'Create Account'}
-            </button>
-          </form>
-
-          <div className="auth-divider">
-            <span>or sign up with</span>
-          </div>
-
-          <div className="social-buttons">
-            <button 
-              type="button" 
-              className="social-btn"
-              onClick={() => {
-                setOauthLoading('google');
-                window.location.href = '/api/auth/google';
-              }}
-              disabled={oauthLoading !== null}
-            >
-              {oauthLoading === 'google' ? (
-                <i className="fa-solid fa-spinner fa-spin"></i>
-              ) : (
-                <i className="fa-brands fa-google"></i>
               )}
-              Google
-            </button>
-            <button 
-              type="button" 
-              className="social-btn"
-              disabled={true}
-              style={{ opacity: 0.6, cursor: 'not-allowed' }}
-              title="Coming Soon"
-            >
-              <i className="fa-brands fa-facebook"></i>
-              Meta <span style={{ fontSize: '10px', marginLeft: '4px' }}>(Soon)</span>
-            </button>
-          </div>
 
-          <div className="auth-footer">
-            <p>Already have an account? <Link href="/login" className="auth-link">Sign in</Link></p>
+              {!success && (
+                <>
+                  <div className="brand-card-header">
+                    <h2>Create Your Account</h2>
+                    <p>Start vetting creators with AI in seconds</p>
+                  </div>
+
+                  <form onSubmit={handleSubmit}>
+                    {error && (
+                      <div className="brand-error">
+                        <i className="fa-solid fa-circle-exclamation"></i>
+                        {error}
+                      </div>
+                    )}
+
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label className="form-label">Full Name *</label>
+                        <div className="input-with-icon">
+                          <i className="fa-solid fa-user"></i>
+                          <input
+                            type="text"
+                            className="form-input"
+                            placeholder="Your name"
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="form-group">
+                        <label className="form-label">Company</label>
+                        <div className="input-with-icon">
+                          <i className="fa-solid fa-building"></i>
+                          <input
+                            type="text"
+                            className="form-input"
+                            placeholder="Your company"
+                            value={formData.company}
+                            onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Email Address *</label>
+                      <div className="input-with-icon">
+                        <i className="fa-solid fa-envelope"></i>
+                        <input
+                          type="email"
+                          className="form-input"
+                          placeholder="your@email.com"
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label className="form-label">Password *</label>
+                        <div className="input-with-icon">
+                          <i className="fa-solid fa-lock"></i>
+                          <input
+                            type="password"
+                            className="form-input"
+                            placeholder="Min 6 characters"
+                            value={formData.password}
+                            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                            required
+                          />
+                        </div>
+                        {formData.password && (
+                          <div className="password-strength">
+                            <div className="strength-bars">
+                              {[1, 2, 3, 4].map((level) => (
+                                <div 
+                                  key={level} 
+                                  className={`strength-bar ${passwordStrength.score >= level ? 'active' : ''}`}
+                                  style={{ backgroundColor: passwordStrength.score >= level ? passwordStrength.color : undefined }}
+                                />
+                              ))}
+                            </div>
+                            <span className="strength-label" style={{ color: passwordStrength.color }}>
+                              {passwordStrength.label}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="form-group">
+                        <label className="form-label">Confirm Password *</label>
+                        <div className="input-with-icon">
+                          <i className="fa-solid fa-lock"></i>
+                          <input
+                            type="password"
+                            className="form-input"
+                            placeholder="Confirm password"
+                            value={formData.confirmPassword}
+                            onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                            required
+                          />
+                        </div>
+                        {formData.confirmPassword && formData.password && (
+                          <div className="password-match">
+                            {formData.password === formData.confirmPassword ? (
+                              <span className="match-success"><i className="fa-solid fa-check"></i> Passwords match</span>
+                            ) : (
+                              <span className="match-error"><i className="fa-solid fa-xmark"></i> Passwords don&apos;t match</span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="auth-options">
+                      <label className="checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={formData.agreeTerms}
+                          onChange={(e) => setFormData({ ...formData, agreeTerms: e.target.checked })}
+                        />
+                        <span>I agree to the <Link href="/terms" className="auth-link">Terms of Service</Link> and <Link href="/privacy" className="auth-link">Privacy Policy</Link></span>
+                      </label>
+                    </div>
+
+                    <button type="submit" className="brand-btn-primary" disabled={loading}>
+                      {loading ? (
+                        <>
+                          <i className="fa-solid fa-spinner fa-spin"></i>
+                          Creating Account...
+                        </>
+                      ) : (
+                        <>
+                          <i className="fa-solid fa-rocket"></i>
+                          Create Account
+                        </>
+                      )}
+                    </button>
+                  </form>
+
+                  <div className="brand-divider">
+                    <span>or continue with</span>
+                  </div>
+
+                  <div className="brand-social-buttons">
+                    <button 
+                      type="button" 
+                      className="brand-social-btn google"
+                      onClick={() => {
+                        setOauthLoading('google');
+                        window.location.href = '/api/auth/google';
+                      }}
+                      disabled={oauthLoading !== null}
+                    >
+                      {oauthLoading === 'google' ? (
+                        <i className="fa-solid fa-spinner fa-spin"></i>
+                      ) : (
+                        <i className="fa-brands fa-google"></i>
+                      )}
+                      <span>Google</span>
+                    </button>
+                    <button 
+                      type="button" 
+                      className="brand-social-btn linkedin"
+                      disabled={true}
+                      title="Coming Soon"
+                    >
+                      <i className="fa-brands fa-linkedin"></i>
+                      <span>LinkedIn <small>(Soon)</small></span>
+                    </button>
+                  </div>
+
+                  <div className="brand-footer">
+                    <p>Already have an account? <Link href="/login" className="auth-link">Sign in</Link></p>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -281,13 +446,9 @@ function RegisterContent() {
 export default function RegisterPage() {
   return (
     <Suspense fallback={
-      <div className="auth-page">
-        <div className="auth-container">
-          <div className="auth-box">
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
-              <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: '24px', color: '#667eea' }}></i>
-            </div>
-          </div>
+      <div className="brand-register-wrapper">
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+          <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: '32px', color: '#00f5ff' }}></i>
         </div>
       </div>
     }>

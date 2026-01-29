@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { StatCard } from './StatCard';
 
 interface Stats {
@@ -25,13 +26,15 @@ const defaultStats: Stats = {
 export function StatsGrid() {
   const [stats, setStats] = useState<Stats>(defaultStats);
   const [isUsingDefaults, setIsUsingDefaults] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem('token');
         if (!token) {
-          console.log('No token found in localStorage');
+          // No token, user needs to login
+          router.push('/login');
           return;
         }
 
@@ -43,21 +46,24 @@ export function StatsGrid() {
 
         if (response.ok) {
           const data = await response.json();
-          console.log('Stats data received:', data);
           if (data.stats) {
             setStats(data.stats);
             setIsUsingDefaults(false);
           }
-        } else {
-          console.error('Stats API error:', response.status, await response.text());
+        } else if (response.status === 401) {
+          // Token is invalid or expired - clear storage and redirect to login
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          router.push('/login');
         }
-      } catch (error) {
-        console.error('Error fetching stats:', error);
+        // Silently handle other errors - just use default stats
+      } catch {
+        // Network error - just use default stats without logging
       }
     };
 
     fetchStats();
-  }, []);
+  }, [router]);
 
   const statsData = [
     {

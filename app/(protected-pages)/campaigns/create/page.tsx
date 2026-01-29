@@ -488,12 +488,10 @@ export default function CreateCampaignPage() {
                     {[
                       { name: 'Instagram', icon: 'fa-instagram' },
                       { name: 'YouTube', icon: 'fa-youtube' },
-                      { name: 'TikTok', icon: 'fa-tiktok' },
                       { name: 'Twitter', icon: 'fa-twitter' },
                       { name: 'LinkedIn', icon: 'fa-linkedin' },
                       { name: 'Facebook', icon: 'fa-facebook' },
                       { name: 'Twitch', icon: 'fa-twitch' },
-                      // { name: 'Pinterest', icon: 'fa-pinterest' },
                     ].map((platform) => (
                       <label key={platform.name} className="checkbox-label">
                         <input

@@ -287,12 +287,10 @@ export default function MatchesPage() {
                 <option value="all">All Platforms</option>
                 <option value="instagram">Instagram</option>
                 <option value="youtube">YouTube</option>
-                <option value="tiktok">TikTok</option>
                 <option value="twitter">Twitter/X</option>
                 <option value="linkedin">LinkedIn</option>
                 <option value="facebook">Facebook</option>
                 <option value="twitch">Twitch</option>
-                {/* <option value="pinterest">Pinterest</option> */}
               </select>
             </div>
             <div className="filter-group">

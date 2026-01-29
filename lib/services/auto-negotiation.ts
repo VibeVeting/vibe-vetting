@@ -67,10 +67,11 @@ export function calculateMarketRate(profile: CreatorProfile, deliverables: strin
   // Base rates per 1000 followers
   const platformMultipliers: Record<string, number> = {
     instagram: 10,
-    tiktok: 8,
     youtube: 15,
     twitter: 6,
     linkedin: 12,
+    facebook: 8,
+    twitch: 12,
   };
   
   const multiplier = platformMultipliers[profile.platform.toLowerCase()] || 10;

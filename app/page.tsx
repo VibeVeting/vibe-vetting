@@ -16,7 +16,7 @@ const analysisMessages = [
 ];
 
 const stats = [
-  { value: "7", label: "Platforms", icon: "fa-globe", color: "#00f5ff" },
+  { value: "6", label: "Platforms", icon: "fa-globe", color: "#00f5ff" },
   { value: "AI", label: "Powered", icon: "fa-robot", color: "#22c55e" },
   { value: "7", label: "Pipeline Stages", icon: "fa-layer-group", color: "#a855f7" },
   { value: "3", label: "AI Features", icon: "fa-brain", color: "#f59e0b" },
@@ -40,9 +40,9 @@ const differentiators = [
   },
   {
     icon: "fa-globe",
-    title: "7 Platforms",
-    description: "Instagram, YouTube, TikTok, Twitter, LinkedIn, Facebook, Twitch - all in one place.",
-    stat: "7",
+    title: "6 Platforms",
+    description: "Instagram, YouTube, Twitter, LinkedIn, Facebook, Twitch - all in one place.",
+    stat: "6",
     statLabel: "Networks",
   },
   {
@@ -58,7 +58,7 @@ const differentiators = [
 
 // How it works for customers - Complete Journey
 const howItWorks = [
-  { step: "1", title: "Discover", desc: "Find creators across 7 platforms matching your brand", icon: "fa-magnifying-glass" },
+  { step: "1", title: "Discover", desc: "Find creators across 6 platforms matching your brand", icon: "fa-magnifying-glass" },
   { step: "2", title: "AI Vetting", desc: "Deep scan of content history, audience & risks", icon: "fa-brain" },
   { step: "3", title: "VibeScore", desc: "Get AI-powered brand alignment score", icon: "fa-chart-line" },
   { step: "4", title: "Add to Pipeline", desc: "Move vetted creators into your workflow", icon: "fa-layer-group" },
@@ -70,13 +70,11 @@ const howItWorks = [
 
 const supportedPlatforms = [
   { name: "Instagram", icon: "fa-instagram", color: "#E4405F" },
-  { name: "TikTok", icon: "fa-tiktok", color: "#00f2ea" },
   { name: "YouTube", icon: "fa-youtube", color: "#FF0000" },
   { name: "Twitter", icon: "fa-twitter", color: "#1DA1F2" },
   { name: "LinkedIn", icon: "fa-linkedin-in", color: "#0A66C2" },
   { name: "Facebook", icon: "fa-facebook-f", color: "#1877F2" },
   { name: "Twitch", icon: "fa-twitch", color: "#9146FF" },
-  // { name: "Pinterest", icon: "fa-pinterest-p", color: "#BD081C" },
 ];
 
 // 🔥 SUPERPOWER FEATURES - Real features that exist in the codebase
@@ -308,7 +306,7 @@ const pricingPlans = [
 const faqs = [
   { q: "How does vibeAI™ analyze creators?", a: "vibeAI™ analyzes every piece of content a creator has posted - examining patterns, values alignment, and predicting future behavior with advanced AI." },
   { q: "What makes vibeAI™ different?", a: "Unlike traditional tools, vibeAI™ analyzes past digital footprint to predict future performance, ensuring you partner with creators who will deliver results." },
-  { q: "What platforms does vibeAI™ analyze?", a: "vibeAI™ processes data from all major platforms including Instagram, YouTube, TikTok, Twitter, LinkedIn, and emerging platforms." },
+  { q: "What platforms does vibeAI™ analyze?", a: "vibeAI™ processes data from all major platforms including Instagram, YouTube, Twitter, LinkedIn, Facebook, Twitch and emerging platforms." },
   { q: "How far back does analysis go?", a: "vibeAI™ analyzes a creator's complete digital history - from their very first post to their most recent activity, no time limit." },
   { q: "What is the beta program?", a: "Beta users get exclusive early access to vibeAI™ at 50% discounted rates, plus direct input into feature development and priority support." },
   { q: "Can I customize the AI model?", a: "Growth and Enterprise plans allow you to customize AI analysis based on your specific brand requirements and target criteria." },
@@ -394,8 +392,13 @@ export default function LandingPage() {
       <nav className="landing-nav glass">
         <div className="nav-container">
           <Link href="/" className="nav-logo">
-            <div className="logo-icon pulse-glow">
-              <i className="fa-solid fa-bolt" />
+            <div className="logo-icon-new">
+              <div className="logo-hexagon">
+                <div className="hex-inner">
+                  <span className="hex-v">V</span>
+                  <span className="hex-pulse"></span>
+                </div>
+              </div>
             </div>
             <span className="logo-text">
               <span className="logo-vibe">VIBE</span>
@@ -434,6 +437,7 @@ export default function LandingPage() {
             <div className="status-badge glass">
               <span className="status-pulse" />
               <span className="status-text">vibeAI™ Beta Now Live</span>
+              <span className="status-sparkle">✨</span>
             </div>
           </div>
 
@@ -444,8 +448,8 @@ export default function LandingPage() {
           </h1>
 
           <p className="hero-subtitle">
-            AI vets creators before you pay. Detect fake followers, hidden controversies, 
-            and overpriced rates instantly. Save time. Save money.
+            AI vets creators before you pay. Detect fake followers, hidden controversies 
+            and overpriced rates instantly. <strong>Save time. Save money.</strong>
           </p>
 
           {/* CTA Buttons */}
@@ -682,34 +686,90 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* How Barter Works Visual */}
+          {/* How Barter Works Visual - Creative Timeline */}
           <div className="barter-flow-section">
-            <h3 className="barter-flow-title">How Barter Deals Work</h3>
-            <div className="barter-flow">
-              <div className="barter-flow-step">
-                <div className="flow-step-icon">📦</div>
-                <div className="flow-step-arrow"></div>
-                <span className="flow-step-label">You Send Product</span>
-              </div>
-              <div className="barter-flow-connector">
-                <div className="connector-line"></div>
-                <i className="fa-solid fa-arrow-right"></i>
-              </div>
-              <div className="barter-flow-step">
-                <div className="flow-step-icon">📸</div>
-                <div className="flow-step-arrow"></div>
-                <span className="flow-step-label">Creator Makes Content</span>
-              </div>
-              <div className="barter-flow-connector">
-                <div className="connector-line"></div>
-                <i className="fa-solid fa-arrow-right"></i>
-              </div>
-              <div className="barter-flow-step">
-                <div className="flow-step-icon">🚀</div>
-                <div className="flow-step-arrow"></div>
-                <span className="flow-step-label">They Post & You Grow</span>
+            <h3 className="barter-flow-title">The Barter Deal Journey</h3>
+            
+            {/* Creative Flow Visualization */}
+            <div className="barter-journey">
+              <div className="journey-steps">
+                <div className="journey-step">
+                  <div className="step-beacon">
+                    <div className="beacon-ring"></div>
+                    <div className="beacon-core">🎯</div>
+                  </div>
+                  <div className="step-content">
+                    <h4>Find Match</h4>
+                    <p>AI finds creators who love your product</p>
+                  </div>
+                </div>
+                
+                <div className="journey-step">
+                  <div className="step-beacon">
+                    <div className="beacon-ring"></div>
+                    <div className="beacon-core">📦</div>
+                  </div>
+                  <div className="step-content">
+                    <h4>Send Product</h4>
+                    <p>Ship your product to the creator</p>
+                  </div>
+                </div>
+                
+                <div className="journey-step">
+                  <div className="step-beacon">
+                    <div className="beacon-ring"></div>
+                    <div className="beacon-core">✨</div>
+                  </div>
+                  <div className="step-content">
+                    <h4>Create Magic</h4>
+                    <p>They create authentic content</p>
+                  </div>
+                </div>
+                
+                <div className="journey-step">
+                  <div className="step-beacon">
+                    <div className="beacon-ring"></div>
+                    <div className="beacon-core">🚀</div>
+                  </div>
+                  <div className="step-content">
+                    <h4>You Grow</h4>
+                    <p>Content goes live, audience grows</p>
+                  </div>
+                </div>
               </div>
             </div>
+            
+            {/* Value Exchange Visual */}
+            <div className="value-exchange-visual">
+              <div className="exchange-party brand">
+                <div className="party-icon">🏢</div>
+                <span className="party-name">Your Brand</span>
+                <div className="gives-badge">
+                  <i className="fa-solid fa-gift"></i> Product
+                </div>
+              </div>
+              
+              <div className="exchange-flow">
+                <div className="flow-arrow top">
+                  <span>Give</span>
+                  <i className="fa-solid fa-arrow-right"></i>
+                </div>
+                <div className="exchange-heart">🤝</div>
+                <div className="flow-arrow bottom">
+                  <i className="fa-solid fa-arrow-left"></i>
+                  <span>Get</span>
+                </div>
+              </div>
+              
+              <div className="exchange-party creator">
+                <div className="party-icon">🎨</div>
+                <span className="party-name">Creator</span>
+                <div className="gives-badge">
+                  <i className="fa-solid fa-camera"></i> Content
+                </div>
+              </div>
+            </div>
+            
             <p className="barter-flow-note">
               <i className="fa-solid fa-circle-check"></i>
               Zero cash exchanged. 100% authentic content. Both parties win.
@@ -770,8 +830,31 @@ export default function LandingPage() {
                 </div>
                 <span className="barter-tag">🎁 Barter Ready</span>
               </div>
+              <div className="showcase-creator">
+                <div className="creator-avatar">🎮</div>
+                <div className="creator-info">
+                  <span className="creator-niche">Gaming</span>
+                  <span className="creator-followers">31.5K followers</span>
+                </div>
+                <span className="barter-tag">🎁 Barter Ready</span>
+              </div>
+              <div className="showcase-creator">
+                <div className="creator-avatar">✈️</div>
+                <div className="creator-info">
+                  <span className="creator-niche">Travel & Lifestyle</span>
+                  <span className="creator-followers">18.9K followers</span>
+                </div>
+                <span className="barter-tag">🎁 Barter Ready</span>
+              </div>
               <div className="showcase-more">
-                <span>+10,000 more</span>
+                <div className="more-content">
+                  <span className="more-icon-wrap">🚀</span>
+                  <span className="more-label">Growing Fast</span>
+                  <span className="more-sublabel">Join the Network</span>
+                </div>
+                <div className="more-arrow">
+                  <i className="fa-solid fa-arrow-right"></i>
+                </div>
               </div>
             </div>
           </div>
@@ -1178,8 +1261,12 @@ export default function LandingPage() {
           <div className="footer-main">
             <div className="footer-brand">
               <Link href="/" className="footer-logo">
-                <div className="logo-icon">
-                  <i className="fa-solid fa-bolt" />
+                <div className="logo-icon-new footer-logo-icon">
+                  <div className="logo-hexagon">
+                    <div className="hex-inner">
+                      <span className="hex-v">V</span>
+                    </div>
+                  </div>
                 </div>
                 <span className="logo-text">
                   <span className="logo-vibe">VIBE</span>
