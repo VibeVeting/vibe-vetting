@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 const benefits = [
   { icon: "fa-brain", text: "AI-Powered Creator Vetting" },
-  { icon: "fa-shield-check", text: "Brand Safety Protection" },
+  { icon: "fa-shield-halved", text: "Brand Safety Protection" },
   { icon: "fa-chart-line", text: "Campaign Analytics" },
   { icon: "fa-robot", text: "Auto-Negotiation Bot" },
 ];
@@ -218,7 +218,7 @@ function RegisterContent() {
 
             <div className="brand-trust-badges">
               <div className="trust-badge">
-                <i className="fa-solid fa-shield-check"></i>
+                <i className="fa-solid fa-shield-halved"></i>
                 <span>Secure & Private</span>
               </div>
               <div className="trust-badge">

@@ -113,26 +113,36 @@ function LoginContent() {
   };
 
   return (
-    <div className="auth-wrapper">
-      <div className="auth-container">
+    <div className="brand-login-wrapper">
+      {/* Floating Elements */}
+      <div className="brand-floating-elements">
+        <div className="brand-float-icon" style={{ top: '10%', left: '5%', animationDelay: '0s' }}>🔐</div>
+        <div className="brand-float-icon" style={{ top: '20%', right: '8%', animationDelay: '1s' }}>✨</div>
+        <div className="brand-float-icon" style={{ bottom: '25%', left: '3%', animationDelay: '2s' }}>🚀</div>
+        <div className="brand-float-icon" style={{ bottom: '15%', right: '5%', animationDelay: '0.5s' }}>💎</div>
+      </div>
+
+      <div className="brand-login-container">
         {/* Logo */}
-        <div className="auth-logo">
-          <div className="auth-logo-icon">
-            <i className="fa-solid fa-check"></i>
+        <div className="brand-login-logo">
+          <div className="brand-logo-hex">
+            <div className="hex-glow"></div>
+            <span className="hex-letter">V</span>
           </div>
-          <h1>VibeVetting</h1>
+          <span className="brand-logo-text">VibeVetting</span>
         </div>
 
-        {/* Auth Card */}
-        <div className="auth-card">
-          <div className="auth-header">
+        {/* Login Card */}
+        <div className="brand-login-card">
+          <div className="brand-card-header">
             <h2>{requires2fa ? 'Two-Factor Verification' : 'Welcome Back'}</h2>
             <p>{requires2fa ? 'Enter the 6-digit code sent to your email' : 'Sign in to your account to continue'}</p>
           </div>
 
           <form onSubmit={handleSubmit}>
             {error && (
-              <div className="auth-error" style={{ color: '#ef4444', backgroundColor: '#fef2f2', padding: '12px', borderRadius: '8px', marginBottom: '16px', fontSize: '14px' }}>
+              <div className="brand-error">
+                <i className="fa-solid fa-circle-exclamation"></i>
                 {error}
               </div>
             )}
@@ -185,7 +195,7 @@ function LoginContent() {
                     required
                   />
                 </div>
-                {twoFaInfo && <div className="helper-text" style={{ marginTop: '6px', color: '#4a5568', fontSize: '12px' }}>{twoFaInfo}</div>}
+                {twoFaInfo && <div className="helper-text">{twoFaInfo}</div>}
               </div>
             )}
 
@@ -196,27 +206,36 @@ function LoginContent() {
                   checked={formData.rememberMe}
                   onChange={(e) => setFormData({ ...formData, rememberMe: e.target.checked })}
                 />
-                Remember me
+                <span>Remember me</span>
               </label>
               <Link href="/forgot-password" className="auth-link">
                 Forgot password?
               </Link>
             </div>
 
-            <button type="submit" className="btn btn-primary auth-btn" disabled={loading}>
-              <i className={loading ? "fa-solid fa-spinner fa-spin" : "fa-solid fa-arrow-right-to-bracket"}></i>
-              {loading ? (requires2fa ? 'Verifying...' : 'Signing In...') : (requires2fa ? 'Verify Code' : 'Sign In')}
+            <button type="submit" className="brand-btn-primary" disabled={loading}>
+              {loading ? (
+                <>
+                  <i className="fa-solid fa-spinner fa-spin"></i>
+                  {requires2fa ? 'Verifying...' : 'Signing In...'}
+                </>
+              ) : (
+                <>
+                  <i className="fa-solid fa-arrow-right-to-bracket"></i>
+                  {requires2fa ? 'Verify Code' : 'Sign In'}
+                </>
+              )}
             </button>
           </form>
 
-          <div className="auth-divider">
+          <div className="brand-divider">
             <span>or continue with</span>
           </div>
 
-          <div className="social-buttons">
+          <div className="brand-social-buttons">
             <button 
               type="button" 
-              className="social-btn"
+              className="brand-social-btn google"
               onClick={() => {
                 setOauthLoading('google');
                 window.location.href = '/api/auth/google';
@@ -228,21 +247,20 @@ function LoginContent() {
               ) : (
                 <i className="fa-brands fa-google"></i>
               )}
-              Google
+              <span>Google</span>
             </button>
             <button 
               type="button" 
-              className="social-btn"
+              className="brand-social-btn linkedin"
               disabled={true}
-              style={{ opacity: 0.6, cursor: 'not-allowed' }}
               title="Coming Soon"
             >
-              <i className="fa-brands fa-facebook"></i>
-              Meta <span style={{ fontSize: '10px', marginLeft: '4px' }}>(Soon)</span>
+              <i className="fa-brands fa-linkedin"></i>
+              <span>LinkedIn <small>(Soon)</small></span>
             </button>
           </div>
 
-          <div className="auth-footer">
+          <div className="brand-footer">
             <p>Don&apos;t have an account? <Link href="/register" className="auth-link">Sign up</Link></p>
           </div>
         </div>
@@ -254,13 +272,9 @@ function LoginContent() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="auth-page">
-        <div className="auth-container">
-          <div className="auth-box">
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
-              <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: '24px', color: '#667eea' }}></i>
-            </div>
-          </div>
+      <div className="brand-login-wrapper">
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+          <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: '32px', color: '#00f5ff' }}></i>
         </div>
       </div>
     }>

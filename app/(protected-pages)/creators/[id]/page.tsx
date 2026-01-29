@@ -474,7 +474,7 @@ export default function CreatorProfilePage() {
                         </div>
                       )) : (
                         <div className="no-concerns">
-                          <i className="fa-solid fa-shield-check"></i>
+                          <i className="fa-solid fa-shield-halved"></i>
                           <p>No significant concerns detected</p>
                         </div>
                       )}

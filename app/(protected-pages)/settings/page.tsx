@@ -1158,7 +1158,7 @@ export default function SettingsPage() {
                         </div>
 
                         <div className="security-note">
-                          <i className="fa-solid fa-shield-check"></i>
+                          <i className="fa-solid fa-shield-halved"></i>
                           Your card details are encrypted and secured with 256-bit SSL
                         </div>
                       </div>

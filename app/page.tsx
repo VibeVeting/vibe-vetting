@@ -1215,7 +1215,7 @@ export default function LandingPage() {
               {/* Premium Features Row */}
               <div className="cta-features-row">
                 <div className="cta-feature">
-                  <i className="fa-solid fa-shield-check"></i>
+                  <i className="fa-solid fa-shield-halved"></i>
                   <span>AI-Powered Vetting</span>
                 </div>
                 <div className="cta-feature-divider"></div>

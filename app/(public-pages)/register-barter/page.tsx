@@ -28,7 +28,7 @@ const followerRanges = [
 const socialPlatforms = [
   { id: 'instagram', name: 'Instagram', icon: 'fa-instagram', color: '#E4405F', gradient: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)', placeholder: '@yourhandle' },
   { id: 'youtube', name: 'YouTube', icon: 'fa-youtube', color: '#FF0000', gradient: 'linear-gradient(45deg, #FF0000, #cc0000)', placeholder: '@channel' },
-  { id: 'twitter', name: 'X', icon: 'fa-x-twitter', color: '#1DA1F2', gradient: 'linear-gradient(45deg, #1DA1F2, #0d8ecf)', placeholder: '@handle' },
+  { id: 'twitter', name: 'X', icon: 'fa-x-twitter', color: '#000000', gradient: 'linear-gradient(45deg, #374151, #1f2937)', placeholder: '@handle' },
   { id: 'linkedin', name: 'LinkedIn', icon: 'fa-linkedin', color: '#0A66C2', gradient: 'linear-gradient(45deg, #0A66C2, #0077B5)', placeholder: 'Profile URL' },
   { id: 'twitch', name: 'Twitch', icon: 'fa-twitch', color: '#9146FF', gradient: 'linear-gradient(45deg, #9146FF, #6441A5)', placeholder: '@channel' },
 ];
@@ -210,7 +210,7 @@ function RegisterBarterContent() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch('/api/auth/register-barter', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -219,7 +219,6 @@ function RegisterBarterContent() {
           name: formData.name,
           email: formData.email,
           password: formData.password,
-          userType: 'barter_creator',
           creatorProfile: {
             socialHandles: {
               instagram: formData.instagram,
@@ -311,22 +310,22 @@ function RegisterBarterContent() {
             {/* Stats Row */}
             <div className="yc-stats-row">
               <div className="yc-stat">
-                <div className="yc-stat-value">
-                  <span className="yc-counter">🎁</span>
+                <div className="yc-stat-icon">
+                  <i className="fa-solid fa-gift"></i>
                 </div>
                 <div className="yc-stat-label">Free Products</div>
               </div>
               <div className="yc-stat-divider" />
               <div className="yc-stat">
-                <div className="yc-stat-value">
-                  <span className="yc-counter">🚀</span>
+                <div className="yc-stat-icon">
+                  <i className="fa-solid fa-rocket"></i>
                 </div>
                 <div className="yc-stat-label">Launching Soon</div>
               </div>
               <div className="yc-stat-divider" />
               <div className="yc-stat">
-                <div className="yc-stat-value">
-                  <span className="yc-counter">💯</span>
+                <div className="yc-stat-icon">
+                  <i className="fa-solid fa-heart"></i>
                 </div>
                 <div className="yc-stat-label">Free Forever</div>
               </div>
@@ -557,7 +556,7 @@ function RegisterBarterContent() {
                       
                       <div className="yc-form-group">
                         <label className="yc-label">
-                          <i className="fa-solid fa-shield-check"></i>
+                          <i className="fa-solid fa-shield-halved"></i>
                           Confirm
                         </label>
                         <div className={`yc-input-wrapper ${focusedField === 'confirmPassword' ? 'focused' : ''} ${passwordsMatch ? 'success' : ''}`}>

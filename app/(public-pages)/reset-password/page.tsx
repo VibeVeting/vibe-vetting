@@ -8,6 +8,8 @@ function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
+  const type = searchParams.get('type'); // 'barter' or null for regular users
+  const isBarter = type === 'barter';
 
   const [formData, setFormData] = useState({
     password: '',
@@ -27,7 +29,8 @@ function ResetPasswordForm() {
       }
 
       try {
-        const response = await fetch(`/api/auth/validate-reset-token?token=${token}`);
+        const typeParam = type ? `&type=${type}` : '';
+        const response = await fetch(`/api/auth/validate-reset-token?token=${token}${typeParam}`);
         const data = await response.json();
         setTokenValid(data.valid);
       } catch (err) {
@@ -38,7 +41,7 @@ function ResetPasswordForm() {
     };
 
     validateToken();
-  }, [token]);
+  }, [token, type]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,6 +68,7 @@ function ResetPasswordForm() {
         body: JSON.stringify({
           token,
           password: formData.password,
+          type: type || undefined,
         }),
       });
 
@@ -83,6 +87,10 @@ function ResetPasswordForm() {
     }
   };
 
+  const loginLink = isBarter ? '/login-barter' : '/login';
+  const forgotPasswordLink = isBarter ? '/forgot-password-barter' : '/forgot-password';
+  const brandName = isBarter ? 'Barter Network' : 'VibeVetting';
+
   if (validating) {
     return (
       <div className="auth-wrapper">
@@ -91,10 +99,10 @@ function ResetPasswordForm() {
             <div className="auth-logo-icon">
               <i className="fa-solid fa-check"></i>
             </div>
-            <h1>VibeVetting</h1>
+            <h1>{brandName}</h1>
           </div>
           <div className="auth-card" style={{ textAlign: 'center', padding: '40px' }}>
-            <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: '32px', color: '#667eea' }}></i>
+            <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: '32px', color: isBarter ? '#f472b6' : '#667eea' }}></i>
             <p style={{ marginTop: '16px', color: '#718096' }}>Validating reset link...</p>
           </div>
         </div>
@@ -110,7 +118,7 @@ function ResetPasswordForm() {
             <div className="auth-logo-icon">
               <i className="fa-solid fa-check"></i>
             </div>
-            <h1>VibeVetting</h1>
+            <h1>{brandName}</h1>
           </div>
           <div className="auth-card" style={{ textAlign: 'center' }}>
             <div style={{ color: '#ef4444', fontSize: '48px', marginBottom: '16px' }}>
@@ -120,7 +128,7 @@ function ResetPasswordForm() {
             <p style={{ color: '#718096', marginBottom: '24px' }}>
               This password reset link is invalid or has expired. Please request a new one.
             </p>
-            <Link href="/forgot-password" className="btn btn-primary">
+            <Link href={forgotPasswordLink} className="btn btn-primary">
               <i className="fa-solid fa-arrow-left"></i>
               Request New Link
             </Link>
@@ -138,7 +146,7 @@ function ResetPasswordForm() {
             <div className="auth-logo-icon">
               <i className="fa-solid fa-check"></i>
             </div>
-            <h1>VibeVetting</h1>
+            <h1>{brandName}</h1>
           </div>
           <div className="auth-card" style={{ textAlign: 'center' }}>
             <div style={{ color: '#22c55e', fontSize: '48px', marginBottom: '16px' }}>
@@ -148,7 +156,7 @@ function ResetPasswordForm() {
             <p style={{ color: '#718096', marginBottom: '24px' }}>
               Your password has been successfully updated. You can now sign in with your new password.
             </p>
-            <Link href="/login" className="btn btn-primary">
+            <Link href={loginLink} className="btn btn-primary">
               <i className="fa-solid fa-arrow-right-to-bracket"></i>
               Sign In
             </Link>
@@ -165,7 +173,7 @@ function ResetPasswordForm() {
           <div className="auth-logo-icon">
             <i className="fa-solid fa-check"></i>
           </div>
-          <h1>VibeVetting</h1>
+          <h1>{brandName}</h1>
         </div>
 
         <div className="auth-card">
@@ -217,7 +225,7 @@ function ResetPasswordForm() {
             </button>
 
             <div className="auth-footer" style={{ marginTop: '24px' }}>
-              <p>Remember your password? <Link href="/login" className="auth-link">Sign in</Link></p>
+              <p>Remember your password? <Link href={loginLink} className="auth-link">Sign in</Link></p>
             </div>
           </form>
         </div>

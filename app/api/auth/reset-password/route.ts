@@ -22,10 +22,15 @@ async function getUsersCollection(): Promise<Collection<UserDocument>> {
   return client.db(DB_NAME).collection<UserDocument>("users");
 }
 
+async function getBarterUsersCollection(): Promise<Collection<UserDocument>> {
+  const client = await clientPromise;
+  return client.db(DB_NAME).collection<UserDocument>("barter_users");
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { token, password } = body;
+    const { token, password, type } = body; // type: 'barter' or undefined for regular users
 
     if (!token || !password) {
       return NextResponse.json(
@@ -41,7 +46,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const collection = await getUsersCollection();
+    // Choose the appropriate collection based on type
+    const collection = type === 'barter'
+      ? await getBarterUsersCollection()
+      : await getUsersCollection();
 
     // Find user with valid reset token
     const user = await collection.findOne({

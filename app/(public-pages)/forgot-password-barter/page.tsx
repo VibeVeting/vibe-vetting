@@ -7,16 +7,41 @@ export default function ForgotPasswordBarterPage() {
   const [email, setEmail] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [resetLink, setResetLink] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    setIsSubmitted(true);
-    setIsLoading(false);
+    try {
+      const response = await fetch('/api/auth/forgot-password-barter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || 'Failed to send reset link');
+        setIsLoading(false);
+        return;
+      }
+
+      setIsSubmitted(true);
+      // In development, show the reset link (in production, this would be emailed)
+      if (data.resetLink) {
+        setResetLink(data.resetLink);
+      }
+    } catch (err) {
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -136,6 +161,13 @@ export default function ForgotPasswordBarterPage() {
               </div>
 
               <form className="barter-forgot-form" onSubmit={handleSubmit}>
+                {error && (
+                  <div className="barter-error-message">
+                    <span>⚠️</span>
+                    <span>{error}</span>
+                  </div>
+                )}
+
                 <div className="auth-field">
                   <label>Email Address</label>
                   <div className="input-with-icon">
@@ -194,6 +226,20 @@ export default function ForgotPasswordBarterPage() {
               <h2>Check Your Inbox!</h2>
               <p>We've sent password reset instructions to:</p>
               <div className="email-display">{email}</div>
+              
+              {/* Development only - show reset link */}
+              {resetLink && (
+                <div className="dev-notice" style={{ marginTop: '16px', padding: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
+                  <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginBottom: '8px' }}>
+                    <strong>Development Mode:</strong> Email not configured.
+                  </p>
+                  <Link href={resetLink} className="barter-submit-btn" style={{ display: 'inline-flex', padding: '10px 20px', fontSize: '14px' }}>
+                    <span>🔗</span>
+                    Click here to reset password
+                  </Link>
+                </div>
+              )}
+              
               <div className="success-tips">
                 <div className="tip">
                   <span>💡</span>
@@ -201,12 +247,15 @@ export default function ForgotPasswordBarterPage() {
                 </div>
                 <div className="tip">
                   <span>⏱️</span>
-                  <span>Link expires in 30 minutes</span>
+                  <span>Link expires in 60 minutes</span>
                 </div>
               </div>
               <button 
                 className="barter-secondary-btn"
-                onClick={() => setIsSubmitted(false)}
+                onClick={() => {
+                  setIsSubmitted(false);
+                  setResetLink('');
+                }}
               >
                 <span>🔄</span>
                 Try a different email

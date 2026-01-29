@@ -1,5 +1,7 @@
 // Export all models
 export { UserModel } from "./user";
+export { BarterUserModel } from "./barter-user";
+export type { BarterUser, CreatorProfile, CreateBarterUserInput, UpdateBarterUserInput } from "./barter-user";
 export { NotificationModel } from "./notification";
 export { AnalyticsModel } from "./analytics";
 export { CampaignPipelineModel } from "./campaign-pipeline";

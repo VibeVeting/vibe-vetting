@@ -7,6 +7,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "vibe-vetting-secret-key";
 export interface JWTPayload {
   userId: string;
   email: string;
+  userType?: 'brand' | 'barter_creator';
   jti: string;
 }
 
