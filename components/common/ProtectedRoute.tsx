@@ -11,13 +11,19 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { isAuthenticated, loading } = useAuth();
   const [mounted, setMounted] = useState(false);
+  const [isBarterCreatorPage, setIsBarterCreatorPage] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    // Check if we're on a barter creator page - these pages handle their own auth
+    setIsBarterCreatorPage(pathname.startsWith('/creator-dashboard'));
+  }, [pathname]);
 
   useEffect(() => {
+    // Skip auth check for barter creator pages - they handle their own auth
+    if (isBarterCreatorPage) return;
+    
     if (mounted && !loading && !isAuthenticated) {
       // Check if user was a barter user based on last known path
       const lastUser = localStorage.getItem('user');
@@ -34,10 +40,13 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
       }
       window.location.href = "/login";
     }
-  }, [isAuthenticated, loading, mounted]);
+  }, [isAuthenticated, loading, mounted, isBarterCreatorPage]);
 
   // Redirect barter users trying to access regular dashboard
   useEffect(() => {
+    // Skip for barter creator pages - they handle their own auth
+    if (isBarterCreatorPage) return;
+    
     if (mounted && !loading && isAuthenticated) {
       const userStr = localStorage.getItem('user');
       if (userStr) {
@@ -45,22 +54,19 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
           const userData = JSON.parse(userStr);
           // If barter user is trying to access non-creator pages, redirect to creator-dashboard
           if (userData.userType === 'barter_creator') {
-            const allowedBarterPaths = ['/creator-dashboard', '/creator-dashboard/settings'];
-            const isOnAllowedPath = allowedBarterPaths.some(path => pathname.startsWith(path));
-            if (!isOnAllowedPath && pathname !== '/creator-dashboard') {
-              window.location.href = "/creator-dashboard";
-            }
-          }
-          // If regular user is trying to access creator pages, redirect to dashboard
-          else if (userData.userType !== 'barter_creator' && pathname.startsWith('/creator-dashboard')) {
-            window.location.href = "/dashboard";
+            window.location.href = "/creator-dashboard";
           }
         } catch (e) {
           // Ignore parse errors
         }
       }
     }
-  }, [mounted, loading, isAuthenticated, pathname]);
+  }, [mounted, loading, isAuthenticated, isBarterCreatorPage]);
+
+  // For barter creator pages, render children immediately - they handle their own loading state
+  if (isBarterCreatorPage) {
+    return <>{children}</>;
+  }
 
   // Don't render until mounted to avoid hydration issues
   if (!mounted || loading) {

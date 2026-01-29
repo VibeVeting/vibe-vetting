@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import './creator-dashboard.css';
 
 interface CreatorProfile {
   niche: string;
@@ -20,10 +21,21 @@ interface UserData {
   creatorProfile?: CreatorProfile;
 }
 
+interface ShippingAddress {
+  fullName: string;
+  phone: string;
+  addressLine1: string;
+  addressLine2?: string;
+  city: string;
+  state: string;
+  pincode: string;
+}
+
 interface BarterOffer {
   _id: string;
   brandName: string;
   brandLogo?: string;
+  brandEmail?: string;
   productName: string;
   productDescription?: string;
   productImage?: string;
@@ -39,6 +51,10 @@ interface BarterOffer {
   filledSlots: number;
   deadline: string;
   hasApplied: boolean;
+  targetNiches?: string[];
+  minFollowers?: number;
+  maxFollowers?: number;
+  targetCities?: string[];
   application?: BarterApplication;
 }
 
@@ -49,6 +65,11 @@ interface BarterApplication {
   contentLink?: string;
   contentSubmittedAt?: string;
   appliedAt: string;
+  shippingAddress?: ShippingAddress;
+  trackingNumber?: string;
+  shippedAt?: string;
+  brandFeedback?: string;
+  revisionNotes?: string;
   offer?: BarterOffer;
 }
 
@@ -70,15 +91,31 @@ const contentTypeIcons: Record<string, { icon: string; color: string; label: str
   carousel: { icon: 'fa-images', color: '#F56040', label: 'Carousel' },
 };
 
-const statusColors: Record<string, { bg: string; color: string; label: string }> = {
-  pending: { bg: '#fef3c7', color: '#d97706', label: 'Pending Review' },
-  approved: { bg: '#d1fae5', color: '#059669', label: 'Approved' },
-  rejected: { bg: '#fee2e2', color: '#dc2626', label: 'Not Selected' },
-  content_pending: { bg: '#dbeafe', color: '#2563eb', label: 'Create Content' },
-  submitted: { bg: '#e0e7ff', color: '#4f46e5', label: 'Under Review' },
-  revision_requested: { bg: '#fef3c7', color: '#d97706', label: 'Revision Needed' },
-  completed: { bg: '#d1fae5', color: '#059669', label: 'Completed' },
-  shipped: { bg: '#d1fae5', color: '#059669', label: 'Product Shipped' },
+const statusColors: Record<string, { bg: string; color: string; label: string; icon: string }> = {
+  pending: { bg: '#fef3c7', color: '#d97706', label: 'Pending Review', icon: 'fa-hourglass-half' },
+  approved: { bg: '#d1fae5', color: '#059669', label: 'Approved', icon: 'fa-check-circle' },
+  rejected: { bg: '#fee2e2', color: '#dc2626', label: 'Not Selected', icon: 'fa-times-circle' },
+  content_pending: { bg: '#dbeafe', color: '#2563eb', label: 'Create Content', icon: 'fa-camera' },
+  submitted: { bg: '#e0e7ff', color: '#4f46e5', label: 'Under Review', icon: 'fa-eye' },
+  revision_requested: { bg: '#fef3c7', color: '#d97706', label: 'Revision Needed', icon: 'fa-edit' },
+  completed: { bg: '#d1fae5', color: '#059669', label: 'Completed', icon: 'fa-trophy' },
+  shipped: { bg: '#d1fae5', color: '#059669', label: 'Product Shipped', icon: 'fa-truck' },
+};
+
+const categoryIcons: Record<string, string> = {
+  'Fashion': '👗',
+  'Beauty': '💄',
+  'Tech': '📱',
+  'Food': '🍕',
+  'Fitness': '💪',
+  'Travel': '✈️',
+  'Lifestyle': '🏠',
+  'Gaming': '🎮',
+  'Health': '🏥',
+  'Finance': '💰',
+  'Education': '📚',
+  'Entertainment': '🎬',
+  'Other': '📦',
 };
 
 export default function CreatorDashboard() {
@@ -92,11 +129,25 @@ export default function CreatorDashboard() {
   const [selectedOffer, setSelectedOffer] = useState<BarterOffer | null>(null);
   const [showApplyModal, setShowApplyModal] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [showOfferDetailModal, setShowOfferDetailModal] = useState(false);
+  const [showShippingModal, setShowShippingModal] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState<BarterApplication | null>(null);
   const [submitLink, setSubmitLink] = useState('');
   const [submitError, setSubmitError] = useState('');
   const [applyLoading, setApplyLoading] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [contentTypeFilter, setContentTypeFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('newest');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [shippingAddress, setShippingAddress] = useState<ShippingAddress>({
+    fullName: '',
+    phone: '',
+    addressLine1: '',
+    addressLine2: '',
+    city: '',
+    state: '',
+    pincode: '',
+  });
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -240,15 +291,108 @@ export default function CreatorDashboard() {
     }
   };
 
+  const handleSubmitShippingAddress = async () => {
+    if (!selectedApplication) return;
+    
+    // Validate required fields
+    if (!shippingAddress.fullName || !shippingAddress.phone || !shippingAddress.addressLine1 || 
+        !shippingAddress.city || !shippingAddress.state || !shippingAddress.pincode) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    // Validate phone number
+    if (!/^\d{10}$/.test(shippingAddress.phone.replace(/\D/g, ''))) {
+      alert('Please enter a valid 10-digit phone number');
+      return;
+    }
+
+    // Validate pincode
+    if (!/^\d{6}$/.test(shippingAddress.pincode)) {
+      alert('Please enter a valid 6-digit pincode');
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    setApplyLoading(true);
+    try {
+      const response = await fetch(`/api/barter/applications/${selectedApplication._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          action: 'update_shipping',
+          shippingAddress: shippingAddress,
+        }),
+      });
+
+      if (response.ok) {
+        setShowShippingModal(false);
+        setSelectedApplication(null);
+        setShippingAddress({
+          fullName: '',
+          phone: '',
+          addressLine1: '',
+          addressLine2: '',
+          city: '',
+          state: '',
+          pincode: '',
+        });
+        fetchData(token);
+        alert('Shipping address saved successfully!');
+      } else {
+        const data = await response.json();
+        alert(data.error || 'Failed to save address');
+      }
+    } catch (error) {
+      console.error('Error saving shipping address:', error);
+      alert('Something went wrong');
+    } finally {
+      setApplyLoading(false);
+    }
+  };
+
   const getFilteredOffers = () => {
     let filtered = offers.filter(o => !o.hasApplied);
     if (categoryFilter !== 'all') {
       filtered = filtered.filter(o => o.productCategory.toLowerCase().includes(categoryFilter.toLowerCase()));
     }
+    if (contentTypeFilter !== 'all') {
+      filtered = filtered.filter(o => o.contentType === contentTypeFilter);
+    }
+    // Sort
+    if (sortBy === 'newest') {
+      filtered.sort((a, b) => new Date(b.deadline).getTime() - new Date(a.deadline).getTime());
+    } else if (sortBy === 'value-high') {
+      filtered.sort((a, b) => b.productValue - a.productValue);
+    } else if (sortBy === 'value-low') {
+      filtered.sort((a, b) => a.productValue - b.productValue);
+    } else if (sortBy === 'deadline') {
+      filtered.sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime());
+    }
     return filtered;
   };
 
   const categories = [...new Set(offers.map(o => o.productCategory))];
+  const contentTypes = [...new Set(offers.map(o => o.contentType))];
+
+  const getDaysRemaining = (deadline: string) => {
+    const days = Math.ceil((new Date(deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+    return days;
+  };
+
+  const getSlotsPercentage = (filled: number, total: number) => {
+    return Math.round((filled / total) * 100);
+  };
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    setMobileMenuOpen(false);
+  };
 
   if (loading || !user) {
     return (
@@ -263,19 +407,55 @@ export default function CreatorDashboard() {
 
   return (
     <div className="creator-dashboard">
+      {/* Mobile Header */}
+      <header className="creator-mobile-header">
+        <button className="mobile-menu-btn" onClick={() => setMobileMenuOpen(true)}>
+          <i className="fa-solid fa-bars"></i>
+        </button>
+        <div className="mobile-logo">
+          <div className="barter-logo-hexagon">
+            <div className="barter-hex-inner">
+              <span className="barter-hex-v">V</span>
+            </div>
+          </div>
+          <span className="logo-text">
+            <span className="logo-vibe">VIBE</span>
+            <span className="logo-vetting">VETTING</span>
+          </span>
+        </div>
+        <div className="mobile-avatar" onClick={() => handleTabChange('profile')}>
+          {user.name.charAt(0).toUpperCase()}
+        </div>
+      </header>
+
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <div className="mobile-menu-overlay" onClick={() => setMobileMenuOpen(false)} />
+      )}
+
       {/* Sidebar */}
-      <aside className="creator-sidebar">
+      <aside className={`creator-sidebar ${mobileMenuOpen ? 'open' : ''}`}>
         <div className="creator-sidebar-header">
           <div className="creator-logo">
-            <span className="logo-icon">🎁</span>
-            <span className="logo-text">Barter</span>
+            <div className="barter-logo-hexagon">
+              <div className="barter-hex-inner">
+                <span className="barter-hex-v">V</span>
+              </div>
+            </div>
+            <span className="logo-text">
+              <span className="logo-vibe">VIBE</span>
+              <span className="logo-vetting">VETTING</span>
+            </span>
           </div>
+          <button className="mobile-close-btn" onClick={() => setMobileMenuOpen(false)}>
+            <i className="fa-solid fa-times"></i>
+          </button>
         </div>
 
         <nav className="creator-nav">
           <button 
             className={`creator-nav-item ${activeTab === 'offers' ? 'active' : ''}`}
-            onClick={() => setActiveTab('offers')}
+            onClick={() => handleTabChange('offers')}
           >
             <i className="fa-solid fa-gift"></i>
             <span>Browse Offers</span>
@@ -283,7 +463,7 @@ export default function CreatorDashboard() {
           </button>
           <button 
             className={`creator-nav-item ${activeTab === 'applications' ? 'active' : ''}`}
-            onClick={() => setActiveTab('applications')}
+            onClick={() => handleTabChange('applications')}
           >
             <i className="fa-solid fa-file-alt"></i>
             <span>My Applications</span>
@@ -291,24 +471,31 @@ export default function CreatorDashboard() {
           </button>
           <button 
             className={`creator-nav-item ${activeTab === 'pending' ? 'active' : ''}`}
-            onClick={() => setActiveTab('pending')}
+            onClick={() => handleTabChange('pending')}
           >
             <i className="fa-solid fa-clock"></i>
             <span>Pending Content</span>
-            <span className="nav-badge">{applications.filter(a => ['approved', 'content_pending', 'revision_requested'].includes(a.status)).length}</span>
+            <span className="nav-badge warning">{applications.filter(a => ['approved', 'content_pending', 'revision_requested'].includes(a.status)).length}</span>
           </button>
           <button 
             className={`creator-nav-item ${activeTab === 'completed' ? 'active' : ''}`}
-            onClick={() => setActiveTab('completed')}
+            onClick={() => handleTabChange('completed')}
           >
             <i className="fa-solid fa-check-circle"></i>
             <span>Completed</span>
-            <span className="nav-badge">{applications.filter(a => ['completed', 'shipped', 'submitted'].includes(a.status)).length}</span>
+            <span className="nav-badge success">{applications.filter(a => ['completed', 'shipped', 'submitted'].includes(a.status)).length}</span>
           </button>
           <div className="nav-divider"></div>
           <button 
+            className={`creator-nav-item ${activeTab === 'earnings' ? 'active' : ''}`}
+            onClick={() => handleTabChange('earnings')}
+          >
+            <i className="fa-solid fa-chart-line"></i>
+            <span>Earnings</span>
+          </button>
+          <button 
             className={`creator-nav-item ${activeTab === 'profile' ? 'active' : ''}`}
-            onClick={() => setActiveTab('profile')}
+            onClick={() => handleTabChange('profile')}
           >
             <i className="fa-solid fa-user"></i>
             <span>My Profile</span>
@@ -325,7 +512,7 @@ export default function CreatorDashboard() {
               <span className="profile-niche">{user.creatorProfile?.niche || 'Creator'}</span>
             </div>
           </div>
-          <button className="logout-btn" onClick={handleLogout}>
+          <button className="logout-btn" onClick={handleLogout} title="Logout">
             <i className="fa-solid fa-right-from-bracket"></i>
           </button>
         </div>
@@ -396,6 +583,42 @@ export default function CreatorDashboard() {
                       <option key={cat} value={cat}>{cat}</option>
                     ))}
                   </select>
+                  <select 
+                    className="filter-select"
+                    value={contentTypeFilter}
+                    onChange={(e) => setContentTypeFilter(e.target.value)}
+                  >
+                    <option value="all">All Content Types</option>
+                    {contentTypes.map(type => (
+                      <option key={type} value={type}>{contentTypeIcons[type]?.label || type}</option>
+                    ))}
+                  </select>
+                  <select 
+                    className="filter-select"
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                  >
+                    <option value="newest">Newest First</option>
+                    <option value="deadline">Ending Soon</option>
+                    <option value="value-high">Highest Value</option>
+                    <option value="value-low">Lowest Value</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Quick Stats Banner */}
+              <div className="offers-quick-stats">
+                <div className="quick-stat">
+                  <i className="fa-solid fa-gift"></i>
+                  <span><strong>{getFilteredOffers().length}</strong> Offers Available</span>
+                </div>
+                <div className="quick-stat">
+                  <i className="fa-solid fa-indian-rupee-sign"></i>
+                  <span>Up to <strong>₹{Math.max(...(getFilteredOffers().map(o => o.productValue) || [0])).toLocaleString()}</strong> worth products</span>
+                </div>
+                <div className="quick-stat">
+                  <i className="fa-solid fa-fire"></i>
+                  <span><strong>{getFilteredOffers().filter(o => getDaysRemaining(o.deadline) <= 7).length}</strong> Ending Soon</span>
                 </div>
               </div>
 
@@ -409,9 +632,21 @@ export default function CreatorDashboard() {
                 ) : (
                   getFilteredOffers().map((offer) => (
                     <div key={offer._id} className="offer-card">
+                      {/* Urgency Badge */}
+                      {getDaysRemaining(offer.deadline) <= 3 && (
+                        <div className="offer-urgency-badge urgent">
+                          <i className="fa-solid fa-fire"></i> Ends in {getDaysRemaining(offer.deadline)} days
+                        </div>
+                      )}
+                      {getDaysRemaining(offer.deadline) > 3 && getDaysRemaining(offer.deadline) <= 7 && (
+                        <div className="offer-urgency-badge warning">
+                          <i className="fa-solid fa-clock"></i> {getDaysRemaining(offer.deadline)} days left
+                        </div>
+                      )}
+                      
                       <div className="offer-card-header">
                         <div className="brand-info">
-                          <span className="brand-logo">{offer.brandLogo || '🏢'}</span>
+                          <span className="brand-logo">{offer.brandLogo || categoryIcons[offer.productCategory] || '🏢'}</span>
                           <div>
                             <h3>{offer.brandName}</h3>
                             <span className="brand-category">{offer.productCategory}</span>
@@ -434,6 +669,29 @@ export default function CreatorDashboard() {
                         <div className="product-details">
                           <h4>{offer.productName}</h4>
                           <span className="product-value">Worth ₹{offer.productValue.toLocaleString()}</span>
+                          {offer.productDescription && (
+                            <p className="product-desc-preview">{offer.productDescription.slice(0, 60)}...</p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Content Requirement Preview */}
+                      <div className="offer-requirement-preview">
+                        <i className={`fa-solid ${contentTypeIcons[offer.contentType]?.icon || 'fa-camera'}`}></i>
+                        <span>{offer.contentRequirement.slice(0, 50)}{offer.contentRequirement.length > 50 ? '...' : ''}</span>
+                      </div>
+
+                      {/* Slots Progress */}
+                      <div className="offer-slots-progress">
+                        <div className="slots-info">
+                          <span>{offer.totalSlots - offer.filledSlots} slots left</span>
+                          <span>{getSlotsPercentage(offer.filledSlots, offer.totalSlots)}% filled</span>
+                        </div>
+                        <div className="slots-bar">
+                          <div 
+                            className="slots-bar-fill" 
+                            style={{ width: `${getSlotsPercentage(offer.filledSlots, offer.totalSlots)}%` }}
+                          />
                         </div>
                       </div>
 
@@ -444,7 +702,7 @@ export default function CreatorDashboard() {
                         </div>
                         <div className="meta-item">
                           <i className="fa-solid fa-users"></i>
-                          <span>{offer.filledSlots}/{offer.totalSlots} slots</span>
+                          <span>{offer.filledSlots}/{offer.totalSlots} creators</span>
                         </div>
                       </div>
 
@@ -453,10 +711,21 @@ export default function CreatorDashboard() {
                           className="btn-view-details"
                           onClick={() => {
                             setSelectedOffer(offer);
+                            setShowOfferDetailModal(true);
+                          }}
+                        >
+                          <i className="fa-solid fa-eye"></i>
+                          View Details
+                        </button>
+                        <button 
+                          className="btn-quick-apply"
+                          onClick={() => {
+                            setSelectedOffer(offer);
                             setShowApplyModal(true);
                           }}
                         >
-                          View & Apply
+                          <i className="fa-solid fa-paper-plane"></i>
+                          Apply
                         </button>
                       </div>
                     </div>
@@ -476,25 +745,95 @@ export default function CreatorDashboard() {
                 </div>
               </div>
 
+              {/* Application Status Overview */}
+              <div className="application-status-overview">
+                <div className="status-card pending">
+                  <div className="status-icon">
+                    <i className="fa-solid fa-hourglass-half"></i>
+                  </div>
+                  <div className="status-info">
+                    <span className="status-count">{applications.filter(a => a.status === 'pending').length}</span>
+                    <span className="status-label">Pending</span>
+                  </div>
+                </div>
+                <div className="status-card approved">
+                  <div className="status-icon">
+                    <i className="fa-solid fa-check-circle"></i>
+                  </div>
+                  <div className="status-info">
+                    <span className="status-count">{applications.filter(a => ['approved', 'content_pending'].includes(a.status)).length}</span>
+                    <span className="status-label">Approved</span>
+                  </div>
+                </div>
+                <div className="status-card submitted">
+                  <div className="status-icon">
+                    <i className="fa-solid fa-eye"></i>
+                  </div>
+                  <div className="status-info">
+                    <span className="status-count">{applications.filter(a => a.status === 'submitted').length}</span>
+                    <span className="status-label">Under Review</span>
+                  </div>
+                </div>
+                <div className="status-card completed">
+                  <div className="status-icon">
+                    <i className="fa-solid fa-trophy"></i>
+                  </div>
+                  <div className="status-info">
+                    <span className="status-count">{applications.filter(a => ['completed', 'shipped'].includes(a.status)).length}</span>
+                    <span className="status-label">Completed</span>
+                  </div>
+                </div>
+              </div>
+
               <div className="applications-list">
                 {applications.length === 0 ? (
                   <div className="empty-state">
                     <i className="fa-solid fa-file-alt"></i>
                     <h3>No applications yet</h3>
                     <p>Apply to some offers to see them here</p>
-                    <button className="btn-primary" onClick={() => setActiveTab('offers')}>
+                    <button className="btn-primary" onClick={() => handleTabChange('offers')}>
                       Browse Offers
                     </button>
                   </div>
                 ) : (
                   applications.map((app) => (
-                    <div key={app._id} className="application-card">
+                    <div key={app._id} className={`application-card status-${app.status}`}>
                       <div className="application-left">
-                        <span className="app-brand-logo">{app.offer?.brandLogo || '🏢'}</span>
+                        <span className="app-brand-logo">{app.offer?.brandLogo || categoryIcons[app.offer?.productCategory || ''] || '🏢'}</span>
                         <div className="app-details">
                           <h4>{app.offer?.brandName || 'Brand'}</h4>
                           <p>{app.offer?.productName || 'Product'}</p>
-                          <span className="app-date">Applied {new Date(app.appliedAt).toLocaleDateString('en-IN')}</span>
+                          <div className="app-meta-row">
+                            <span className="app-date">
+                              <i className="fa-solid fa-calendar"></i>
+                              Applied {new Date(app.appliedAt).toLocaleDateString('en-IN')}
+                            </span>
+                            <span className="app-value">
+                              <i className="fa-solid fa-indian-rupee-sign"></i>
+                              ₹{app.offer?.productValue?.toLocaleString() || 0}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="application-center">
+                        {/* Status Timeline */}
+                        <div className="status-timeline">
+                          <div className={`timeline-step ${['pending', 'approved', 'content_pending', 'submitted', 'completed', 'shipped'].includes(app.status) ? 'completed' : ''}`}>
+                            <div className="step-dot"></div>
+                            <span>Applied</span>
+                          </div>
+                          <div className={`timeline-step ${['approved', 'content_pending', 'submitted', 'completed', 'shipped'].includes(app.status) ? 'completed' : ''}`}>
+                            <div className="step-dot"></div>
+                            <span>Approved</span>
+                          </div>
+                          <div className={`timeline-step ${['submitted', 'completed', 'shipped'].includes(app.status) ? 'completed' : ''}`}>
+                            <div className="step-dot"></div>
+                            <span>Content</span>
+                          </div>
+                          <div className={`timeline-step ${['completed', 'shipped'].includes(app.status) ? 'completed' : ''}`}>
+                            <div className="step-dot"></div>
+                            <span>Done</span>
+                          </div>
                         </div>
                       </div>
                       <div className="application-right">
@@ -505,8 +844,31 @@ export default function CreatorDashboard() {
                             color: statusColors[app.status]?.color || '#374151'
                           }}
                         >
+                          <i className={`fa-solid ${statusColors[app.status]?.icon || 'fa-circle'}`}></i>
                           {statusColors[app.status]?.label || app.status}
                         </span>
+                        {['approved', 'content_pending'].includes(app.status) && !app.shippingAddress && (
+                          <button 
+                            className="btn-shipping-address"
+                            onClick={() => {
+                              setSelectedApplication(app);
+                              // Pre-fill with user data if available
+                              setShippingAddress({
+                                fullName: user?.name || '',
+                                phone: '',
+                                addressLine1: '',
+                                addressLine2: '',
+                                city: user?.creatorProfile?.city || '',
+                                state: '',
+                                pincode: '',
+                              });
+                              setShowShippingModal(true);
+                            }}
+                          >
+                            <i className="fa-solid fa-location-dot"></i>
+                            Add Address
+                          </button>
+                        )}
                         {['approved', 'content_pending', 'revision_requested'].includes(app.status) && !app.contentLink && (
                           <button 
                             className="btn-submit-content"
@@ -515,8 +877,27 @@ export default function CreatorDashboard() {
                               setShowSubmitModal(true);
                             }}
                           >
+                            <i className="fa-solid fa-upload"></i>
                             Submit Content
                           </button>
+                        )}
+                        {app.status === 'revision_requested' && app.revisionNotes && (
+                          <div className="revision-notes">
+                            <i className="fa-solid fa-exclamation-triangle"></i>
+                            <span>{app.revisionNotes}</span>
+                          </div>
+                        )}
+                        {app.shippingAddress && (
+                          <div className="shipping-added-info">
+                            <i className="fa-solid fa-check-circle"></i>
+                            <span>Address Added</span>
+                          </div>
+                        )}
+                        {app.trackingNumber && (
+                          <div className="tracking-info">
+                            <i className="fa-solid fa-truck"></i>
+                            <span>Tracking: {app.trackingNumber}</span>
+                          </div>
                         )}
                       </div>
                     </div>
@@ -588,16 +969,45 @@ export default function CreatorDashboard() {
                             <i className="fa-solid fa-calendar"></i>
                             Due: {app.offer?.deadline ? new Date(app.offer.deadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
                           </span>
-                          <button 
-                            className="btn-submit-content"
-                            onClick={() => {
-                              setSelectedApplication(app);
-                              setShowSubmitModal(true);
-                            }}
-                          >
-                            <i className="fa-solid fa-upload"></i>
-                            Submit Content
-                          </button>
+                          <div className="pending-actions">
+                            {!app.shippingAddress && (
+                              <button 
+                                className="btn-shipping-address"
+                                onClick={() => {
+                                  setSelectedApplication(app);
+                                  setShippingAddress({
+                                    fullName: user?.name || '',
+                                    phone: '',
+                                    addressLine1: '',
+                                    addressLine2: '',
+                                    city: user?.creatorProfile?.city || '',
+                                    state: '',
+                                    pincode: '',
+                                  });
+                                  setShowShippingModal(true);
+                                }}
+                              >
+                                <i className="fa-solid fa-location-dot"></i>
+                                Add Address
+                              </button>
+                            )}
+                            {app.shippingAddress && (
+                              <div className="shipping-added-info">
+                                <i className="fa-solid fa-check-circle"></i>
+                                <span>Address Added</span>
+                              </div>
+                            )}
+                            <button 
+                              className="btn-submit-content"
+                              onClick={() => {
+                                setSelectedApplication(app);
+                                setShowSubmitModal(true);
+                              }}
+                            >
+                              <i className="fa-solid fa-upload"></i>
+                              Submit Content
+                            </button>
+                          </div>
                         </div>
                       </div>
                     ))
@@ -745,8 +1155,242 @@ export default function CreatorDashboard() {
               </div>
             </>
           )}
+
+          {/* Earnings Tab */}
+          {activeTab === 'earnings' && (
+            <>
+              <div className="content-header">
+                <div className="header-left">
+                  <h1>💰 My Earnings</h1>
+                  <p>Track the value of products you&apos;ve earned through collaborations</p>
+                </div>
+              </div>
+
+              <div className="earnings-overview">
+                <div className="earnings-card total">
+                  <div className="earnings-icon">
+                    <i className="fa-solid fa-gift"></i>
+                  </div>
+                  <div className="earnings-details">
+                    <span className="earnings-value">₹{stats?.totalEarned?.toLocaleString() || 0}</span>
+                    <span className="earnings-label">Total Products Earned</span>
+                  </div>
+                </div>
+                <div className="earnings-card pending">
+                  <div className="earnings-icon">
+                    <i className="fa-solid fa-hourglass-half"></i>
+                  </div>
+                  <div className="earnings-details">
+                    <span className="earnings-value">
+                      ₹{applications
+                        .filter(a => ['approved', 'content_pending', 'submitted'].includes(a.status))
+                        .reduce((sum, a) => sum + (a.offer?.productValue || 0), 0)
+                        .toLocaleString()}
+                    </span>
+                    <span className="earnings-label">Pending Products</span>
+                  </div>
+                </div>
+                <div className="earnings-card completed">
+                  <div className="earnings-icon">
+                    <i className="fa-solid fa-check-circle"></i>
+                  </div>
+                  <div className="earnings-details">
+                    <span className="earnings-value">{applications.filter(a => ['completed', 'shipped'].includes(a.status)).length}</span>
+                    <span className="earnings-label">Completed Deals</span>
+                  </div>
+                </div>
+                <div className="earnings-card rate">
+                  <div className="earnings-icon">
+                    <i className="fa-solid fa-chart-line"></i>
+                  </div>
+                  <div className="earnings-details">
+                    <span className="earnings-value">{stats?.totalApplications && stats.totalApplications > 0 ? Math.round((stats.approved / stats.totalApplications) * 100) : 0}%</span>
+                    <span className="earnings-label">Approval Rate</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="earnings-history">
+                <h3>Earnings History</h3>
+                {applications.filter(a => ['completed', 'shipped'].includes(a.status)).length === 0 ? (
+                  <div className="empty-state">
+                    <i className="fa-solid fa-coins"></i>
+                    <h3>No earnings yet</h3>
+                    <p>Complete your first collaboration to start earning</p>
+                  </div>
+                ) : (
+                  <div className="earnings-list">
+                    {applications
+                      .filter(a => ['completed', 'shipped'].includes(a.status))
+                      .map(app => (
+                        <div key={app._id} className="earnings-item">
+                          <span className="earnings-brand-logo">{app.offer?.brandLogo || categoryIcons[app.offer?.productCategory || ''] || '🏢'}</span>
+                          <div className="earnings-item-info">
+                            <h4>{app.offer?.brandName}</h4>
+                            <p>{app.offer?.productName}</p>
+                          </div>
+                          <span className="earnings-item-value">₹{app.offer?.productValue?.toLocaleString() || 0}</span>
+                          <span className="earnings-item-date">{new Date(app.contentSubmittedAt || app.appliedAt).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}</span>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
       </main>
+
+      {/* Offer Detail Modal */}
+      {showOfferDetailModal && selectedOffer && (
+        <div className="modal-overlay" onClick={() => { setShowOfferDetailModal(false); setSelectedOffer(null); }}>
+          <div className="modal-content offer-detail-modal large" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => { setShowOfferDetailModal(false); setSelectedOffer(null); }}>
+              <i className="fa-solid fa-times"></i>
+            </button>
+
+            <div className="modal-header">
+              <div className="brand-info-large">
+                <span className="brand-logo-large">{selectedOffer.brandLogo || categoryIcons[selectedOffer.productCategory] || '🏢'}</span>
+                <div>
+                  <h2>{selectedOffer.brandName}</h2>
+                  <p>{selectedOffer.productCategory}</p>
+                </div>
+              </div>
+              <div 
+                className="content-type-badge large" 
+                style={{ 
+                  background: `${contentTypeIcons[selectedOffer.contentType]?.color || '#666'}20`, 
+                  color: contentTypeIcons[selectedOffer.contentType]?.color || '#666' 
+                }}
+              >
+                <i className={`fa-solid ${contentTypeIcons[selectedOffer.contentType]?.icon || 'fa-file'}`}></i>
+                {contentTypeIcons[selectedOffer.contentType]?.label || selectedOffer.contentType}
+              </div>
+            </div>
+
+            <div className="modal-body">
+              {/* Product Section */}
+              <div className="detail-section product-section">
+                <h3><i className="fa-solid fa-gift"></i> Product Details</h3>
+                <div className="product-showcase-large">
+                  <span className="product-image-large">{selectedOffer.productImage || '📦'}</span>
+                  <div className="product-info-large">
+                    <h4>{selectedOffer.productName}</h4>
+                    <span className="product-value-badge">Worth ₹{selectedOffer.productValue.toLocaleString()}</span>
+                    {selectedOffer.productDescription && (
+                      <p className="product-description">{selectedOffer.productDescription}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Campaign Details */}
+              <div className="detail-section">
+                <h3><i className="fa-solid fa-info-circle"></i> Campaign Details</h3>
+                <div className="campaign-details-grid">
+                  <div className="detail-item">
+                    <i className="fa-solid fa-calendar"></i>
+                    <div>
+                      <span className="detail-label">Deadline</span>
+                      <span className="detail-value">{new Date(selectedOffer.deadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                    </div>
+                  </div>
+                  <div className="detail-item">
+                    <i className="fa-solid fa-users"></i>
+                    <div>
+                      <span className="detail-label">Slots Available</span>
+                      <span className="detail-value">{selectedOffer.totalSlots - selectedOffer.filledSlots} of {selectedOffer.totalSlots}</span>
+                    </div>
+                  </div>
+                  {selectedOffer.targetNiches && selectedOffer.targetNiches.length > 0 && (
+                    <div className="detail-item full-width">
+                      <i className="fa-solid fa-bullseye"></i>
+                      <div>
+                        <span className="detail-label">Target Niches</span>
+                        <span className="detail-value">{selectedOffer.targetNiches.join(', ')}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Content Requirements */}
+              <div className="detail-section">
+                <h3><i className="fa-solid fa-camera"></i> Content Requirements</h3>
+                <div className="content-requirement-detail">
+                  <p className="requirement-text">{selectedOffer.contentRequirement}</p>
+                </div>
+              </div>
+
+              {selectedOffer.script && (
+                <div className="detail-section">
+                  <h3><i className="fa-solid fa-scroll"></i> Content Brief / Script</h3>
+                  <div className="script-box">
+                    <p>{selectedOffer.script}</p>
+                  </div>
+                </div>
+              )}
+
+              {selectedOffer.hashtags && selectedOffer.hashtags.length > 0 && (
+                <div className="detail-section">
+                  <h3><i className="fa-solid fa-hashtag"></i> Required Hashtags</h3>
+                  <div className="hashtag-list">
+                    {selectedOffer.hashtags.map((tag, i) => (
+                      <span key={i} className="hashtag">{tag}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Do's and Don'ts */}
+              {((selectedOffer.dos && selectedOffer.dos.length > 0) || (selectedOffer.donts && selectedOffer.donts.length > 0)) && (
+                <div className="detail-section guidelines">
+                  <h3><i className="fa-solid fa-clipboard-list"></i> Brand Guidelines</h3>
+                  <div className="guidelines-grid">
+                    {selectedOffer.dos && selectedOffer.dos.length > 0 && (
+                      <div className="guidelines-box dos">
+                        <h4><i className="fa-solid fa-check-circle"></i> Do&apos;s</h4>
+                        <ul>
+                          {selectedOffer.dos.map((item, i) => (
+                            <li key={i}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {selectedOffer.donts && selectedOffer.donts.length > 0 && (
+                      <div className="guidelines-box donts">
+                        <h4><i className="fa-solid fa-times-circle"></i> Don&apos;ts</h4>
+                        <ul>
+                          {selectedOffer.donts.map((item, i) => (
+                            <li key={i}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="modal-footer">
+              <button className="btn-secondary" onClick={() => { setShowOfferDetailModal(false); setSelectedOffer(null); }}>
+                Close
+              </button>
+              <button 
+                className="btn-primary-pink" 
+                onClick={() => {
+                  setShowOfferDetailModal(false);
+                  setShowApplyModal(true);
+                }}
+              >
+                <i className="fa-solid fa-paper-plane"></i>
+                Apply Now
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Apply Modal */}
       {showApplyModal && selectedOffer && (
@@ -925,6 +1569,138 @@ export default function CreatorDashboard() {
                   <>
                     <i className="fa-solid fa-check"></i>
                     Submit Content
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Shipping Address Modal */}
+      {showShippingModal && selectedApplication && (
+        <div className="modal-overlay" onClick={() => { setShowShippingModal(false); setSelectedApplication(null); }}>
+          <div className="modal-content shipping-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => { setShowShippingModal(false); setSelectedApplication(null); }}>
+              <i className="fa-solid fa-times"></i>
+            </button>
+
+            <div className="modal-header">
+              <h2>🚚 Shipping Address</h2>
+              <p>Enter your address to receive {selectedApplication.offer?.productName}</p>
+            </div>
+
+            <div className="modal-body">
+              <div className="shipping-form">
+                <div className="shipping-form-row single">
+                  <div className="form-group">
+                    <label className="form-label">Full Name *</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="Enter your full name"
+                      value={shippingAddress.fullName}
+                      onChange={(e) => setShippingAddress({...shippingAddress, fullName: e.target.value})}
+                    />
+                  </div>
+                </div>
+
+                <div className="shipping-form-row single">
+                  <div className="form-group">
+                    <label className="form-label">Phone Number *</label>
+                    <input
+                      type="tel"
+                      className="form-input"
+                      placeholder="10-digit phone number"
+                      value={shippingAddress.phone}
+                      onChange={(e) => setShippingAddress({...shippingAddress, phone: e.target.value})}
+                    />
+                  </div>
+                </div>
+
+                <div className="shipping-form-row single">
+                  <div className="form-group">
+                    <label className="form-label">Address Line 1 *</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="House/Flat No., Building Name, Street"
+                      value={shippingAddress.addressLine1}
+                      onChange={(e) => setShippingAddress({...shippingAddress, addressLine1: e.target.value})}
+                    />
+                  </div>
+                </div>
+
+                <div className="shipping-form-row single">
+                  <div className="form-group">
+                    <label className="form-label">Address Line 2</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="Landmark, Area (Optional)"
+                      value={shippingAddress.addressLine2 || ''}
+                      onChange={(e) => setShippingAddress({...shippingAddress, addressLine2: e.target.value})}
+                    />
+                  </div>
+                </div>
+
+                <div className="shipping-form-row">
+                  <div className="form-group">
+                    <label className="form-label">City *</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="City"
+                      value={shippingAddress.city}
+                      onChange={(e) => setShippingAddress({...shippingAddress, city: e.target.value})}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">State *</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="State"
+                      value={shippingAddress.state}
+                      onChange={(e) => setShippingAddress({...shippingAddress, state: e.target.value})}
+                    />
+                  </div>
+                </div>
+
+                <div className="shipping-form-row single">
+                  <div className="form-group">
+                    <label className="form-label">Pincode *</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="6-digit Pincode"
+                      value={shippingAddress.pincode}
+                      onChange={(e) => setShippingAddress({...shippingAddress, pincode: e.target.value})}
+                    />
+                  </div>
+                </div>
+
+                <div className="shipping-info-box">
+                  <i className="fa-solid fa-info-circle"></i>
+                  <span>Your address will be shared with the brand for product delivery. Make sure all details are correct.</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button className="btn-secondary" onClick={() => { setShowShippingModal(false); setSelectedApplication(null); }}>
+                Cancel
+              </button>
+              <button className="btn-primary-pink" onClick={handleSubmitShippingAddress} disabled={applyLoading}>
+                {applyLoading ? (
+                  <>
+                    <i className="fa-solid fa-spinner fa-spin"></i>
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <i className="fa-solid fa-check"></i>
+                    Save Address
                   </>
                 )}
               </button>

@@ -53,8 +53,15 @@ export default function ForgotPasswordBarterPage() {
             Back to Home
           </Link>
           <div className="barter-logo">
-            <span className="logo-icon">🎁</span>
-            <span className="logo-text">Barter Creators</span>
+            <div className="barter-logo-hexagon">
+              <div className="barter-hex-inner">
+                <span className="barter-hex-v">V</span>
+              </div>
+            </div>
+            <span className="logo-text">
+              <span className="logo-vibe">VIBE</span>
+              <span className="logo-vetting">VETTING</span>
+            </span>
           </div>
         </div>
 

@@ -97,13 +97,18 @@ export function Sidebar() {
     <aside className="sidebar" ref={sidebarRef}>
       {/* Logo Section */}
       <Link href="/dashboard" scroll={false} className="sidebar-logo">
-        <div className="sidebar-logo-icon">
-          <i className="fa-solid fa-bolt"></i>
+        <div className="sidebar-logo-icon-new">
+          <div className="sidebar-logo-hexagon">
+            <div className="sidebar-hex-inner">
+              <span className="sidebar-hex-v">V</span>
+            </div>
+          </div>
         </div>
         <div className="sidebar-logo-text">
-          <h2>VibeVetting</h2>
-          <span className="sidebar-badge">BETA</span>
+          <span className="sidebar-logo-vibe">VIBE</span>
+          <span className="sidebar-logo-vetting">VETTING</span>
         </div>
+        <span className="sidebar-badge">BETA</span>
       </Link>
 
       {/* Quick Stats - Circular */}

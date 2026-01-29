@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import '../creator-dashboard.css';
 
 const niches = [
   "Beauty", "Fashion", "Food", "Fitness", "Tech", 

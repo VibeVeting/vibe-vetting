@@ -403,8 +403,15 @@ function RegisterBarterContent() {
             {/* Mobile Logo */}
             <div className="yc-mobile-header">
               <div className="yc-mobile-logo">
-                <span className="yc-logo-icon">🎁</span>
-                <span className="yc-logo-text">vibeVetting</span>
+                <div className="yc-barter-logo-hexagon">
+                  <div className="yc-barter-hex-inner">
+                    <span className="yc-barter-hex-v">V</span>
+                  </div>
+                </div>
+                <span className="yc-logo-text">
+                  <span className="yc-logo-vibe">VIBE</span>
+                  <span className="yc-logo-vetting">VETTING</span>
+                </span>
               </div>
             </div>
 
