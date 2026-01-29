@@ -228,37 +228,34 @@ export default function CampaignsPage() {
             />
 
             {/* Status Tabs */}
-            <div className="status-tabs">
+            <div className="campaign-status-tabs">
               <button 
-                className={`status-tab ${statusFilter === 'all' ? 'active' : ''}`}
+                className={`campaign-tab ${statusFilter === 'all' ? 'active' : ''}`}
                 onClick={() => setStatusFilter('all')}
               >
                 <span>All</span>
-                <span className="tab-count">{statusCounts.all}</span>
+                <span className="campaign-tab-count">{statusCounts.all}</span>
               </button>
               <button 
-                className={`status-tab ${statusFilter === 'active' ? 'active' : ''}`}
+                className={`campaign-tab ${statusFilter === 'active' ? 'active' : ''}`}
                 onClick={() => setStatusFilter('active')}
               >
-                <i className="fa-solid fa-circle-play"></i>
                 <span>Active</span>
-                <span className="tab-count">{statusCounts.active}</span>
+                <span className="campaign-tab-count">{statusCounts.active}</span>
               </button>
               <button 
-                className={`status-tab ${statusFilter === 'draft' ? 'active' : ''}`}
+                className={`campaign-tab ${statusFilter === 'draft' ? 'active' : ''}`}
                 onClick={() => setStatusFilter('draft')}
               >
-                <i className="fa-solid fa-file-pen"></i>
                 <span>Draft</span>
-                <span className="tab-count">{statusCounts.draft}</span>
+                <span className="campaign-tab-count">{statusCounts.draft}</span>
               </button>
               <button 
-                className={`status-tab ${statusFilter === 'completed' ? 'active' : ''}`}
+                className={`campaign-tab ${statusFilter === 'completed' ? 'active' : ''}`}
                 onClick={() => setStatusFilter('completed')}
               >
-                <i className="fa-solid fa-circle-check"></i>
                 <span>Completed</span>
-                <span className="tab-count">{statusCounts.completed}</span>
+                <span className="campaign-tab-count">{statusCounts.completed}</span>
               </button>
             </div>
 
