@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/contexts/auth-context";
 import { useEffect, ReactNode, useState } from "react";
+import { usePathname } from "next/navigation";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -10,6 +11,7 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { isAuthenticated, loading } = useAuth();
   const [mounted, setMounted] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     setMounted(true);
@@ -17,10 +19,48 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   useEffect(() => {
     if (mounted && !loading && !isAuthenticated) {
-      // Use window.location instead of router to avoid issues
+      // Check if user was a barter user based on last known path
+      const lastUser = localStorage.getItem('user');
+      if (lastUser) {
+        try {
+          const userData = JSON.parse(lastUser);
+          if (userData.userType === 'barter_creator') {
+            window.location.href = "/login-barter";
+            return;
+          }
+        } catch (e) {
+          // Ignore parse errors
+        }
+      }
       window.location.href = "/login";
     }
   }, [isAuthenticated, loading, mounted]);
+
+  // Redirect barter users trying to access regular dashboard
+  useEffect(() => {
+    if (mounted && !loading && isAuthenticated) {
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        try {
+          const userData = JSON.parse(userStr);
+          // If barter user is trying to access non-creator pages, redirect to creator-dashboard
+          if (userData.userType === 'barter_creator') {
+            const allowedBarterPaths = ['/creator-dashboard', '/creator-dashboard/settings'];
+            const isOnAllowedPath = allowedBarterPaths.some(path => pathname.startsWith(path));
+            if (!isOnAllowedPath && pathname !== '/creator-dashboard') {
+              window.location.href = "/creator-dashboard";
+            }
+          }
+          // If regular user is trying to access creator pages, redirect to dashboard
+          else if (userData.userType !== 'barter_creator' && pathname.startsWith('/creator-dashboard')) {
+            window.location.href = "/dashboard";
+          }
+        } catch (e) {
+          // Ignore parse errors
+        }
+      }
+    }
+  }, [mounted, loading, isAuthenticated, pathname]);
 
   // Don't render until mounted to avoid hydration issues
   if (!mounted || loading) {

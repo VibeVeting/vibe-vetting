@@ -45,135 +45,42 @@ export default function ForgotPasswordBarterPage() {
   };
 
   return (
-    <div className="barter-forgot-wrapper">
-      {/* Floating Elements */}
-      <div className="barter-floating-elements">
-        <div className="floating-icon" style={{ top: '15%', left: '10%', animationDelay: '0s' }}>🔐</div>
-        <div className="floating-icon" style={{ top: '25%', right: '15%', animationDelay: '1s' }}>✉️</div>
-        <div className="floating-icon" style={{ bottom: '30%', left: '8%', animationDelay: '2s' }}>🔑</div>
-        <div className="floating-icon" style={{ bottom: '20%', right: '12%', animationDelay: '0.5s' }}>💫</div>
-      </div>
-
-      <div className="barter-forgot-container">
-        {/* Left Side - Creative Flow Explanation */}
-        <div className="barter-flow-section">
-          <div className="flow-header">
-            <span className="flow-badge">✨ How Barter Works</span>
-            <h2>Get Products You Love.<br />Create Content You're Proud Of.</h2>
-            <p>A simple 3-step journey from signup to free products</p>
-          </div>
-
-          <div className="barter-flow-visual">
-            {/* Step 1 */}
-            <div className="flow-step">
-              <div className="step-number">1</div>
-              <div className="step-icon-box">
-                <div className="step-icon">🏢</div>
-                <div className="step-glow"></div>
-              </div>
-              <div className="step-content">
-                <h3>Brands Onboard</h3>
-                <p>Premium brands list their products & content requirements</p>
-                <div className="step-tags">
-                  <span>Beauty</span>
-                  <span>Tech</span>
-                  <span>Food</span>
-                  <span>Fashion</span>
-                </div>
-              </div>
-              <div className="flow-connector">
-                <div className="connector-line"></div>
-                <div className="connector-arrow">→</div>
-              </div>
-            </div>
-
-            {/* Step 2 */}
-            <div className="flow-step">
-              <div className="step-number">2</div>
-              <div className="step-icon-box">
-                <div className="step-icon">📝</div>
-                <div className="step-glow"></div>
-              </div>
-              <div className="step-content">
-                <h3>You Create Magic</h3>
-                <p>Pick offers, follow the brief, create authentic content</p>
-                <div className="step-checklist">
-                  <div className="check-item">✓ Follow script guidelines</div>
-                  <div className="check-item">✓ Add required hashtags</div>
-                  <div className="check-item">✓ Tag the brand</div>
-                  <div className="check-item">✓ Keep it public</div>
-                </div>
-              </div>
-              <div className="flow-connector">
-                <div className="connector-line"></div>
-                <div className="connector-arrow">→</div>
-              </div>
-            </div>
-
-            {/* Step 3 */}
-            <div className="flow-step final-step">
-              <div className="step-number">3</div>
-              <div className="step-icon-box celebration">
-                <div className="step-icon">🎁</div>
-                <div className="step-glow"></div>
-                <div className="confetti">🎉</div>
-              </div>
-              <div className="step-content">
-                <h3>Get Free Products!</h3>
-                <p>Once approved, receive your product at your doorstep</p>
-                <div className="reward-examples">
-                  <div className="reward-item">
-                    <span className="reward-icon">💄</span>
-                    <span>₹2,500 Skincare Kit</span>
-                  </div>
-                  <div className="reward-item">
-                    <span className="reward-icon">🎧</span>
-                    <span>₹3,999 Earbuds</span>
-                  </div>
-                  <div className="reward-item">
-                    <span className="reward-icon">☕</span>
-                    <span>₹1,200 Coffee Box</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="flow-footer">
-            <div className="trust-badge">
-              <span>🛡️</span>
-              <span>No hidden charges. No catches. Just create & receive.</span>
-            </div>
+    <div className="barter-register-wrapper">
+      <div className="barter-register-container" style={{ maxWidth: '440px' }}>
+        <div className="barter-register-header">
+          <Link href="/" className="barter-back-link">
+            <i className="fa-solid fa-arrow-left"></i>
+            Back to Home
+          </Link>
+          <div className="barter-logo">
+            <span className="logo-icon">🎁</span>
+            <span className="logo-text">Barter Creators</span>
           </div>
         </div>
 
-        {/* Right Side - Forgot Password Form */}
-        <div className="barter-forgot-card">
+        <div className="barter-register-card">
           {!isSubmitted ? (
             <>
-              <div className="barter-forgot-header">
-                <div className="forgot-icon-wrapper">
-                  <span className="forgot-main-icon">🔐</span>
-                  <div className="forgot-icon-ring"></div>
-                </div>
-                <h1>Reset Your Password</h1>
-                <p>No worries! Enter your email and we'll send you reset instructions.</p>
+              <div className="barter-card-header">
+                <h2>🔐 Reset Password</h2>
+                <p>No worries! Enter your email and we&apos;ll send you reset instructions.</p>
               </div>
 
-              <form className="barter-forgot-form" onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit}>
                 {error && (
-                  <div className="barter-error-message">
-                    <span>⚠️</span>
-                    <span>{error}</span>
+                  <div className="barter-error">
+                    <i className="fa-solid fa-circle-exclamation"></i>
+                    {error}
                   </div>
                 )}
 
-                <div className="auth-field">
-                  <label>Email Address</label>
+                <div className="form-group">
+                  <label className="form-label">Email Address</label>
                   <div className="input-with-icon">
-                    <span className="input-icon">📧</span>
+                    <i className="fa-solid fa-envelope"></i>
                     <input
                       type="email"
+                      className="form-input"
                       placeholder="creator@example.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -184,84 +91,146 @@ export default function ForgotPasswordBarterPage() {
 
                 <button 
                   type="submit" 
-                  className="barter-submit-btn"
+                  className="barter-btn-primary"
                   disabled={isLoading}
                 >
                   {isLoading ? (
                     <>
-                      <span className="btn-spinner"></span>
+                      <i className="fa-solid fa-spinner fa-spin"></i>
                       Sending...
                     </>
                   ) : (
                     <>
-                      <span>📨</span>
+                      <i className="fa-solid fa-paper-plane"></i>
                       Send Reset Link
                     </>
                   )}
                 </button>
-              </form>
 
-              <div className="barter-forgot-footer">
-                <p>
-                  Remember your password?{' '}
-                  <Link href="/login-barter">Back to Login</Link>
-                </p>
-                <p>
-                  New creator?{' '}
-                  <Link href="/register-barter">Join the Barter Network</Link>
-                </p>
-              </div>
+                <div className="barter-footer" style={{ marginTop: '24px', textAlign: 'center' }}>
+                  <p>Remember your password? <Link href="/login-barter" className="auth-link">Back to Login</Link></p>
+                  <p style={{ marginTop: '8px' }}>New creator? <Link href="/register-barter" className="auth-link">Join the Barter Network</Link></p>
+                </div>
+              </form>
             </>
           ) : (
-            <div className="barter-success-state">
-              <div className="success-icon-wrapper">
-                <span className="success-main-icon">✅</span>
-                <div className="success-icon-ring"></div>
-                <div className="success-particles">
-                  <span>✨</span>
-                  <span>✨</span>
-                  <span>✨</span>
-                </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ 
+                width: '80px', 
+                height: '80px', 
+                margin: '0 auto 24px', 
+                background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(16, 185, 129, 0.2))',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '40px'
+              }}>
+                ✅
               </div>
-              <h2>Check Your Inbox!</h2>
-              <p>We've sent password reset instructions to:</p>
-              <div className="email-display">{email}</div>
+              <h2 style={{ 
+                fontSize: '24px', 
+                fontWeight: 700, 
+                color: '#ffffff', 
+                marginBottom: '10px',
+                fontFamily: "'Space Grotesk', sans-serif"
+              }}>
+                Check Your Inbox!
+              </h2>
+              <p style={{ 
+                color: 'rgba(255, 255, 255, 0.6)', 
+                fontSize: '14px',
+                marginBottom: '12px',
+                lineHeight: 1.6
+              }}>
+                We&apos;ve sent password reset instructions to:
+              </p>
+              <div style={{
+                display: 'inline-block',
+                padding: '10px 20px',
+                background: 'rgba(244, 114, 182, 0.1)',
+                border: '1px solid rgba(244, 114, 182, 0.3)',
+                borderRadius: '10px',
+                color: '#f472b6',
+                fontWeight: 500,
+                fontSize: '14px',
+                marginBottom: '24px'
+              }}>
+                {email}
+              </div>
               
               {/* Development only - show reset link */}
               {resetLink && (
-                <div className="dev-notice" style={{ marginTop: '16px', padding: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
-                  <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginBottom: '8px' }}>
+                <div style={{ 
+                  padding: '16px', 
+                  background: 'rgba(255, 255, 255, 0.03)', 
+                  borderRadius: '12px',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  marginBottom: '20px'
+                }}>
+                  <p style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '12px' }}>
                     <strong>Development Mode:</strong> Email not configured.
                   </p>
-                  <Link href={resetLink} className="barter-submit-btn" style={{ display: 'inline-flex', padding: '10px 20px', fontSize: '14px' }}>
-                    <span>🔗</span>
-                    Click here to reset password
+                  <Link 
+                    href={resetLink} 
+                    className="barter-btn-primary"
+                    style={{ display: 'inline-flex', padding: '12px 24px', fontSize: '14px' }}
+                  >
+                    <i className="fa-solid fa-key"></i>
+                    Reset Password Now
                   </Link>
                 </div>
               )}
               
-              <div className="success-tips">
-                <div className="tip">
+              <div style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                gap: '8px', 
+                marginBottom: '24px',
+                padding: '16px',
+                background: 'rgba(255, 255, 255, 0.02)',
+                borderRadius: '12px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '13px', color: 'rgba(255, 255, 255, 0.6)' }}>
                   <span>💡</span>
-                  <span>Can't find it? Check your spam folder</span>
+                  <span>Can&apos;t find it? Check your spam folder</span>
                 </div>
-                <div className="tip">
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '13px', color: 'rgba(255, 255, 255, 0.6)' }}>
                   <span>⏱️</span>
                   <span>Link expires in 60 minutes</span>
                 </div>
               </div>
+              
               <button 
-                className="barter-secondary-btn"
+                className="barter-btn-secondary"
                 onClick={() => {
                   setIsSubmitted(false);
                   setResetLink('');
                 }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  width: '100%',
+                  padding: '12px 24px',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '12px',
+                  color: 'white',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  marginBottom: '16px'
+                }}
               >
-                <span>🔄</span>
+                <i className="fa-solid fa-rotate"></i>
                 Try a different email
               </button>
-              <Link href="/login-barter" className="back-to-login-link">
-                ← Back to Login
+              
+              <Link href="/login-barter" className="auth-link" style={{ fontSize: '14px' }}>
+                <i className="fa-solid fa-arrow-left" style={{ marginRight: '6px' }}></i>
+                Back to Login
               </Link>
             </div>
           )}

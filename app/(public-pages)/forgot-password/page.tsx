@@ -46,79 +46,138 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="auth-wrapper">
-      <div className="auth-container">
+    <div className="brand-login-wrapper">
+      {/* Floating Elements */}
+      <div className="brand-floating-elements">
+        <div className="brand-float-icon" style={{ top: '10%', left: '5%', animationDelay: '0s' }}>🔐</div>
+        <div className="brand-float-icon" style={{ top: '20%', right: '8%', animationDelay: '1s' }}>✉️</div>
+        <div className="brand-float-icon" style={{ bottom: '25%', left: '3%', animationDelay: '2s' }}>🔑</div>
+        <div className="brand-float-icon" style={{ bottom: '15%', right: '5%', animationDelay: '0.5s' }}>💫</div>
+      </div>
+
+      <div className="brand-login-container">
         {/* Logo */}
-        <div className="auth-logo">
-          <div className="auth-logo-icon">
-            <i className="fa-solid fa-check"></i>
+        <div className="brand-login-logo">
+          <div className="brand-logo-hex">
+            <div className="hex-glow"></div>
+            <span className="hex-letter">V</span>
           </div>
-          <h1>VibeVetting</h1>
+          <span className="brand-logo-text">VibeVetting</span>
         </div>
 
-        {/* Auth Card */}
-        <div className="auth-card">
-          <div className="auth-header">
-            <h2>Forgot Password</h2>
-            <p>Enter your email to receive a reset link</p>
-          </div>
-
+        {/* Forgot Password Card */}
+        <div className="brand-login-card">
           {success ? (
-            <div className="success-message">
-              <div className="success-icon">
-                <i className="fa-solid fa-check-circle"></i>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ 
+                width: '80px', 
+                height: '80px', 
+                margin: '0 auto 24px', 
+                background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(16, 185, 129, 0.2))',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '40px'
+              }}>
+                ✅
               </div>
-              <h3>Check Your Email</h3>
-              <p>We&apos;ve sent a password reset link to <strong>{email}</strong></p>
+              <h2 style={{ 
+                fontSize: '24px', 
+                fontWeight: 700, 
+                color: '#ffffff', 
+                marginBottom: '10px',
+                fontFamily: "'Space Grotesk', sans-serif"
+              }}>
+                Check Your Email
+              </h2>
+              <p style={{ 
+                color: 'rgba(255, 255, 255, 0.6)', 
+                fontSize: '14px',
+                marginBottom: '24px',
+                lineHeight: 1.6
+              }}>
+                We&apos;ve sent a password reset link to<br />
+                <strong style={{ color: '#00f5ff' }}>{email}</strong>
+              </p>
               
               {/* Development only - show reset link */}
               {resetLink && (
-                <div className="dev-notice">
-                  <p style={{ fontSize: '12px', color: '#718096', marginTop: '16px' }}>
+                <div style={{ 
+                  padding: '16px', 
+                  background: 'rgba(255, 255, 255, 0.03)', 
+                  borderRadius: '12px',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  marginBottom: '20px'
+                }}>
+                  <p style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '12px' }}>
                     <strong>Development Mode:</strong> Email not configured.
                   </p>
-                  <Link href={resetLink} className="btn btn-primary" style={{ marginTop: '12px', display: 'inline-block' }}>
-                    Click here to reset password
+                  <Link 
+                    href={resetLink} 
+                    className="brand-btn-primary"
+                    style={{ display: 'inline-flex', padding: '12px 24px', fontSize: '14px' }}
+                  >
+                    <i className="fa-solid fa-key"></i>
+                    Reset Password Now
                   </Link>
                 </div>
               )}
               
-              <Link href="/login" className="auth-link" style={{ marginTop: '20px', display: 'block' }}>
+              <Link href="/login" className="auth-link" style={{ fontSize: '14px' }}>
+                <i className="fa-solid fa-arrow-left" style={{ marginRight: '6px' }}></i>
                 Back to Login
               </Link>
             </div>
           ) : (
-            <form onSubmit={handleSubmit}>
-              {error && (
-                <div className="auth-error" style={{ color: '#ef4444', backgroundColor: '#fef2f2', padding: '12px', borderRadius: '8px', marginBottom: '16px', fontSize: '14px' }}>
-                  {error}
-                </div>
-              )}
-
-              <div className="form-group">
-                <label className="form-label">Email Address</label>
-                <div className="input-with-icon">
-                  <i className="fa-solid fa-envelope"></i>
-                  <input
-                    type="email"
-                    className="form-input"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
+            <>
+              <div className="brand-card-header">
+                <h2>Forgot Password</h2>
+                <p>Enter your email to receive a reset link</p>
               </div>
 
-              <button type="submit" className="btn btn-primary auth-btn" disabled={loading}>
-                <i className={loading ? "fa-solid fa-spinner fa-spin" : "fa-solid fa-paper-plane"}></i>
-                {loading ? 'Sending...' : 'Send Reset Link'}
-              </button>
+              <form onSubmit={handleSubmit}>
+                {error && (
+                  <div className="brand-error">
+                    <i className="fa-solid fa-circle-exclamation"></i>
+                    {error}
+                  </div>
+                )}
 
-              <div className="auth-footer" style={{ marginTop: '24px' }}>
-                <p>Remember your password? <Link href="/login" className="auth-link">Sign in</Link></p>
-              </div>
-            </form>
+                <div className="form-group">
+                  <label className="form-label">Email Address</label>
+                  <div className="input-with-icon">
+                    <i className="fa-solid fa-envelope"></i>
+                    <input
+                      type="email"
+                      className="form-input"
+                      placeholder="Enter your email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <button type="submit" className="brand-btn-primary" disabled={loading}>
+                  {loading ? (
+                    <>
+                      <i className="fa-solid fa-spinner fa-spin"></i>
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <i className="fa-solid fa-paper-plane"></i>
+                      Send Reset Link
+                    </>
+                  )}
+                </button>
+
+                <div className="brand-footer" style={{ marginTop: '24px', textAlign: 'center' }}>
+                  <p>Remember your password? <Link href="/login" className="auth-link">Sign in</Link></p>
+                </div>
+              </form>
+            </>
           )}
         </div>
       </div>
