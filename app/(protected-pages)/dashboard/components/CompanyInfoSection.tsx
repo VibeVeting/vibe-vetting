@@ -422,7 +422,7 @@ export function CompanyInfoSection() {
           uuid: 'demo',
           companyName: user?.company || 'Your Company',
           industry: 'Technology',
-          location: 'San Francisco, CA',
+          location: 'Bangalore, India',
           continent: 'North America',
           employee_range: '51-100',
           revenue_range: '$1M-$10M',

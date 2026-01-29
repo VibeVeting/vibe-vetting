@@ -7,7 +7,7 @@ const DB_NAME = "vibe-vetting";
 const sampleCompanies = [
   {
     companyName: "Vibe Vetting",
-    location: "San Francisco, CA",
+    location: "Bangalore, India",
     continent: "North America",
     region: "California",
     revenue_range: "$1M-$10M",
