@@ -117,18 +117,44 @@ export function StatCard({ label, icon, iconBg, iconColor, value, change, positi
         .stat-card-enhanced {
           position: relative;
           background: linear-gradient(180deg, #ffffff 0%, #fafbfc 100%);
-          border-radius: 20px;
-          padding: 24px;
-          border: 1px solid rgba(226, 232, 240, 0.8);
-          border-bottom: 4px solid rgba(226, 232, 240, 0.9);
+          border-radius: 16px;
+          padding: 20px;
+          border: 1px solid rgba(226, 232, 240, 0.7);
           overflow: hidden;
           opacity: 0;
-          transform: translateY(20px) perspective(1000px) rotateX(2deg);
-          transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+          transform: translateY(15px) perspective(1000px) rotateX(1deg);
+          transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
           box-shadow: 
-            0 4px 20px rgba(0, 0, 0, 0.04),
-            0 1px 3px rgba(0, 0, 0, 0.03),
+            0 2px 12px rgba(0, 0, 0, 0.03),
+            0 1px 2px rgba(0, 0, 0, 0.02),
             inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }
+
+        .stat-card-enhanced::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 3px;
+          background: linear-gradient(90deg, #667eea 0%, #a855f7 50%, #ec4899 100%);
+          opacity: 0;
+          transition: opacity 0.25s ease;
+        }
+
+        .stat-card-enhanced::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: 16px;
+          padding: 1.5px;
+          background: linear-gradient(135deg, transparent 40%, rgba(102, 126, 234, 0.2) 50%, transparent 60%);
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          opacity: 0;
+          transition: opacity 0.25s ease;
         }
 
         .stat-card-enhanced.visible {
@@ -137,28 +163,40 @@ export function StatCard({ label, icon, iconBg, iconColor, value, change, positi
         }
 
         .stat-card-enhanced:hover {
-          transform: translateY(-6px) perspective(1000px) rotateX(-2deg) scale(1.02);
+          transform: translateY(-5px) perspective(1000px) rotateX(-1deg) scale(1.01);
           box-shadow: 
-            0 25px 50px rgba(102, 126, 234, 0.15),
-            0 10px 20px rgba(0, 0, 0, 0.08),
+            0 18px 40px rgba(102, 126, 234, 0.12),
+            0 8px 20px rgba(0, 0, 0, 0.05),
             inset 0 1px 0 rgba(255, 255, 255, 1);
-          border-bottom-color: rgba(102, 126, 234, 0.5);
         }
+
+        .stat-card-enhanced:hover::before {
+          opacity: 1;
+        }
+
+        .stat-card-enhanced:hover::after {
+          opacity: 1;
+        }
+
+        .stat-card-enhanced:nth-child(1)::before { background: linear-gradient(90deg, #667eea, #818cf8); }
+        .stat-card-enhanced:nth-child(2)::before { background: linear-gradient(90deg, #22c55e, #4ade80); }
+        .stat-card-enhanced:nth-child(3)::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+        .stat-card-enhanced:nth-child(4)::before { background: linear-gradient(90deg, #ec4899, #f472b6); }
 
         .stat-card-glow {
           position: absolute;
           top: -50%;
           right: -20%;
-          width: 150px;
-          height: 150px;
+          width: 140px;
+          height: 140px;
           border-radius: 50%;
           filter: blur(40px);
-          opacity: 0.5;
-          transition: all 0.3s ease;
+          opacity: 0.3;
+          transition: all 0.35s ease;
         }
 
         .stat-card-enhanced:hover .stat-card-glow {
-          opacity: 0.9;
+          opacity: 0.6;
           transform: scale(1.3);
         }
 
@@ -171,38 +209,38 @@ export function StatCard({ label, icon, iconBg, iconColor, value, change, positi
           display: flex;
           justify-content: space-between;
           align-items: flex-start;
-          margin-bottom: 16px;
+          margin-bottom: 12px;
         }
 
         .stat-label {
-          font-size: 13px;
-          font-weight: 600;
-          color: #718096;
+          font-size: 11px;
+          font-weight: 700;
+          color: #64748b;
           text-transform: uppercase;
           letter-spacing: 0.5px;
         }
 
         .stat-icon-badge {
-          width: 44px;
-          height: 44px;
+          width: 40px;
+          height: 40px;
           border-radius: 12px;
           display: flex;
           align-items: center;
           justify-content: center;
           font-size: 18px;
-          transition: all 0.3s ease;
+          transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
           box-shadow: 
             0 4px 12px rgba(0, 0, 0, 0.1),
-            inset 0 2px 4px rgba(255, 255, 255, 0.3),
-            inset 0 -2px 4px rgba(0, 0, 0, 0.05);
-          transform: perspective(100px) rotateX(5deg);
+            inset 0 2px 3px rgba(255, 255, 255, 0.35),
+            inset 0 -1px 3px rgba(0, 0, 0, 0.04);
+          transform: perspective(100px) rotateX(3deg);
         }
 
         .stat-card-enhanced:hover .stat-icon-badge {
-          transform: perspective(100px) rotateX(0deg) scale(1.15) rotate(5deg);
+          transform: perspective(100px) rotateX(0deg) scale(1.1) rotate(5deg);
           box-shadow: 
-            0 8px 20px rgba(0, 0, 0, 0.15),
-            inset 0 2px 4px rgba(255, 255, 255, 0.4);
+            0 8px 20px rgba(0, 0, 0, 0.14),
+            inset 0 2px 3px rgba(255, 255, 255, 0.45);
         }
 
         .stat-value-wrapper {
@@ -210,20 +248,24 @@ export function StatCard({ label, icon, iconBg, iconColor, value, change, positi
         }
 
         .stat-value {
-          font-size: 36px;
+          font-size: 28px;
           font-weight: 800;
           color: #1a202c;
           line-height: 1.1;
-          margin-bottom: 8px;
+          margin-bottom: 6px;
           font-variant-numeric: tabular-nums;
+          background: linear-gradient(135deg, #1a202c 0%, #475569 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
         }
 
         .stat-sparkline {
           position: absolute;
-          bottom: 8px;
+          bottom: 4px;
           right: 0;
-          width: 80px;
-          height: 24px;
+          width: 70px;
+          height: 22px;
           opacity: 0.6;
         }
 
@@ -235,8 +277,8 @@ export function StatCard({ label, icon, iconBg, iconColor, value, change, positi
         .sparkline-path {
           stroke-dasharray: 100;
           stroke-dashoffset: 100;
-          animation: drawLine 1.5s ease-out forwards;
-          animation-delay: 0.5s;
+          animation: drawLine 1.2s ease-out forwards;
+          animation-delay: 0.4s;
         }
 
         @keyframes drawLine {
@@ -246,26 +288,31 @@ export function StatCard({ label, icon, iconBg, iconColor, value, change, positi
         }
 
         .stat-change {
-          display: flex;
+          display: inline-flex;
           align-items: center;
-          gap: 6px;
-          font-size: 13px;
+          gap: 5px;
+          font-size: 11px;
           font-weight: 600;
-          color: #718096;
+          color: #64748b;
+          padding: 4px 10px;
+          border-radius: 16px;
+          background: rgba(226, 232, 240, 0.4);
         }
 
         .stat-change.positive {
-          color: #22c55e;
+          color: #059669;
+          background: rgba(34, 197, 94, 0.12);
         }
 
         .stat-change.negative {
-          color: #ef4444;
+          color: #dc2626;
+          background: rgba(239, 68, 68, 0.12);
         }
 
         .stat-change-icon {
           display: flex;
           align-items: center;
-          font-size: 12px;
+          font-size: 10px;
         }
       `}</style>
     </div>

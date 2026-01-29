@@ -1053,6 +1053,32 @@ Duration: {{contract_duration}}"
           justify-content: flex-end;
           margin-bottom: 24px;
         }
+        .page-header-actions .btn-secondary {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 14px 24px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          border: none;
+          border-radius: 14px;
+          color: white;
+          font-size: 14px;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 
+            0 6px 20px rgba(102, 126, 234, 0.35),
+            0 2px 6px rgba(0, 0, 0, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        .page-header-actions .btn-secondary:hover {
+          background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+          transform: translateY(-3px) scale(1.03);
+          box-shadow: 
+            0 12px 30px rgba(102, 126, 234, 0.45),
+            0 4px 10px rgba(0, 0, 0, 0.12),
+            inset 0 1px 0 rgba(255, 255, 255, 0.25);
+        }
         .btn-secondary {
           display: flex;
           align-items: center;
