@@ -118,6 +118,162 @@ const categoryIcons: Record<string, string> = {
   'Other': '📦',
 };
 
+// Mock offers for testing/demo purposes
+const MOCK_OFFERS: BarterOffer[] = [
+  {
+    _id: 'mock-1',
+    brandName: 'HealthyBite Snacks',
+    brandLogo: '🥜',
+    productName: 'Premium Trail Mix Box',
+    productDescription: 'Artisanal trail mix with exotic nuts, dried fruits, and dark chocolate chunks. Perfect for health-conscious foodies.',
+    productImage: '🥜',
+    productValue: 1499,
+    productCategory: 'Food',
+    contentType: 'reel',
+    contentRequirement: 'Create an unboxing reel showing the premium packaging and taste test reaction',
+    hashtags: ['#HealthySnacking', '#TrailMix', '#HealthyBite'],
+    dos: ['Show genuine reaction', 'Highlight premium ingredients', 'Mention protein content'],
+    donts: ['No competitor mentions', 'No filters on product shots'],
+    totalSlots: 25,
+    filledSlots: 12,
+    deadline: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+    hasApplied: false,
+  },
+  {
+    _id: 'mock-2',
+    brandName: 'GlowUp Cosmetics',
+    brandLogo: '💄',
+    productName: 'Vitamin C Serum Kit',
+    productDescription: 'Complete skincare kit with Vitamin C serum, moisturizer, and sunscreen for radiant skin.',
+    productImage: '✨',
+    productValue: 2499,
+    productCategory: 'Beauty',
+    contentType: 'video',
+    contentRequirement: 'Create a morning skincare routine video showcasing all 3 products',
+    hashtags: ['#GlowUp', '#SkincareMorning', '#VitaminC'],
+    dos: ['Show application technique', 'Good lighting', 'Before/after if possible'],
+    donts: ['No makeup during routine', 'No other brands visible'],
+    totalSlots: 15,
+    filledSlots: 8,
+    deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+    hasApplied: false,
+  },
+  {
+    _id: 'mock-3',
+    brandName: 'FitGear Pro',
+    brandLogo: '💪',
+    productName: 'Resistance Band Set',
+    productDescription: 'Professional-grade resistance bands with 5 levels, door anchor, and carry bag.',
+    productImage: '🏋️',
+    productValue: 1299,
+    productCategory: 'Fitness',
+    contentType: 'reel',
+    contentRequirement: 'Create a 30-second workout reel using at least 3 different exercises',
+    hashtags: ['#HomeWorkout', '#FitGearPro', '#ResistanceTraining'],
+    dos: ['Show proper form', 'Energetic music', 'Demonstrate versatility'],
+    donts: ['No gym equipment visible', 'No competing brands'],
+    totalSlots: 50,
+    filledSlots: 23,
+    deadline: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000).toISOString(),
+    hasApplied: false,
+  },
+  {
+    _id: 'mock-4',
+    brandName: 'TechWave Audio',
+    brandLogo: '🎧',
+    productName: 'Wireless Earbuds Pro',
+    productDescription: 'Premium wireless earbuds with ANC, 40hr battery life, and crystal-clear audio.',
+    productImage: '🎧',
+    productValue: 3999,
+    productCategory: 'Tech',
+    contentType: 'video',
+    contentRequirement: 'Create an unboxing + first impressions video highlighting key features',
+    hashtags: ['#TechWave', '#WirelessAudio', '#EarbudsPro'],
+    dos: ['Show all accessories', 'Test sound quality', 'Compare to daily use scenario'],
+    donts: ['No competitor comparisons', 'No price mentions'],
+    totalSlots: 20,
+    filledSlots: 5,
+    deadline: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(),
+    hasApplied: false,
+  },
+  {
+    _id: 'mock-5',
+    brandName: 'BrewCraft Coffee',
+    brandLogo: '☕',
+    productName: 'Artisan Coffee Bundle',
+    productDescription: 'Premium coffee beans from 4 regions: Ethiopian, Colombian, Brazilian, and Indian.',
+    productImage: '☕',
+    productValue: 1799,
+    productCategory: 'Food',
+    contentType: 'story',
+    contentRequirement: 'Create 3-5 stories showing your morning coffee ritual with our beans',
+    hashtags: ['#BrewCraft', '#CoffeeLover', '#MorningRitual'],
+    dos: ['Show brewing process', 'Authentic reactions', 'Tag us in each story'],
+    donts: ['No instant coffee visible', 'No competing brands'],
+    totalSlots: 100,
+    filledSlots: 67,
+    deadline: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+    hasApplied: false,
+  },
+  {
+    _id: 'mock-6',
+    brandName: 'StyleVerse Fashion',
+    brandLogo: '👗',
+    productName: 'Designer Tote Bag',
+    productDescription: 'Handcrafted vegan leather tote with premium stitching and gold accents.',
+    productImage: '👜',
+    productValue: 2999,
+    productCategory: 'Fashion',
+    contentType: 'carousel',
+    contentRequirement: 'Create a carousel post with 5-7 photos styling the bag in different outfits',
+    hashtags: ['#StyleVerse', '#VeganFashion', '#ToteBag'],
+    dos: ['Different outfit styles', 'Good lighting', 'Show bag details close-up'],
+    donts: ['No other bag brands visible', 'No heavy editing'],
+    totalSlots: 30,
+    filledSlots: 18,
+    deadline: new Date(Date.now() + 12 * 24 * 60 * 60 * 1000).toISOString(),
+    hasApplied: false,
+  },
+  {
+    _id: 'mock-7',
+    brandName: 'ZenLife Wellness',
+    brandLogo: '🧘',
+    productName: 'Aromatherapy Diffuser Set',
+    productDescription: 'Smart diffuser with 6 essential oils, app control, and mood lighting.',
+    productImage: '🕯️',
+    productValue: 2199,
+    productCategory: 'Lifestyle',
+    contentType: 'reel',
+    contentRequirement: 'Create a relaxing evening routine reel featuring the diffuser',
+    hashtags: ['#ZenLife', '#Aromatherapy', '#SelfCare'],
+    dos: ['Cozy ambiance', 'Show app features', 'Peaceful music'],
+    donts: ['No energetic content', 'No competing products'],
+    totalSlots: 40,
+    filledSlots: 31,
+    deadline: new Date(Date.now() + 8 * 24 * 60 * 60 * 1000).toISOString(),
+    hasApplied: false,
+  },
+  {
+    _id: 'mock-8',
+    brandName: 'GameZone Elite',
+    brandLogo: '🎮',
+    productName: 'RGB Gaming Mouse',
+    productDescription: 'Professional gaming mouse with 16000 DPI, 7 programmable buttons, and custom RGB.',
+    productImage: '🖱️',
+    productValue: 2499,
+    productCategory: 'Gaming',
+    contentType: 'video',
+    contentRequirement: 'Create a gaming setup video or gameplay montage featuring the mouse',
+    hashtags: ['#GameZone', '#GamingSetup', '#RGBGaming'],
+    dos: ['Show RGB effects', 'Demonstrate responsiveness', 'Gaming footage welcome'],
+    donts: ['No competitor mice visible', 'No negative gaming content'],
+    totalSlots: 35,
+    filledSlots: 14,
+    deadline: new Date(Date.now() + 18 * 24 * 60 * 60 * 1000).toISOString(),
+    hasApplied: false,
+  },
+];
+
 export default function CreatorDashboard() {
   const router = useRouter();
   const [user, setUser] = useState<UserData | null>(null);
@@ -185,7 +341,12 @@ export default function CreatorDashboard() {
 
       if (offersRes.ok) {
         const offersData = await offersRes.json();
-        setOffers(offersData.offers || []);
+        const apiOffers = offersData.offers || [];
+        // Use mock offers if API returns empty (for testing/demo)
+        setOffers(apiOffers.length > 0 ? apiOffers : MOCK_OFFERS);
+      } else {
+        // Use mock offers if API fails
+        setOffers(MOCK_OFFERS);
       }
 
       if (applicationsRes.ok) {
@@ -199,6 +360,8 @@ export default function CreatorDashboard() {
       }
     } catch (error) {
       console.error('Error fetching data:', error);
+      // Use mock offers on error
+      setOffers(MOCK_OFFERS);
     } finally {
       setLoading(false);
     }
@@ -398,9 +561,12 @@ export default function CreatorDashboard() {
     return (
       <div className="creator-dashboard-loading">
         <div className="loading-spinner">
-          <i className="fa-solid fa-spinner fa-spin"></i>
+          <i className="fa-solid fa-bolt"></i>
         </div>
-        <p>Loading your dashboard...</p>
+        <div className="loading-text">
+          <h3>Loading Dashboard</h3>
+          <p>Fetching your amazing opportunities...</p>
+        </div>
       </div>
     );
   }
