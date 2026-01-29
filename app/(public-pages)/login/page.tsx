@@ -252,11 +252,18 @@ function LoginContent() {
             <button 
               type="button" 
               className="brand-social-btn linkedin"
-              disabled={true}
-              title="Coming Soon"
+              onClick={() => {
+                setOauthLoading('linkedin');
+                window.location.href = '/api/auth/linkedin';
+              }}
+              disabled={oauthLoading !== null}
             >
-              <i className="fa-brands fa-linkedin"></i>
-              <span>LinkedIn <small>(Soon)</small></span>
+              {oauthLoading === 'linkedin' ? (
+                <i className="fa-solid fa-spinner fa-spin"></i>
+              ) : (
+                <i className="fa-brands fa-linkedin"></i>
+              )}
+              <span>LinkedIn</span>
             </button>
           </div>
 

@@ -1,4 +1,4 @@
-// OAuth Configuration for Google and Meta (Facebook)
+// OAuth Configuration for Google, Meta (Facebook), and LinkedIn
 
 export const oauthConfig = {
   google: {
@@ -22,6 +22,17 @@ export const oauthConfig = {
     tokenUrl: 'https://graph.facebook.com/v18.0/oauth/access_token',
     userInfoUrl: 'https://graph.facebook.com/me',
     scope: 'email,public_profile',
+  },
+  linkedin: {
+    clientId: process.env.LINKEDIN_CLIENT_ID || '',
+    clientSecret: process.env.LINKEDIN_CLIENT_SECRET || '',
+    redirectUri: process.env.NEXTAUTH_URL 
+      ? `${process.env.NEXTAUTH_URL}/api/auth/callback/linkedin`
+      : 'http://localhost:3000/api/auth/callback/linkedin',
+    authUrl: 'https://www.linkedin.com/oauth/v2/authorization',
+    tokenUrl: 'https://www.linkedin.com/oauth/v2/accessToken',
+    userInfoUrl: 'https://api.linkedin.com/v2/userinfo',
+    scope: 'openid profile email',
   },
 };
 
@@ -51,6 +62,19 @@ export function getMetaAuthUrl(state: string): string {
   });
   
   return `${oauthConfig.meta.authUrl}?${params.toString()}`;
+}
+
+// Generate OAuth authorization URL for LinkedIn
+export function getLinkedInAuthUrl(state: string): string {
+  const params = new URLSearchParams({
+    client_id: oauthConfig.linkedin.clientId,
+    redirect_uri: oauthConfig.linkedin.redirectUri,
+    response_type: 'code',
+    scope: oauthConfig.linkedin.scope,
+    state: state,
+  });
+  
+  return `${oauthConfig.linkedin.authUrl}?${params.toString()}`;
 }
 
 // Exchange authorization code for tokens - Google
@@ -102,6 +126,34 @@ export async function exchangeMetaCode(code: string): Promise<{
   return response.json();
 }
 
+// Exchange authorization code for tokens - LinkedIn
+export async function exchangeLinkedInCode(code: string): Promise<{
+  access_token: string;
+  expires_in: number;
+  id_token?: string;
+}> {
+  const response = await fetch(oauthConfig.linkedin.tokenUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({
+      grant_type: 'authorization_code',
+      code: code,
+      client_id: oauthConfig.linkedin.clientId,
+      client_secret: oauthConfig.linkedin.clientSecret,
+      redirect_uri: oauthConfig.linkedin.redirectUri,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Failed to exchange LinkedIn code: ${error}`);
+  }
+
+  return response.json();
+}
+
 // Get user info from Google
 export async function getGoogleUserInfo(accessToken: string): Promise<{
   id: string;
@@ -138,6 +190,30 @@ export async function getMetaUserInfo(accessToken: string): Promise<{
 
   if (!response.ok) {
     throw new Error('Failed to get Meta user info');
+  }
+
+  return response.json();
+}
+
+// Get user info from LinkedIn (using OpenID Connect userinfo endpoint)
+export async function getLinkedInUserInfo(accessToken: string): Promise<{
+  sub: string;
+  email: string;
+  name: string;
+  given_name?: string;
+  family_name?: string;
+  picture?: string;
+  email_verified?: boolean;
+}> {
+  const response = await fetch(oauthConfig.linkedin.userInfoUrl, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Failed to get LinkedIn user info: ${error}`);
   }
 
   return response.json();

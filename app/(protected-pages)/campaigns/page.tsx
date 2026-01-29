@@ -392,9 +392,6 @@ export default function CampaignsPage() {
                       <Link href={`/campaigns/${campaign.id}/pipeline`} className="btn btn-primary">
                         <i className="fa-solid fa-diagram-project"></i> Pipeline
                       </Link>
-                      <Link href={`/campaigns/${campaign.id}/pipeline`} className="btn btn-secondary">
-                        View Details
-                      </Link>
                       <button 
                         className="btn btn-secondary"
                         onClick={() => handleAddCreatorsToPipeline(campaign.id)}

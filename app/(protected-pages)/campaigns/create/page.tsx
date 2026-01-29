@@ -230,15 +230,15 @@ export default function CreateCampaignPage() {
                 <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 600, color: '#fff' }}>
                   ✨ AI Auto-Fill
                 </h3>
-                <p style={{ margin: 0, fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>
+                <p style={{ margin: 0, fontSize: '13px', color: 'rgba(255,255,255,0.7)' }}>
                   Enter your company details and let AI fill the entire form for you
                 </p>
               </div>
             </div>
             
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '16px' }}>
+            <div className="autofill-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '16px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.7)', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'rgba(255,255,255,0.8)', marginBottom: '6px' }}>
                   Company Name *
                 </label>
                 <input
@@ -259,7 +259,7 @@ export default function CreateCampaignPage() {
                 />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.7)', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'rgba(255,255,255,0.8)', marginBottom: '6px' }}>
                   Product Name *
                 </label>
                 <input
@@ -280,7 +280,7 @@ export default function CreateCampaignPage() {
                 />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.7)', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'rgba(255,255,255,0.8)', marginBottom: '6px' }}>
                   Website URL (optional)
                 </label>
                 <input
@@ -304,7 +304,7 @@ export default function CreateCampaignPage() {
 
             {/* Custom Prompt Textarea */}
             <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.7)', marginBottom: '6px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'rgba(255,255,255,0.8)', marginBottom: '6px' }}>
                 Custom Instructions (optional)
               </label>
               <textarea
