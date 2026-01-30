@@ -745,6 +745,58 @@ body {
   50% { background-position: 100% 50%; }
 }
 
+/* Typewriter Effect Styles */
+.typewriter-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.2em;
+  min-width: 320px;
+}
+
+.typewriter-text {
+  background: linear-gradient(90deg, #ef4444 0%, #f97316 25%, #eab308 50%, #22c55e 75%, #00f5ff 100%);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: typewriterGlow 3s ease-in-out infinite;
+  text-shadow: 0 0 40px rgba(239, 68, 68, 0.3);
+  font-weight: 700;
+}
+
+@keyframes typewriterGlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.typewriter-cursor {
+  display: inline-block;
+  color: #ef4444;
+  animation: cursorBlink 0.7s step-end infinite;
+  font-weight: 400;
+  margin-left: 4px;
+  text-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+}
+
+@keyframes cursorBlink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* Mobile responsive typewriter */
+@media (max-width: 768px) {
+  .typewriter-container {
+    min-width: 220px;
+    justify-content: center;
+  }
+  
+  .typewriter-text {
+    font-size: 0.9em;
+  }
+}
+
 .title-glow {
   color: var(--text-primary);
   text-shadow: 

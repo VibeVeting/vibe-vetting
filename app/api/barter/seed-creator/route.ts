@@ -350,7 +350,7 @@ export async function POST() {
 
           // Add shipping address for approved/shipped applications
           if (status === "approved" || status === "content_pending" || status === "submitted" || status === "completed") {
-            await BarterApplicationModel.addShippingAddress(application._id!.toString(), {
+            await BarterApplicationModel.updateShippingAddress(application._id!.toString(), {
               fullName: "Vinay Prajapati",
               phone: "9876543210",
               addressLine1: "123, Tech Park",

@@ -3,6 +3,20 @@
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 
+// Typewriter catchy lines for hero - Based on Superpower Features
+const catchyLines = [
+  "Influencers Who Hurt Your Brand",
+  "Followers That Don't Exist",
+  "Engagement That's All Bots",
+  "Creators Who Ghost You",
+  "Rates Above Market",
+  "Scandals You Didn't See Coming",
+  "Campaigns That Flop Hard",
+  "Reach That Never Converts",
+  "Promises That Never Deliver",
+  "Content That Damages Trust",
+];
+
 const analysisMessages = [
   "Scanning 847 creators in real-time...",
   "AI computing brand impact potential...",
@@ -317,6 +331,42 @@ export default function LandingPage() {
   const [isVisible, setIsVisible] = useState(false);
   const [particles, setParticles] = useState<Array<{ left: number; top: number; delay: number; duration: number }>>([]);
   const heroRef = useRef<HTMLDivElement>(null);
+  
+  // Typewriter effect state
+  const [currentLineIndex, setCurrentLineIndex] = useState(0);
+  const [displayText, setDisplayText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [typingSpeed, setTypingSpeed] = useState(100);
+
+  // Typewriter effect
+  useEffect(() => {
+    const currentLine = catchyLines[currentLineIndex];
+    
+    const handleTyping = () => {
+      if (!isDeleting) {
+        // Typing
+        if (displayText.length < currentLine.length) {
+          setDisplayText(currentLine.substring(0, displayText.length + 1));
+          setTypingSpeed(80 + Math.random() * 50); // Natural typing speed variation
+        } else {
+          // Pause at end before deleting
+          setTimeout(() => setIsDeleting(true), 2000);
+        }
+      } else {
+        // Deleting
+        if (displayText.length > 0) {
+          setDisplayText(currentLine.substring(0, displayText.length - 1));
+          setTypingSpeed(40); // Faster delete
+        } else {
+          setIsDeleting(false);
+          setCurrentLineIndex((prev) => (prev + 1) % catchyLines.length);
+        }
+      }
+    };
+
+    const timer = setTimeout(handleTyping, typingSpeed);
+    return () => clearTimeout(timer);
+  }, [displayText, isDeleting, currentLineIndex, typingSpeed]);
 
   useEffect(() => {
     setIsVisible(true);
@@ -439,8 +489,11 @@ export default function LandingPage() {
 
           {/* Main Title */}
           <h1 className="hero-title">
-            <span className="title-line">Stop Paying Influencers</span>
-            <span className="title-line title-gradient">Who Hurt Your Brand</span>
+            <span className="title-line">Stop Paying For</span>
+            <span className="title-line typewriter-container">
+              <span className="typewriter-text">{displayText}</span>
+              <span className="typewriter-cursor">|</span>
+            </span>
           </h1>
 
           <p className="hero-subtitle">
