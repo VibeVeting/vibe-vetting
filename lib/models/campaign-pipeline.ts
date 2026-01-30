@@ -345,7 +345,7 @@ export const CampaignPipelineModel = {
     id: string, 
     initialOffer: number, 
     deliverables: DeliverableItem[],
-    currency = "USD"
+    currency = "INR"
   ): Promise<CampaignCreator | null> {
     const collection = await getCampaignCreatorsCollection();
     const now = new Date();

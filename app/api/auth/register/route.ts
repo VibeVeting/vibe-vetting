@@ -93,6 +93,7 @@ export async function POST(request: NextRequest) {
           name: newUser.name,
           email: newUser.email,
           company: newUser.company,
+          userType: 'brand',
         },
       },
       { status: 201 }

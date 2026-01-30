@@ -59,8 +59,8 @@ export async function seedPlans(): Promise<void> {
   const USD_TO_INR = 83.5;
   
   // Beta pricing with 50% discount applied
-  // Starter: $120 regular → $60 beta
-  // Growth: $360 regular → $180 beta
+  // Starter: ₹9,999 regular → ₹4,999 beta
+  // Growth: ₹29,999 regular → ₹14,999 beta
   // Enterprise: Custom
   // Note: 18% GST applicable for Indian customers
   
@@ -68,7 +68,7 @@ export async function seedPlans(): Promise<void> {
     {
       id: 'starter',
       name: 'Starter',
-      priceUSD: 60, // Beta price (50% off $120)
+      priceUSD: 60, // For international customers
       price: 4999, // ₹4,999
       period: 'month',
       features: [
@@ -87,7 +87,7 @@ export async function seedPlans(): Promise<void> {
     {
       id: 'growth',
       name: 'Growth',
-      priceUSD: 180, // Beta price (50% off $360)
+      priceUSD: 180, // For international customers
       price: 14999, // ₹14,999
       period: 'month',
       features: [

@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Sidebar } from '@/components/common/Sidebar';
-import { TopBar } from '@/components/common/TopBar';
 import { AIButton } from '@/components/common/AIButton';
 
 interface Creator {
@@ -70,6 +69,11 @@ export default function DiscoverCreatorsPage() {
   const [loading, setLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
   const [hasSearched, setHasSearched] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  
+  useEffect(() => {
+    setTimeout(() => setIsVisible(true), 50);
+  }, []);
   
   const [filters, setFilters] = useState<Filters>({
     handle_contains: '',
@@ -177,11 +181,28 @@ export default function DiscoverCreatorsPage() {
     <div className="dashboard-wrapper">
       <Sidebar />
       <div className="main-content">
-        <div className="container">
-          <TopBar
-            title="Discover Creators"
-            subtitle="Find micro-creators with high engagement using AI"
-          />
+        <div className="yc-page">
+          {/* YC Background Effects */}
+          <div className="yc-page-bg">
+            <div className="yc-page-orb yc-page-orb-1"></div>
+            <div className="yc-page-orb yc-page-orb-2"></div>
+            <div className="yc-page-grid"></div>
+          </div>
+
+          {/* YC Page Header */}
+          <div className={`yc-page-header ${isVisible ? 'visible' : ''}`}>
+            <div className="yc-page-header-content">
+              <div className="yc-page-title-section">
+                <div className="yc-page-icon" style={{ background: 'linear-gradient(135deg, #00f5ff 0%, #667eea 100%)' }}>
+                  <i className="fa-solid fa-magnifying-glass"></i>
+                </div>
+                <div>
+                  <h1 className="yc-page-title">Discover Creators</h1>
+                  <p className="yc-page-subtitle">Find micro-creators with high engagement using AI</p>
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Filters Card */}
           <div className="discover-filters-card">
@@ -442,9 +463,9 @@ export default function DiscoverCreatorsPage() {
 
       <style jsx>{`
         .discover-filters-card {
-          background: #ffffff;
+          background: var(--bg-card, #ffffff);
           border-radius: 20px;
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--border-color, #e2e8f0);
           margin-bottom: 24px;
           overflow: hidden;
         }
@@ -454,7 +475,7 @@ export default function DiscoverCreatorsPage() {
           align-items: center;
           justify-content: space-between;
           padding: 20px 24px;
-          border-bottom: 1px solid #e2e8f0;
+          border-bottom: 1px solid var(--border-color, #e2e8f0);
         }
 
         .filters-title {
@@ -463,7 +484,7 @@ export default function DiscoverCreatorsPage() {
           gap: 10px;
           font-size: 16px;
           font-weight: 700;
-          color: #1a202c;
+          color: var(--text-primary, #1a202c);
         }
 
         .filters-title i {
@@ -475,18 +496,18 @@ export default function DiscoverCreatorsPage() {
           align-items: center;
           gap: 8px;
           padding: 8px 16px;
-          background: #f7fafc;
-          border: 1px solid #e2e8f0;
+          background: var(--bg-hover, #f7fafc);
+          border: 1px solid var(--border-color, #e2e8f0);
           border-radius: 10px;
           font-size: 13px;
           font-weight: 600;
-          color: #4a5568;
+          color: var(--text-secondary, #4a5568);
           cursor: pointer;
           transition: all 0.2s;
         }
 
         .toggle-btn:hover {
-          background: #edf2f7;
+          background: var(--bg-elevated, #edf2f7);
         }
 
         .filters-body {
@@ -512,17 +533,17 @@ export default function DiscoverCreatorsPage() {
         .filter-group label {
           font-size: 13px;
           font-weight: 600;
-          color: #4a5568;
+          color: var(--text-secondary, #4a5568);
         }
 
         .filter-group input,
         .filter-group select {
           padding: 12px 16px;
-          background: #f7fafc;
-          border: 1px solid #e2e8f0;
+          background: var(--bg-hover, #f7fafc);
+          border: 1px solid var(--border-color, #e2e8f0);
           border-radius: 10px;
           font-size: 14px;
-          color: #1a202c;
+          color: var(--text-primary, #1a202c);
           transition: all 0.2s;
           width: 100%;
           box-sizing: border-box;
@@ -534,6 +555,10 @@ export default function DiscoverCreatorsPage() {
           outline: none;
           border-color: #667eea;
           box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .filter-group input::placeholder {
+          color: var(--text-muted, #a0aec0);
         }
 
         .range-inputs {
@@ -549,8 +574,9 @@ export default function DiscoverCreatorsPage() {
         }
 
         .range-inputs span {
-          color: #718096;
+          color: var(--text-secondary, #718096);
           font-size: 13px;
+          flex-shrink: 0;
         }
 
         .filters-footer {
@@ -558,7 +584,8 @@ export default function DiscoverCreatorsPage() {
           justify-content: flex-end;
           gap: 12px;
           padding-top: 20px;
-          border-top: 1px solid #e2e8f0;
+          border-top: 1px solid var(--border-color, #e2e8f0);
+          flex-wrap: wrap;
         }
 
         .reset-btn {
@@ -566,18 +593,18 @@ export default function DiscoverCreatorsPage() {
           align-items: center;
           gap: 8px;
           padding: 12px 20px;
-          background: #f7fafc;
-          border: 1px solid #e2e8f0;
+          background: var(--bg-hover, #f7fafc);
+          border: 1px solid var(--border-color, #e2e8f0);
           border-radius: 10px;
           font-size: 14px;
           font-weight: 600;
-          color: #4a5568;
+          color: var(--text-secondary, #4a5568);
           cursor: pointer;
           transition: all 0.2s;
         }
 
         .reset-btn:hover {
-          background: #edf2f7;
+          background: var(--bg-elevated, #edf2f7);
         }
 
         .search-btn {
@@ -622,24 +649,24 @@ export default function DiscoverCreatorsPage() {
         .count-number {
           font-size: 28px;
           font-weight: 800;
-          color: #1a202c;
+          color: var(--text-primary, #1a202c);
         }
 
         .count-label {
           font-size: 14px;
-          color: #718096;
+          color: var(--text-secondary, #718096);
         }
 
         .creators-grid {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
+          grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
           gap: 24px;
         }
 
         .creator-card {
-          background: #ffffff;
+          background: var(--bg-card, #ffffff);
           border-radius: 20px;
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--border-color, #e2e8f0);
           padding: 24px;
           transition: all 0.3s;
         }
@@ -655,6 +682,8 @@ export default function DiscoverCreatorsPage() {
           align-items: center;
           justify-content: space-between;
           margin-bottom: 16px;
+          flex-wrap: wrap;
+          gap: 8px;
         }
 
         .platform-badge {
@@ -689,7 +718,8 @@ export default function DiscoverCreatorsPage() {
           height: 56px;
           border-radius: 16px;
           overflow: hidden;
-          border: 3px solid #e2e8f0;
+          border: 3px solid var(--border-color, #e2e8f0);
+          flex-shrink: 0;
         }
 
         .creator-avatar img {
@@ -700,6 +730,7 @@ export default function DiscoverCreatorsPage() {
 
         .creator-info {
           flex: 1;
+          min-width: 0;
         }
 
         .creator-handle {
@@ -708,7 +739,7 @@ export default function DiscoverCreatorsPage() {
           gap: 6px;
           font-size: 15px;
           font-weight: 700;
-          color: #1a202c;
+          color: var(--text-primary, #1a202c);
           text-decoration: none;
           transition: color 0.2s;
         }
@@ -727,7 +758,7 @@ export default function DiscoverCreatorsPage() {
           align-items: center;
           gap: 6px;
           font-size: 13px;
-          color: #718096;
+          color: var(--text-secondary, #718096);
           margin-top: 4px;
         }
 
@@ -737,14 +768,14 @@ export default function DiscoverCreatorsPage() {
 
         .creator-bio {
           font-size: 13px;
-          color: #4a5568;
+          color: var(--text-secondary, #4a5568);
           line-height: 1.6;
           margin-bottom: 16px;
           min-height: 42px;
         }
 
         .no-bio {
-          color: #a0aec0;
+          color: var(--text-muted, #a0aec0);
           font-style: italic;
         }
 
@@ -752,8 +783,8 @@ export default function DiscoverCreatorsPage() {
           display: flex;
           gap: 12px;
           padding: 14px 0;
-          border-top: 1px solid #e2e8f0;
-          border-bottom: 1px solid #e2e8f0;
+          border-top: 1px solid var(--border-color, #e2e8f0);
+          border-bottom: 1px solid var(--border-color, #e2e8f0);
           margin-bottom: 16px;
         }
 
@@ -766,7 +797,7 @@ export default function DiscoverCreatorsPage() {
           display: block;
           font-size: 18px;
           font-weight: 700;
-          color: #1a202c;
+          color: var(--text-primary, #1a202c);
         }
 
         .stat-value.high {
@@ -783,7 +814,7 @@ export default function DiscoverCreatorsPage() {
 
         .stat-label {
           font-size: 11px;
-          color: #718096;
+          color: var(--text-secondary, #718096);
           text-transform: uppercase;
           letter-spacing: 0.5px;
         }
@@ -791,10 +822,12 @@ export default function DiscoverCreatorsPage() {
         .creator-actions {
           display: flex;
           gap: 10px;
+          flex-wrap: wrap;
         }
 
         .creator-actions :global(button) {
           flex: 1;
+          min-width: 80px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -819,6 +852,7 @@ export default function DiscoverCreatorsPage() {
         .view-btn,
         .add-btn {
           flex: 1;
+          min-width: 80px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -833,14 +867,14 @@ export default function DiscoverCreatorsPage() {
         }
 
         .view-btn {
-          background: #f7fafc;
-          border: 1px solid #e2e8f0;
-          color: #4a5568;
+          background: var(--bg-hover, #f7fafc);
+          border: 1px solid var(--border-color, #e2e8f0);
+          color: var(--text-secondary, #4a5568);
         }
 
         .view-btn:hover {
-          background: #edf2f7;
-          border-color: #cbd5e0;
+          background: var(--bg-elevated, #edf2f7);
+          border-color: var(--border-color, #cbd5e0);
         }
 
         .add-btn {
@@ -857,9 +891,9 @@ export default function DiscoverCreatorsPage() {
         .empty-state {
           text-align: center;
           padding: 80px 20px;
-          background: #ffffff;
+          background: var(--bg-card, #ffffff);
           border-radius: 20px;
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--border-color, #e2e8f0);
         }
 
         .empty-icon {
@@ -878,19 +912,22 @@ export default function DiscoverCreatorsPage() {
         .empty-state h3 {
           font-size: 20px;
           font-weight: 700;
-          color: #1a202c;
+          color: var(--text-primary, #1a202c);
           margin-bottom: 8px;
         }
 
         .empty-state p {
           font-size: 14px;
-          color: #718096;
+          color: var(--text-secondary, #718096);
           margin-bottom: 24px;
+          max-width: 400px;
+          margin-left: auto;
+          margin-right: auto;
         }
 
         @media (max-width: 1200px) {
           .creators-grid {
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
           }
         }
 
@@ -898,14 +935,43 @@ export default function DiscoverCreatorsPage() {
           .creators-grid {
             grid-template-columns: 1fr;
           }
+          
           .filters-grid {
             grid-template-columns: 1fr;
+          }
+          
+          .filters-footer {
+            flex-direction: column;
+          }
+          
+          .filters-footer button {
+            width: 100%;
+            justify-content: center;
+          }
+          
+          .creator-actions {
+            flex-direction: column;
+          }
+          
+          .creator-actions > * {
+            width: 100%;
           }
         }
 
         @media (max-width: 480px) {
           .filters-grid {
             grid-template-columns: 1fr;
+          }
+          
+          .filters-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+          }
+          
+          .toggle-btn {
+            width: 100%;
+            justify-content: center;
           }
         }
       `}</style>

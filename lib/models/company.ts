@@ -36,6 +36,10 @@ export interface Company {
     idealCreatorProfile?: string;
     generatedAt?: Date;
   };
+  // Blueprint lock status
+  blueprintLocked?: boolean;
+  blueprintLockedAt?: Date | null;
+  blueprintLockedBy?: string | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -142,5 +146,23 @@ export const CompanyModel = {
     const collection = await getCollection();
     const result = await collection.deleteOne({ _id: new ObjectId(id) });
     return result.deletedCount === 1;
+  },
+
+  // Toggle blueprint lock
+  async toggleBlueprintLock(companyName: string, locked: boolean, lockedBy?: string): Promise<Company | null> {
+    const collection = await getCollection();
+    const result = await collection.findOneAndUpdate(
+      { companyName: { $regex: new RegExp(`^${companyName}$`, 'i') } },
+      { 
+        $set: { 
+          blueprintLocked: locked,
+          blueprintLockedAt: locked ? new Date() : null,
+          blueprintLockedBy: locked ? lockedBy : null,
+          updatedAt: new Date() 
+        } 
+      },
+      { returnDocument: "after" }
+    );
+    return result;
   },
 };

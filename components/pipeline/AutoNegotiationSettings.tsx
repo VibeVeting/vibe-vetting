@@ -154,8 +154,25 @@ export function AutoNegotiationSettings({ campaignId, onSettingsChange }: AutoNe
       {/* Header with Toggle */}
       <div className="settings-header">
         <div className="header-left">
-          <div className="header-icon">
-            <i className="fa-solid fa-robot"></i>
+          <div className="header-icon ai-brain-logo">
+            <div className="brain-core">
+              <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="brainGradSettings" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#fff" stopOpacity="1"/>
+                    <stop offset="100%" stopColor="#e0e7ff" stopOpacity="0.9"/>
+                  </linearGradient>
+                </defs>
+                <path d="M20 4C14.5 4 10 8.5 10 14c0 2.5 1 4.8 2.5 6.5L10 28h8v8h4v-8h8l-2.5-7.5C29 18.8 30 16.5 30 14c0-5.5-4.5-10-10-10z" fill="url(#brainGradSettings)" className="brain-path"/>
+                <circle cx="15" cy="13" r="2" fill="rgba(102, 126, 234, 0.8)" className="neuron n1"/>
+                <circle cx="25" cy="13" r="2" fill="rgba(168, 85, 247, 0.8)" className="neuron n2"/>
+                <circle cx="20" cy="18" r="2.5" fill="rgba(236, 72, 153, 0.8)" className="neuron n3"/>
+                <line x1="15" y1="13" x2="20" y2="18" stroke="rgba(255,255,255,0.6)" strokeWidth="1" className="synapse"/>
+                <line x1="25" y1="13" x2="20" y2="18" stroke="rgba(255,255,255,0.6)" strokeWidth="1" className="synapse"/>
+              </svg>
+            </div>
+            <div className="pulse-ring"></div>
+            <div className="pulse-ring delay"></div>
           </div>
           <div className="header-text">
             <h3>Auto-Negotiation</h3>
@@ -434,16 +451,16 @@ export function AutoNegotiationSettings({ campaignId, onSettingsChange }: AutoNe
 
       <style jsx>{`
         .auto-negotiate-settings {
-          background: white;
+          background: var(--bg-elevated);
           border-radius: 16px;
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--border-color);
           overflow: hidden;
         }
 
         .auto-negotiate-loading {
           padding: 40px;
           text-align: center;
-          color: #718096;
+          color: var(--text-muted);
         }
 
         .auto-negotiate-loading i {
@@ -455,8 +472,9 @@ export function AutoNegotiationSettings({ campaignId, onSettingsChange }: AutoNe
           align-items: center;
           justify-content: space-between;
           padding: 20px 24px;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: linear-gradient(135deg, var(--primary, #667eea) 0%, var(--accent-purple, #a855f7) 50%, var(--secondary, #764ba2) 100%);
           color: white;
+          border-radius: 16px 16px 0 0;
         }
 
         .header-left {
@@ -474,6 +492,79 @@ export function AutoNegotiationSettings({ campaignId, onSettingsChange }: AutoNe
           align-items: center;
           justify-content: center;
           font-size: 24px;
+        }
+
+        .header-icon.ai-brain-logo {
+          position: relative;
+          background: linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(168, 85, 247, 0.3) 50%, rgba(236, 72, 153, 0.2) 100%);
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          overflow: visible;
+        }
+
+        .brain-core {
+          width: 32px;
+          height: 32px;
+          position: relative;
+          z-index: 2;
+        }
+
+        .brain-core svg {
+          width: 100%;
+          height: 100%;
+          filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+
+        .brain-path {
+          animation: brainGlow 2s ease-in-out infinite;
+        }
+
+        .neuron {
+          animation: neuronPulse 1.5s ease-in-out infinite;
+        }
+
+        .neuron.n1 { animation-delay: 0s; }
+        .neuron.n2 { animation-delay: 0.5s; }
+        .neuron.n3 { animation-delay: 1s; }
+
+        .synapse {
+          animation: synapseFlow 2s ease-in-out infinite;
+        }
+
+        .pulse-ring {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 100%;
+          height: 100%;
+          border-radius: 12px;
+          border: 2px solid rgba(255, 255, 255, 0.4);
+          animation: pulseExpand 2s ease-out infinite;
+        }
+
+        .pulse-ring.delay {
+          animation-delay: 1s;
+        }
+
+        @keyframes brainGlow {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.85; }
+        }
+
+        @keyframes neuronPulse {
+          0%, 100% { r: 2; opacity: 0.8; }
+          50% { r: 2.5; opacity: 1; }
+        }
+
+        @keyframes synapseFlow {
+          0%, 100% { stroke-opacity: 0.6; }
+          50% { stroke-opacity: 1; }
+        }
+
+        @keyframes pulseExpand {
+          0% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+          100% { transform: translate(-50%, -50%) scale(1.4); opacity: 0; }
         }
 
         .header-text h3 {
@@ -548,14 +639,14 @@ export function AutoNegotiationSettings({ campaignId, onSettingsChange }: AutoNe
 
         .settings-section {
           padding: 24px;
-          border-bottom: 1px solid #e2e8f0;
+          border-bottom: 1px solid var(--border-color);
         }
 
         .settings-section h4 {
           margin: 0 0 16px;
           font-size: 14px;
           font-weight: 600;
-          color: #1a202c;
+          color: var(--text-primary);
           display: flex;
           align-items: center;
           gap: 8px;
@@ -573,21 +664,22 @@ export function AutoNegotiationSettings({ campaignId, onSettingsChange }: AutoNe
 
         .strategy-card {
           padding: 16px;
-          border: 2px solid #e2e8f0;
+          border: 2px solid var(--border-color);
           border-radius: 12px;
           cursor: pointer;
           transition: all 0.2s;
           text-align: center;
+          background: var(--bg-card);
         }
 
         .strategy-card:hover {
           border-color: #667eea;
-          background: #f7fafc;
+          background: var(--bg-hover);
         }
 
         .strategy-card.selected {
           border-color: #667eea;
-          background: #ebf4ff;
+          background: rgba(102, 126, 234, 0.15);
         }
 
         .strategy-icon {
@@ -602,31 +694,31 @@ export function AutoNegotiationSettings({ campaignId, onSettingsChange }: AutoNe
         }
 
         .strategy-icon.aggressive {
-          background: #fed7d7;
-          color: #c53030;
+          background: rgba(239, 68, 68, 0.2);
+          color: #ef4444;
         }
 
         .strategy-icon.balanced {
-          background: #c6f6d5;
-          color: #22543d;
+          background: rgba(34, 197, 94, 0.2);
+          color: #22c55e;
         }
 
         .strategy-icon.generous {
-          background: #feebc8;
-          color: #744210;
+          background: rgba(245, 158, 11, 0.2);
+          color: #f59e0b;
         }
 
         .strategy-card h5 {
           margin: 0 0 4px;
           font-size: 14px;
           font-weight: 600;
-          color: #1a202c;
+          color: var(--text-primary);
         }
 
         .strategy-card p {
           margin: 0;
           font-size: 12px;
-          color: #718096;
+          color: var(--text-muted);
         }
 
         .settings-grid {
@@ -644,7 +736,7 @@ export function AutoNegotiationSettings({ campaignId, onSettingsChange }: AutoNe
         .setting-item label {
           font-size: 13px;
           font-weight: 500;
-          color: #4a5568;
+          color: var(--text-secondary);
           display: flex;
           align-items: center;
           gap: 6px;
@@ -652,7 +744,7 @@ export function AutoNegotiationSettings({ campaignId, onSettingsChange }: AutoNe
 
         .tooltip {
           position: relative;
-          color: #a0aec0;
+          color: var(--text-muted);
           cursor: help;
         }
 
@@ -661,8 +753,8 @@ export function AutoNegotiationSettings({ campaignId, onSettingsChange }: AutoNe
           bottom: 100%;
           left: 50%;
           transform: translateX(-50%);
-          background: #1a202c;
-          color: white;
+          background: var(--bg-dark);
+          color: var(--text-primary);
           padding: 8px 12px;
           border-radius: 6px;
           font-size: 11px;
@@ -671,6 +763,7 @@ export function AutoNegotiationSettings({ campaignId, onSettingsChange }: AutoNe
           opacity: 0;
           pointer-events: none;
           transition: opacity 0.2s;
+          border: 1px solid var(--border-color);
         }
 
         .tooltip:hover .tooltip-text {
@@ -680,15 +773,15 @@ export function AutoNegotiationSettings({ campaignId, onSettingsChange }: AutoNe
         .input-with-prefix, .input-with-suffix {
           display: flex;
           align-items: center;
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--border-color);
           border-radius: 8px;
           overflow: hidden;
         }
 
         .input-with-prefix span, .input-with-suffix span {
           padding: 10px 12px;
-          background: #f7fafc;
-          color: #718096;
+          background: var(--bg-hover);
+          color: var(--text-muted);
           font-weight: 500;
         }
 
@@ -698,21 +791,25 @@ export function AutoNegotiationSettings({ campaignId, onSettingsChange }: AutoNe
           padding: 10px 12px;
           font-size: 14px;
           outline: none;
+          background: var(--bg-elevated);
+          color: var(--text-primary);
         }
 
         .setting-item > input {
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--border-color);
           border-radius: 8px;
           padding: 10px 12px;
           font-size: 14px;
           outline: none;
+          background: var(--bg-elevated);
+          color: var(--text-primary);
         }
 
         .setting-item > input:focus,
         .input-with-prefix:focus-within,
         .input-with-suffix:focus-within {
           border-color: #667eea;
-          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
         }
 
         .toggle-items {
@@ -726,7 +823,7 @@ export function AutoNegotiationSettings({ campaignId, onSettingsChange }: AutoNe
           align-items: center;
           justify-content: space-between;
           padding: 12px 16px;
-          background: #f7fafc;
+          background: var(--bg-hover);
           border-radius: 10px;
         }
 
@@ -738,24 +835,24 @@ export function AutoNegotiationSettings({ campaignId, onSettingsChange }: AutoNe
         .toggle-label {
           font-size: 14px;
           font-weight: 500;
-          color: #1a202c;
+          color: var(--text-primary);
         }
 
         .toggle-description {
           font-size: 12px;
-          color: #718096;
+          color: var(--text-muted);
         }
 
         .budget-preview {
           padding: 24px;
-          background: #f7fafc;
+          background: var(--bg-hover);
         }
 
         .budget-preview h4 {
           margin: 0 0 16px;
           font-size: 14px;
           font-weight: 600;
-          color: #1a202c;
+          color: var(--text-primary);
           display: flex;
           align-items: center;
           gap: 8px;
@@ -763,9 +860,9 @@ export function AutoNegotiationSettings({ campaignId, onSettingsChange }: AutoNe
 
         .budget-bar {
           padding: 16px;
-          background: white;
+          background: var(--bg-elevated);
           border-radius: 12px;
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--border-color);
         }
 
         .budget-labels {
@@ -774,7 +871,7 @@ export function AutoNegotiationSettings({ campaignId, onSettingsChange }: AutoNe
           margin-bottom: 8px;
           font-size: 12px;
           font-weight: 500;
-          color: #718096;
+          color: var(--text-muted);
         }
 
         .budget-labels .target {
@@ -784,7 +881,7 @@ export function AutoNegotiationSettings({ campaignId, onSettingsChange }: AutoNe
 
         .budget-track {
           height: 8px;
-          background: #e2e8f0;
+          background: var(--bg-input);
           border-radius: 4px;
           position: relative;
           margin-bottom: 12px;
@@ -811,7 +908,7 @@ export function AutoNegotiationSettings({ campaignId, onSettingsChange }: AutoNe
           display: flex;
           gap: 16px;
           font-size: 11px;
-          color: #718096;
+          color: var(--text-muted);
         }
 
         .budget-legend span {
@@ -844,20 +941,20 @@ export function AutoNegotiationSettings({ campaignId, onSettingsChange }: AutoNe
         }
 
         .alert-error {
-          background: #fed7d7;
-          color: #c53030;
+          background: rgba(239, 68, 68, 0.15);
+          color: #ef4444;
         }
 
         .alert-success {
-          background: #c6f6d5;
-          color: #22543d;
+          background: rgba(34, 197, 94, 0.15);
+          color: var(--accent-green);
         }
 
         .settings-footer {
           padding: 20px 24px;
           display: flex;
           justify-content: flex-end;
-          background: #f7fafc;
+          background: var(--bg-hover);
         }
 
         .btn {
@@ -891,19 +988,19 @@ export function AutoNegotiationSettings({ campaignId, onSettingsChange }: AutoNe
         .disabled-message {
           padding: 40px;
           text-align: center;
-          color: #718096;
+          color: var(--text-secondary);
         }
 
         .disabled-message i {
           font-size: 48px;
           margin-bottom: 16px;
-          color: #cbd5e0;
+          color: var(--text-muted);
         }
 
         .disabled-message h4 {
           margin: 0 0 8px;
           font-size: 18px;
-          color: #4a5568;
+          color: var(--text-primary);
         }
 
         .disabled-message p {
@@ -925,12 +1022,12 @@ export function AutoNegotiationSettings({ campaignId, onSettingsChange }: AutoNe
           align-items: center;
           gap: 6px;
           font-size: 13px;
-          color: #4a5568;
+          color: var(--text-secondary);
         }
 
         .disabled-message li i {
           font-size: 12px;
-          color: #22c55e;
+          color: var(--accent-green);
           margin: 0;
         }
 

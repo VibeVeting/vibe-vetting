@@ -97,7 +97,7 @@ export default function ScanningPage() {
                   </div>
                 </div>
                 <h2 className="scanning-status">
-                  {progress < 100 ? 'AI Analysis Active' : '✓ Analysis Complete'}
+                  {progress < 100 ? 'Neural Analysis Active' : '✓ Analysis Complete'}
                 </h2>
                 <p className="scanning-step-text">{steps[currentStep]?.text}</p>
                 <div className="scanning-indicators">
@@ -165,7 +165,7 @@ export default function ScanningPage() {
               </div>
               <div className="info-card-data">
                 <span className="info-card-value">AI</span>
-                  <span className="info-card-label">AI Engine</span>
+                <span className="info-card-label">Neural Engine</span>
               </div>
               <div className="info-card-status active">
                 <span className="pulse-dot"></span>

@@ -180,7 +180,7 @@ export default function NotFound() {
               transition: 'all 0.3s ease',
             }}
           >
-            <i className="fa-solid fa-gauge-high" />
+            <i className="fa-solid fa-gauge" />
             <span>Dashboard</span>
           </Link>
         </div>

@@ -125,7 +125,7 @@ export function makeNegotiationDecision(context: NegotiationContext): Negotiatio
       action: 'accept',
       newOffer: creatorAsk,
       message: generateAcceptMessage(creatorAsk),
-      reasoning: `Creator ask ($${creatorAsk}) is within ${settings.autoAcceptThreshold}% of target ($${settings.targetBudget})`,
+      reasoning: `Creator ask (₹${creatorAsk.toLocaleString('en-IN')}) is within ${settings.autoAcceptThreshold}% of target (₹${settings.targetBudget.toLocaleString('en-IN')})`,
       confidence: 95,
     };
   }
@@ -135,7 +135,7 @@ export function makeNegotiationDecision(context: NegotiationContext): Negotiatio
     return {
       action: 'decline',
       message: generateDeclineMessage(settings.maxBudget),
-      reasoning: `Creator ask ($${creatorAsk}) exceeds auto-decline threshold ($${settings.autoDeclineAbove})`,
+      reasoning: `Creator ask (₹${creatorAsk.toLocaleString('en-IN')}) exceeds auto-decline threshold (₹${settings.autoDeclineAbove.toLocaleString('en-IN')})`,
       confidence: 90,
     };
   }
@@ -168,7 +168,7 @@ export function makeNegotiationDecision(context: NegotiationContext): Negotiatio
     return {
       action: 'escalate',
       message: 'Budget constraints require manual review.',
-      reasoning: `Cannot meet creator ask ($${creatorAsk}) within max budget ($${settings.maxBudget})`,
+      reasoning: `Cannot meet creator ask (₹${creatorAsk.toLocaleString('en-IN')}) within max budget (₹${settings.maxBudget.toLocaleString('en-IN')})`,
       confidence: 85,
     };
   }
@@ -177,7 +177,7 @@ export function makeNegotiationDecision(context: NegotiationContext): Negotiatio
     action: 'counter',
     newOffer,
     message: generateCounterMessage(newOffer, creatorAsk, roundNumber, settings.strategy),
-    reasoning: `Round ${roundNumber + 1}: Offering $${newOffer} (${settings.strategy} strategy)`,
+    reasoning: `Round ${roundNumber + 1}: Offering ₹${newOffer.toLocaleString('en-IN')} (${settings.strategy} strategy)`,
     confidence: 75 + (roundNumber * 5),
   };
 }
@@ -229,7 +229,7 @@ Thank you for your interest in collaborating with us! We've reviewed your profil
 For the following deliverables:
 ${deliverablesList}
 
-We'd like to offer $${amount.toLocaleString()} as compensation.
+We'd like to offer ₹${amount.toLocaleString('en-IN')} as compensation.
 
 This rate reflects the value we see in your content and engagement with your audience. We're also open to discussing bonus incentives based on performance!
 
@@ -237,7 +237,7 @@ Looking forward to hearing from you!`;
 }
 
 function generateAcceptMessage(amount: number): string {
-  return `Wonderful! We're happy to move forward at $${amount.toLocaleString()}.
+  return `Wonderful! We're happy to move forward at ₹${amount.toLocaleString('en-IN')}.
 
 We'll be sending over the contract shortly with all the details. Please review it carefully and let us know if you have any questions.
 
@@ -247,7 +247,7 @@ We're excited to work with you!`;
 function generateDeclineMessage(maxBudget: number): string {
   return `Thank you for your interest and for sharing your rates with us.
 
-Unfortunately, this exceeds our budget for this particular campaign. Our maximum budget is $${maxBudget.toLocaleString()}.
+Unfortunately, this exceeds our budget for this particular campaign. Our maximum budget is ₹${maxBudget.toLocaleString('en-IN')}.
 
 We'd love to keep you in mind for future campaigns that might be a better fit. Would you be open to staying in touch?
 
@@ -264,39 +264,39 @@ function generateCounterMessage(
     round1: {
       aggressive: `Thank you for sharing your rates! We appreciate the transparency.
 
-While we understand the value you bring, our budget for this campaign is structured differently. We can offer $${newOffer.toLocaleString()}, which we believe is competitive for the scope of work.
+While we understand the value you bring, our budget for this campaign is structured differently. We can offer ₹${newOffer.toLocaleString('en-IN')}, which we believe is competitive for the scope of work.
 
 This includes potential for bonuses based on performance metrics. Would this work for you?`,
-      balanced: `Thank you for your response! We've considered your rate of $${creatorAsk.toLocaleString()}.
+      balanced: `Thank you for your response! We've considered your rate of ₹${creatorAsk.toLocaleString('en-IN')}.
 
-To find a middle ground that works for both of us, we'd like to propose $${newOffer.toLocaleString()}.
+To find a middle ground that works for both of us, we'd like to propose ₹${newOffer.toLocaleString('en-IN')}.
 
 We value quality partnerships and are confident this collaboration will be mutually beneficial. What do you think?`,
       generous: `Thank you for getting back to us!
 
-We want to make this work and value what you bring to the table. How about $${newOffer.toLocaleString()}?
+We want to make this work and value what you bring to the table. How about ₹${newOffer.toLocaleString('en-IN')}?
 
 We're also happy to discuss additional perks like product gifts, exclusive previews, or affiliate opportunities!`,
     },
     round2: {
-      aggressive: `We've reviewed our budget again and can stretch to $${newOffer.toLocaleString()}.
+      aggressive: `We've reviewed our budget again and can stretch to ₹${newOffer.toLocaleString('en-IN')}.
 
 This is getting close to our ceiling for this campaign. We hope we can find common ground!`,
-      balanced: `We really want to work with you! After internal discussions, we can offer $${newOffer.toLocaleString()}.
+      balanced: `We really want to work with you! After internal discussions, we can offer ₹${newOffer.toLocaleString('en-IN')}.
 
 This represents our best effort to meet you closer to your expectations while staying within our campaign budget.`,
-      generous: `We've pushed our budget to $${newOffer.toLocaleString()} because we believe in this partnership!
+      generous: `We've pushed our budget to ₹${newOffer.toLocaleString('en-IN')} because we believe in this partnership!
 
 Let us know if this works. We're excited about the possibilities!`,
     },
     final: {
-      aggressive: `Our final offer is $${newOffer.toLocaleString()}. This is the maximum we can allocate for this campaign.
+      aggressive: `Our final offer is ₹${newOffer.toLocaleString('en-IN')}. This is the maximum we can allocate for this campaign.
 
 We hope this works for you, but we understand if it doesn't. Either way, we'd love to stay connected for future opportunities!`,
-      balanced: `After careful consideration, we can offer $${newOffer.toLocaleString()} as our best and final offer.
+      balanced: `After careful consideration, we can offer ₹${newOffer.toLocaleString('en-IN')} as our best and final offer.
 
 We truly believe this partnership would be amazing and hope we can make it work!`,
-      generous: `We've done everything we can and our final offer is $${newOffer.toLocaleString()}.
+      generous: `We've done everything we can and our final offer is ₹${newOffer.toLocaleString('en-IN')}.
 
 This reflects our genuine interest in working with you. Let us know!`,
     },
@@ -317,12 +317,12 @@ export function analyzeCreatorResponse(response: string): {
 } {
   const lowerResponse = response.toLowerCase();
   
-  // Extract mentioned prices
-  const priceMatches = response.match(/\$[\d,]+(?:\.\d{2})?|\d+(?:,\d{3})*(?:\.\d{2})?\s*(?:dollars?|usd)/gi);
+  // Extract mentioned prices (supports INR ₹ format)
+  const priceMatches = response.match(/₹[\d,]+(?:\.\d{2})?|\d+(?:,\d{3})*(?:\.\d{2})?\s*(?:rupees?|inr)/gi);
   let mentionedPrice: number | undefined;
   if (priceMatches) {
     const prices = priceMatches.map(p => {
-      const num = p.replace(/[$,a-zA-Z\s]/g, '');
+      const num = p.replace(/[₹,a-zA-Z\s]/g, '');
       return parseFloat(num);
     }).filter(p => p > 100); // Filter out small numbers
     mentionedPrice = prices.length > 0 ? Math.max(...prices) : undefined;
@@ -353,7 +353,7 @@ export function analyzeCreatorResponse(response: string): {
   
   // Extract key points
   const keyPoints: string[] = [];
-  if (mentionedPrice) keyPoints.push(`Mentioned price: $${mentionedPrice}`);
+  if (mentionedPrice) keyPoints.push(`Mentioned price: ₹${mentionedPrice.toLocaleString('en-IN')}`);
   if (isAcceptance) keyPoints.push('Indicates acceptance');
   if (isDecline) keyPoints.push('Indicates decline');
   if (isCounterOffer) keyPoints.push('Contains counter offer');

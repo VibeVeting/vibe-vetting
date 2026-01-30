@@ -7,8 +7,6 @@ const pricingPlans = [
     name: "Starter",
     price: "₹4,999",
     originalPrice: "₹9,999",
-    priceUSD: "$60",
-    originalPriceUSD: "$120",
     period: "/mo",
     description: "For D2C brands & small teams",
     features: [
@@ -23,8 +21,6 @@ const pricingPlans = [
     name: "Growth",
     price: "₹14,999",
     originalPrice: "₹29,999",
-    priceUSD: "$180",
-    originalPriceUSD: "$360",
     period: "/mo",
     description: "For agencies & mid-size brands",
     featured: true,
@@ -87,16 +83,13 @@ export default function PricingPage() {
                 </div>
 
                 <div className="plan-price">
-                  {plan.originalPriceUSD && (
-                    <span className="original-price">{plan.originalPriceUSD}</span>
+                  {plan.originalPrice && (
+                    <span className="original-price">{plan.originalPrice}</span>
                   )}
                   <span className="current-price">
-                    {plan.priceUSD || plan.price}
+                    {plan.price}
                   </span>
                   <span className="price-period">{plan.period}</span>
-                  {plan.price !== 'Custom' && (
-                    <span className="price-inr">≈ {plan.price}{plan.period}</span>
-                  )}
                 </div>
 
                 {plan.originalPrice && (

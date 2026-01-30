@@ -130,15 +130,32 @@ function RegisterBarterContent() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    const user = localStorage.getItem('user');
-    if (token && user) {
-      const userData = JSON.parse(user);
-      if (userData.userType === 'barter_creator') {
-        window.location.href = '/creator-dashboard';
-      } else {
-        window.location.href = '/dashboard';
+    const userStr = localStorage.getItem('user');
+    
+    if (token && userStr) {
+      try {
+        const userData = JSON.parse(userStr);
+        if (userData.userType === 'barter_creator') {
+          // Barter creator already logged in
+          window.location.href = '/creator-dashboard';
+          return;
+        } else if (userData.userType === 'barter_company') {
+          // Barter company logged in
+          window.location.href = '/barter-company-dashboard';
+          return;
+        } else {
+          // Regular brand user is logged in - clear and let them register as barter creator
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+        }
+      } catch (e) {
+        // Invalid user data, clear and let them register fresh
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
       }
-      return;
+    } else if (token) {
+      // Token but no user data, clear it
+      localStorage.removeItem('token');
     }
 
     const oauthError = searchParams.get('error');
@@ -210,6 +227,7 @@ function RegisterBarterContent() {
     setLoading(true);
 
     try {
+      // First, register the user
       const response = await fetch('/api/auth/register-barter', {
         method: 'POST',
         headers: {
@@ -245,12 +263,33 @@ function RegisterBarterContent() {
         return;
       }
 
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      // Send verification email via AWS SES
+      const verifyResponse = await fetch('/api/auth/send-verification', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          name: formData.name,
+          userType: 'barter_creator',
+        }),
+      });
+
+      if (!verifyResponse.ok) {
+        console.warn('Failed to send verification email, but user registered');
+      }
+
+      // Store user data (but don't log in until email is verified)
+      localStorage.setItem('pendingVerification', JSON.stringify({
+        email: formData.email,
+        name: formData.name,
+        userType: 'barter_creator',
+      }));
       
       setSuccess(true);
       setTimeout(() => {
-        router.push('/creator-dashboard');
+        router.push(`/verify-email?email=${encodeURIComponent(formData.email)}&type=barter_creator`);
       }, 2000);
     } catch {
       setError('Something went wrong. Please try again.');
@@ -453,8 +492,8 @@ function RegisterBarterContent() {
                       ))}
                     </div>
                   </div>
-                  <h2>Welcome to the Network! 🎉</h2>
-                  <p>Your creator account is ready. Redirecting to dashboard...</p>
+                  <h2>Check Your Email! ✉️</h2>
+                  <p>We&apos;ve sent a verification link. Please verify your email to continue.</p>
                   <div className="yc-success-loader">
                     <div className="yc-loader-bar" />
                   </div>

@@ -60,14 +60,14 @@ export function Button({
         }
 
         .btn-primary {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: var(--gradient-primary);
           color: white;
-          box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+          box-shadow: 0 6px 20px var(--gradient-glow);
         }
 
         .btn-primary:hover:not(:disabled) {
           transform: translateY(-2px);
-          box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+          box-shadow: 0 10px 30px var(--gradient-glow);
         }
 
         .btn-primary:active:not(:disabled) {

@@ -154,7 +154,7 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
 
       // Add quick navigation results if query matches
       const quickLinks = [
-        { name: 'Dashboard', url: '/dashboard', icon: 'fa-gauge-high' },
+        { name: 'Dashboard', url: '/dashboard', icon: 'fa-gauge' },
         { name: 'Creators', url: '/creators', icon: 'fa-users' },
         { name: 'Discover Creators', url: '/creators/discover', icon: 'fa-compass' },
         { name: 'Campaigns', url: '/campaigns', icon: 'fa-bullhorn' },
@@ -446,7 +446,7 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
 
               <div className="dropdown-section">
                 <a href="/dashboard" className="dropdown-item">
-                  <i className="fa-solid fa-gauge-high"></i>
+                  <i className="fa-solid fa-gauge"></i>
                   Dashboard
                 </a>
                 <a href="/settings" className="dropdown-item">
@@ -484,9 +484,9 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
         .top-bar-title {
           font-size: 28px;
           font-weight: 800;
-          color: #1a202c;
+          color: var(--text-primary);
           margin-bottom: 4px;
-          background: linear-gradient(135deg, #1a202c 0%, #4a5568 100%);
+          background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -494,7 +494,7 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
 
         .top-bar-subtitle {
           font-size: 14px;
-          color: #718096;
+          color: var(--text-secondary);
           font-weight: 500;
         }
 
@@ -508,8 +508,8 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
           position: relative;
           display: flex;
           align-items: center;
-          background: white;
-          border: 2px solid #edf2f7;
+          background: var(--bg-input);
+          border: 2px solid var(--border-color);
           border-radius: 14px;
           padding: 0 16px;
           transition: all 0.2s ease;
@@ -518,11 +518,11 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
 
         .search-container.focused {
           border-color: #667eea;
-          box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+          box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
         }
 
         .search-icon {
-          color: #a0aec0;
+          color: var(--text-muted);
           font-size: 14px;
           margin-right: 12px;
         }
@@ -533,12 +533,12 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
           background: transparent;
           padding: 12px 0;
           font-size: 14px;
-          color: #1a202c;
+          color: var(--text-primary);
           outline: none;
         }
 
         .search-input::placeholder {
-          color: #a0aec0;
+          color: var(--text-muted);
         }
 
         .search-shortcut {
@@ -547,13 +547,13 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
         }
 
         .search-shortcut kbd {
-          background: #f7fafc;
-          border: 1px solid #e2e8f0;
+          background: var(--bg-hover);
+          border: 1px solid var(--border-color);
           border-radius: 6px;
           padding: 2px 6px;
           font-size: 11px;
           font-weight: 600;
-          color: #718096;
+          color: var(--text-muted);
           font-family: inherit;
         }
 
@@ -562,10 +562,10 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
           top: calc(100% + 8px);
           left: 0;
           right: 0;
-          background: white;
-          border: 1px solid #e2e8f0;
+          background: var(--bg-elevated);
+          border: 1px solid var(--border-color);
           border-radius: 16px;
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
           z-index: 99999;
           overflow: hidden;
           max-height: 400px;
@@ -574,7 +574,7 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
         .search-results-loading {
           padding: 24px;
           text-align: center;
-          color: #718096;
+          color: var(--text-muted);
           font-size: 14px;
         }
 
@@ -591,7 +591,7 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
         .search-results-empty {
           padding: 24px;
           text-align: center;
-          color: #718096;
+          color: var(--text-muted);
           font-size: 14px;
         }
 
@@ -603,7 +603,7 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
           padding: 8px 12px;
           font-size: 11px;
           font-weight: 600;
-          color: #a0aec0;
+          color: var(--text-muted);
           text-transform: uppercase;
           letter-spacing: 0.5px;
         }
@@ -619,7 +619,7 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
         }
 
         .search-result-item:hover {
-          background: #f7fafc;
+          background: var(--bg-hover);
         }
 
         .search-result-icon {
@@ -643,7 +643,7 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
         }
 
         .search-result-icon.navigation {
-          background: #f7fafc;
+          background: var(--bg-hover);
           color: #667eea;
         }
 
@@ -656,7 +656,7 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
           display: block;
           font-size: 14px;
           font-weight: 500;
-          color: #1a202c;
+          color: var(--text-primary);
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -665,14 +665,14 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
         .search-result-subtitle {
           display: block;
           font-size: 12px;
-          color: #718096;
+          color: var(--text-muted);
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
         }
 
         .search-result-arrow {
-          color: #a0aec0;
+          color: var(--text-muted);
           font-size: 12px;
           opacity: 0;
           transition: opacity 0.15s ease;
@@ -684,18 +684,18 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
 
         .search-results-footer {
           padding: 12px;
-          background: #f7fafc;
-          border-top: 1px solid #e2e8f0;
+          background: var(--bg-hover);
+          border-top: 1px solid var(--border-color);
           display: flex;
           justify-content: center;
           gap: 24px;
           font-size: 12px;
-          color: #718096;
+          color: var(--text-muted);
         }
 
         .search-results-footer kbd {
-          background: white;
-          border: 1px solid #e2e8f0;
+          background: var(--bg-elevated);
+          border: 1px solid var(--border-color);
           border-radius: 4px;
           padding: 2px 6px;
           font-size: 10px;
@@ -767,7 +767,7 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
           display: flex;
           align-items: center;
           justify-content: center;
-          border: 2px solid white;
+          border: 2px solid var(--bg-elevated);
         }
 
         .notification-container {
@@ -780,14 +780,10 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
           top: calc(100% + 12px);
           right: 0;
           width: 360px;
-          background: linear-gradient(180deg, #ffffff 0%, #fafbfc 100%);
+          background: var(--bg-elevated);
           border-radius: 18px;
-          box-shadow: 
-            0 25px 60px rgba(0, 0, 0, 0.18),
-            0 10px 20px rgba(0, 0, 0, 0.08),
-            inset 0 1px 0 rgba(255, 255, 255, 0.9);
-          border: 1px solid rgba(226, 232, 240, 0.8);
-          border-bottom: 3px solid rgba(102, 126, 234, 0.2);
+          box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+          border: 1px solid var(--border-color);
           overflow: hidden;
           z-index: 99999;
           animation: dropdownIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -809,13 +805,13 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
           justify-content: space-between;
           align-items: center;
           padding: 16px 20px;
-          border-bottom: 1px solid #edf2f7;
+          border-bottom: 1px solid var(--border-color);
         }
 
         .notification-header h4 {
           font-size: 15px;
           font-weight: 700;
-          color: #1a202c;
+          color: var(--text-primary);
         }
 
         .mark-all-btn {
@@ -837,17 +833,17 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
           align-items: flex-start;
           gap: 12px;
           padding: 14px 20px;
-          border-bottom: 1px solid #f7fafc;
+          border-bottom: 1px solid var(--border-color);
           transition: background 0.2s ease;
           cursor: pointer;
         }
 
         .notification-item:hover {
-          background: #f7fafc;
+          background: var(--bg-hover);
         }
 
         .notification-item.unread {
-          background: rgba(102, 126, 234, 0.03);
+          background: rgba(102, 126, 234, 0.08);
         }
 
         .notification-icon {
@@ -892,19 +888,19 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
         .notification-title {
           font-size: 13px;
           font-weight: 600;
-          color: #1a202c;
+          color: var(--text-primary);
           margin-bottom: 2px;
         }
 
         .notification-desc {
           font-size: 12px;
-          color: #718096;
+          color: var(--text-muted);
           margin-bottom: 4px;
         }
 
         .notification-time {
           font-size: 11px;
-          color: #a0aec0;
+          color: var(--text-muted);
         }
 
         .unread-dot {
@@ -931,12 +927,12 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
           font-size: 13px;
           font-weight: 600;
           text-decoration: none;
-          border-top: 1px solid #edf2f7;
+          border-top: 1px solid var(--border-color);
           transition: background 0.2s ease;
         }
 
         .view-all-notifications:hover {
-          background: #f7fafc;
+          background: var(--bg-hover);
         }
 
         .user-profile-container {
@@ -954,7 +950,7 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
         }
 
         .user-avatar-btn:hover {
-          background: #f7fafc;
+          background: var(--bg-hover);
         }
 
         .user-avatar-circle {
@@ -984,7 +980,7 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
 
         .avatar-chevron {
           font-size: 10px;
-          color: #718096;
+          color: var(--text-muted);
           transition: transform 0.2s ease;
         }
 
@@ -997,14 +993,10 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
           top: calc(100% + 12px);
           right: 0;
           width: 240px;
-          background: linear-gradient(180deg, #ffffff 0%, #fafbfc 100%);
+          background: var(--bg-elevated);
           border-radius: 18px;
-          box-shadow: 
-            0 25px 60px rgba(0, 0, 0, 0.18),
-            0 10px 20px rgba(0, 0, 0, 0.08),
-            inset 0 1px 0 rgba(255, 255, 255, 0.9);
-          border: 1px solid rgba(226, 232, 240, 0.8);
-          border-bottom: 3px solid rgba(102, 126, 234, 0.2);
+          box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+          border: 1px solid var(--border-color);
           overflow: hidden;
           z-index: 100;
           animation: dropdownIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -1015,8 +1007,8 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
           align-items: center;
           gap: 12px;
           padding: 16px;
-          background: linear-gradient(180deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.04) 100%);
-          border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+          background: linear-gradient(180deg, rgba(102, 126, 234, 0.12) 0%, rgba(118, 75, 162, 0.06) 100%);
+          border-bottom: 1px solid var(--border-color);
         }
 
         .dropdown-avatar {
@@ -1044,7 +1036,7 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
           display: block;
           font-size: 14px;
           font-weight: 700;
-          color: #1a202c;
+          color: var(--text-primary);
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -1053,7 +1045,7 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
         .dropdown-email {
           display: block;
           font-size: 12px;
-          color: #718096;
+          color: var(--text-muted);
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -1069,7 +1061,7 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
           gap: 12px;
           padding: 10px 12px;
           border-radius: 10px;
-          color: #4a5568;
+          color: var(--text-secondary);
           text-decoration: none;
           font-size: 14px;
           font-weight: 500;
@@ -1077,7 +1069,7 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
         }
 
         .dropdown-item:hover {
-          background: #f7fafc;
+          background: var(--bg-hover);
           color: #667eea;
         }
 
@@ -1089,7 +1081,7 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
 
         .dropdown-footer {
           padding: 8px;
-          border-top: 1px solid #edf2f7;
+          border-top: 1px solid var(--border-color);
         }
 
         .dropdown-logout {
@@ -1109,7 +1101,7 @@ export function TopBar({ title, subtitle, showSearch = true, actionButton, secon
         }
 
         .dropdown-logout:hover {
-          background: #fef2f2;
+          background: rgba(239, 68, 68, 0.1);
         }
 
         .dropdown-logout i {

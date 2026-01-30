@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CardMenu, MenuItem } from '@/components/common/CardMenu';
-import { exportAsCSV } from '@/lib/export-utils';
+import Link from 'next/link';
 
 interface CreatorAnalysis {
   id: string;
@@ -13,35 +12,17 @@ interface CreatorAnalysis {
   status: 'verified' | 'pending' | 'risk';
   alignmentScore: number;
   riskLevel: string;
-}
-
-// Empty default state - no sample data
-const defaultAnalyses: CreatorAnalysis[] = [];
-
-function StatusBadge({ status }: { status: 'verified' | 'pending' | 'risk' }) {
-  const classMap = {
-    verified: 'badge-verified',
-    pending: 'badge-pending',
-    risk: 'badge-risk',
-  };
-  const labels = {
-    verified: 'Verified',
-    pending: 'Pending',
-    risk: 'Risk',
-  };
-  return (
-    <span className={`badge ${classMap[status]}`}>
-      {labels[status]}
-    </span>
-  );
+  platform?: string;
 }
 
 export function RecentAnalysesTable() {
-  const [analyses, setAnalyses] = useState<CreatorAnalysis[]>(defaultAnalyses);
-  const [isUsingDefaults, setIsUsingDefaults] = useState(true);
+  const [analyses, setAnalyses] = useState<CreatorAnalysis[]>([]);
+  const [isVisible, setIsVisible] = useState(false);
+  const [hoveredRow, setHoveredRow] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
+    setTimeout(() => setIsVisible(true), 300);
     const fetchAnalyses = async () => {
       try {
         const token = localStorage.getItem('token');
@@ -56,7 +37,6 @@ export function RecentAnalysesTable() {
         if (response.ok) {
           const data = await response.json();
           setAnalyses(data.analyses || []);
-          setIsUsingDefaults(false);
         }
       } catch (error) {
         console.error('Error fetching analyses:', error);
@@ -66,97 +46,138 @@ export function RecentAnalysesTable() {
     fetchAnalyses();
   }, []);
 
-  const menuItems: MenuItem[] = [
-    {
-      label: 'View All Analyses',
-      icon: 'fa-list',
-      onClick: () => router.push('/creators'),
-    },
-    {
-      label: 'Export to CSV',
-      icon: 'fa-file-csv',
-      onClick: () => {
-        if (analyses.length === 0) {
-          alert('No data to export');
-          return;
-        }
-        const exportData = analyses.map(a => ({
-          'Creator Name': a.name,
-          'Followers': a.followers,
-          'Status': a.status,
-          'Alignment Score': `${a.alignmentScore}%`,
-          'Risk Level': a.riskLevel
-        }));
-        exportAsCSV(exportData, `creator-analyses-${new Date().toISOString().split('T')[0]}`);
-      },
-    },
-    {
-      label: 'Refresh Data',
-      icon: 'fa-refresh',
-      onClick: () => {
-        window.location.reload();
-      },
-    },
-  ];
+  const getStatusConfig = (status: string) => {
+    switch (status) {
+      case 'verified':
+        return { color: '#22c55e', bg: 'rgba(34, 197, 94, 0.15)', icon: 'fa-check-circle', label: 'Verified' };
+      case 'pending':
+        return { color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.15)', icon: 'fa-clock', label: 'Pending' };
+      case 'risk':
+        return { color: '#ef4444', bg: 'rgba(239, 68, 68, 0.15)', icon: 'fa-exclamation-triangle', label: 'Risk' };
+      default:
+        return { color: '#6b7280', bg: 'rgba(107, 114, 128, 0.15)', icon: 'fa-question', label: 'Unknown' };
+    }
+  };
 
-  const displayData = analyses;
+  const getScoreColor = (score: number) => {
+    if (score >= 90) return '#22c55e';
+    if (score >= 70) return '#00f5ff';
+    if (score >= 50) return '#f59e0b';
+    return '#ef4444';
+  };
 
   return (
-    <div className="card">
-      <div className="card-header">
-        <h3 className="card-title">
-          Recent Creator Analyses
-        </h3>
-        <CardMenu items={menuItems} />
+    <div className={`yc-table-section ${isVisible ? 'visible' : ''}`}>
+      <div className="yc-table-header">
+        <div className="yc-table-title">
+          <div className="yc-table-icon">
+            <i className="fa-solid fa-users-viewfinder"></i>
+          </div>
+          <div>
+            <h2>Recent Creator Analyses</h2>
+            <p>Latest AI-powered vetting results</p>
+          </div>
+        </div>
+        <div className="yc-table-actions">
+          <Link href="/creators" className="yc-table-btn">
+            <span>View All</span>
+            <i className="fa-solid fa-arrow-right"></i>
+          </Link>
+        </div>
       </div>
-      <div style={{ overflowX: 'auto' }}>
+
+      <div className="yc-table-container">
         {analyses.length === 0 ? (
-          <div style={{ padding: '40px', textAlign: 'center', color: '#718096' }}>
-            <i className="fa-solid fa-users" style={{ fontSize: '32px', marginBottom: '12px', opacity: 0.5 }}></i>
-            <p>No creators analyzed yet</p>
-            <p style={{ fontSize: '13px', marginTop: '4px' }}>Start analyzing creators to see them here</p>
+          <div className="yc-empty-state">
+            <div className="yc-empty-icon">
+              <i className="fa-solid fa-user-astronaut"></i>
+            </div>
+            <h3>No Creators Analyzed Yet</h3>
+            <p>Start discovering and vetting creators to see them here</p>
+            <Link href="/creators/discover" className="yc-empty-action">
+              <i className="fa-solid fa-rocket"></i>
+              <span>Discover Creators</span>
+            </Link>
           </div>
         ) : (
-        <table className="analytics-table">
-          <thead>
-            <tr>
-              <th>Creator Name</th>
-              <th>Followers</th>
-              <th>Status</th>
-              <th>Alignment Score</th>
-              <th>Brand Risk</th>
-            </tr>
-          </thead>
-          <tbody>
-            {displayData.map((creator) => (
-              <tr key={creator.id}>
-                <td>
-                  <div className="creator-name">
-                    <img 
-                      className="creator-avatar" 
-                      src={creator.avatar} 
-                      alt={creator.name}
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.name)}&background=667eea&color=fff`;
-                      }}
-                    />
-                    {creator.name}
-                  </div>
-                </td>
-                <td>{creator.followers}</td>
-                <td>
-                  <StatusBadge status={creator.status} />
-                </td>
-                <td>
-                  <span className={`score ${
-                      creator.alignmentScore >= 90 ? 'high' : creator.alignmentScore >= 70 ? 'medium' : 'low'
-                    }`}>
-                      {creator.alignmentScore}%
-                    </span>
-                  </td>
-                  <td>{creator.riskLevel}</td>
-                </tr>
-              ))}
+          <table className="yc-table">
+            <thead>
+              <tr>
+                <th>Creator</th>
+                <th>Platform</th>
+                <th>Followers</th>
+                <th>Status</th>
+                <th>AI Score</th>
+                <th>Risk Level</th>
+              </tr>
+            </thead>
+            <tbody>
+              {analyses.map((creator, index) => {
+                const statusConfig = getStatusConfig(creator.status);
+                const scoreColor = getScoreColor(creator.alignmentScore);
+                return (
+                  <tr
+                    key={creator.id}
+                    className={hoveredRow === creator.id ? 'hovered' : ''}
+                    style={{ animationDelay: `${index * 0.05}s` }}
+                    onMouseEnter={() => setHoveredRow(creator.id)}
+                    onMouseLeave={() => setHoveredRow(null)}
+                    onClick={() => router.push(`/creators/${creator.id}`)}
+                  >
+                    <td>
+                      <div className="yc-creator-cell">
+                        <div className="yc-creator-avatar">
+                          <img
+                            src={creator.avatar}
+                            alt={creator.name}
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.name)}&background=667eea&color=fff`;
+                            }}
+                          />
+                          <span className="yc-avatar-ring" style={{ borderColor: statusConfig.color }}></span>
+                        </div>
+                        <span className="yc-creator-name">{creator.name}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="yc-platform-badge">
+                        <i className={`fa-brands fa-${creator.platform?.toLowerCase() || 'instagram'}`}></i>
+                        <span>{creator.platform || 'Instagram'}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <span className="yc-followers">{creator.followers}</span>
+                    </td>
+                    <td>
+                      <div className="yc-status-badge" style={{ background: statusConfig.bg, color: statusConfig.color }}>
+                        <i className={`fa-solid ${statusConfig.icon}`}></i>
+                        <span>{statusConfig.label}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="yc-score-cell">
+                        <div className="yc-score-bar">
+                          <div
+                            className="yc-score-fill"
+                            style={{
+                              width: `${creator.alignmentScore}%`,
+                              background: `linear-gradient(90deg, ${scoreColor}aa, ${scoreColor})`,
+                            }}
+                          ></div>
+                        </div>
+                        <span className="yc-score-value" style={{ color: scoreColor }}>
+                          {creator.alignmentScore}%
+                        </span>
+                      </div>
+                    </td>
+                    <td>
+                      <span className={`yc-risk-badge ${creator.riskLevel?.toLowerCase().replace(' ', '-') || 'low'}`}>
+                        {creator.riskLevel || 'Low'}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}

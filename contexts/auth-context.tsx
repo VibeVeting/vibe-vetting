@@ -10,6 +10,7 @@ interface User {
   twoFactorEnabled?: boolean;
   currentPlan?: string;
   planUpdatedAt?: string;
+  userType?: 'brand' | 'barter_creator' | 'barter_company';
 }
 
 interface AuthContextType {
@@ -73,6 +74,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = useCallback(() => {
+    // Get user type before clearing to redirect appropriately
+    let userType: string | undefined;
+    if (isBrowser()) {
+      try {
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+          const userData = JSON.parse(userStr);
+          userType = userData.userType;
+        }
+      } catch {
+        // Ignore parse errors
+      }
+    }
+    
     setToken(null);
     setUser(null);
     if (isBrowser()) {
@@ -83,9 +98,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Ignore localStorage errors
       }
     }
-    // Use window.location for navigation to avoid router issues
+    // Redirect to appropriate login page based on user type
     if (isBrowser()) {
-      window.location.href = "/login";
+      if (userType === 'barter_creator') {
+        window.location.href = "/login-barter";
+      } else if (userType === 'barter_company') {
+        window.location.href = "/login-barter-company";
+      } else {
+        window.location.href = "/login";
+      }
     }
   }, []);
 

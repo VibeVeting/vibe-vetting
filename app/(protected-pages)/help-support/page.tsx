@@ -1,9 +1,8 @@
 "use client";
 
 import { Sidebar } from '@/components/common/Sidebar';
-import { TopBar } from '@/components/common/TopBar';
 import { useAuth } from '@/contexts/auth-context';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface FAQItem {
   question: string;
@@ -67,11 +66,6 @@ const faqData: FAQItem[] = [
     question: 'Which social platforms do you support?',
     answer: 'We currently support Instagram, Twitter/X, LinkedIn, YouTube, Facebook, and Twitch. We\'re continuously adding support for more platforms based on user demand.'
   },
-  {
-    category: 'Technical',
-    question: 'Is my data secure?',
-    answer: 'Absolutely. We use industry-standard AES-256 encryption for all data at rest and TLS 1.3 for data in transit. We\'re SOC 2 Type II compliant and regularly undergo security audits. Your data is never shared with third parties.'
-  },
 ];
 
 const categories = ['All', 'Getting Started', 'Analytics', 'Billing', 'Contracts', 'Technical'];
@@ -88,6 +82,11 @@ export default function HelpSupportPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    setTimeout(() => setIsVisible(true), 50);
+  }, []);
 
   const filteredFAQs = faqData.filter((faq) => {
     const matchesCategory = activeCategory === 'All' || faq.category === activeCategory;
@@ -103,7 +102,6 @@ export default function HelpSupportPage() {
     setSubmitMessage(null);
 
     try {
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       setSubmitMessage({
@@ -121,134 +119,155 @@ export default function HelpSupportPage() {
     }
   };
 
+  const quickLinks = [
+    { icon: 'fa-book', title: 'Documentation', desc: 'Explore detailed guides and tutorials', color: '#667eea' },
+    { icon: 'fa-video', title: 'Video Tutorials', desc: 'Watch step-by-step video guides', color: '#ec4899' },
+    { icon: 'fa-comments', title: 'Community', desc: 'Connect with other users', color: '#22c55e' },
+    { icon: 'fa-headset', title: 'Live Chat', desc: 'Talk to our support team', color: '#f59e0b' },
+  ];
+
   return (
     <div className="dashboard-wrapper">
       <Sidebar />
-      <main className="main-content">
-        <TopBar title="Help & Support" />
-        
-        <div className="page-content">
-          {/* Hero Section */}
-          <div className="help-hero">
-            <div className="help-hero-content">
-              <h1>How can we help you?</h1>
-              <p>Search our knowledge base or browse categories below</p>
-              <div className="help-search-box">
-                <i className="fa-solid fa-search"></i>
+      <div className="main-content">
+        <div className="yc-page">
+          {/* YC Background Effects */}
+          <div className="yc-page-bg">
+            <div className="yc-page-orb yc-page-orb-1"></div>
+            <div className="yc-page-orb yc-page-orb-2"></div>
+            <div className="yc-page-grid"></div>
+          </div>
+
+          {/* YC Hero Header */}
+          <div className={`yc-page-header ${isVisible ? 'visible' : ''}`} style={{ background: 'linear-gradient(135deg, rgba(var(--primary-rgb, 102, 126, 234), 0.1) 0%, rgba(var(--secondary-rgb, 118, 75, 162), 0.1) 100%)', borderRadius: '24px', padding: '48px', marginBottom: '32px', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'radial-gradient(circle at 50% 50%, var(--bg-hover) 1px, transparent 1px)', backgroundSize: '20px 20px', pointerEvents: 'none', opacity: 0.5 }}></div>
+            <div style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
+              <div style={{ width: '80px', height: '80px', background: 'var(--gradient-primary)', borderRadius: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', boxShadow: `0 20px 40px var(--gradient-glow)` }}>
+                <i className="fa-solid fa-circle-question" style={{ fontSize: '36px', color: 'white' }}></i>
+              </div>
+              <h1 style={{ fontSize: '32px', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 8px' }}>How can we help you?</h1>
+              <p style={{ fontSize: '16px', color: 'var(--text-secondary)', margin: '0 0 32px' }}>Search our knowledge base or browse categories below</p>
+              <div style={{ maxWidth: '500px', margin: '0 auto', position: 'relative' }}>
+                <i className="fa-solid fa-search" style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)', color: 'var(--primary)', fontSize: '16px' }}></i>
                 <input
                   type="text"
                   placeholder="Search for answers..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{ width: '100%', padding: '18px 20px 18px 50px', border: '2px solid transparent', borderRadius: '16px', fontSize: '16px', background: 'var(--bg-elevated)', color: 'var(--text-primary)', boxShadow: `0 8px 32px var(--gradient-glow)`, transition: '0.3s' }}
                 />
               </div>
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div className="help-quick-links">
-            <div className="quick-link-card">
-              <div className="quick-link-icon">
-                <i className="fa-solid fa-book"></i>
+          {/* Quick Links Grid */}
+          <div style={{ position: 'relative', zIndex: 10, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '32px' }}>
+            {quickLinks.map((link, index) => (
+              <div key={index} style={{ background: 'var(--bg-elevated)', borderRadius: '16px', padding: '24px', textAlign: 'center', border: '1px solid var(--border-color)', cursor: 'pointer', transition: 'all 0.3s ease', animation: 'ycCardFadeIn 0.6s ease forwards', animationDelay: `${index * 0.1}s`, opacity: 0 }}>
+                <div style={{ width: '56px', height: '56px', background: `${link.color}15`, borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                  <i className={`fa-solid ${link.icon}`} style={{ fontSize: '24px', color: link.color }}></i>
+                </div>
+                <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', margin: '0 0 4px' }}>{link.title}</h3>
+                <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0 }}>{link.desc}</p>
               </div>
-              <h3>Documentation</h3>
-              <p>Explore detailed guides and tutorials</p>
-            </div>
-            <div className="quick-link-card">
-              <div className="quick-link-icon">
-                <i className="fa-solid fa-video"></i>
-              </div>
-              <h3>Video Tutorials</h3>
-              <p>Watch step-by-step video guides</p>
-            </div>
-            <div className="quick-link-card">
-              <div className="quick-link-icon">
-                <i className="fa-solid fa-comments"></i>
-              </div>
-              <h3>Community</h3>
-              <p>Connect with other users</p>
-            </div>
-            <div className="quick-link-card">
-              <div className="quick-link-icon">
-                <i className="fa-solid fa-headset"></i>
-              </div>
-              <h3>Live Chat</h3>
-              <p>Talk to our support team</p>
-            </div>
+            ))}
           </div>
 
-          <div className="help-content-grid">
+          {/* Main Content Grid */}
+          <div style={{ position: 'relative', zIndex: 10, display: 'grid', gridTemplateColumns: '1fr 400px', gap: '24px' }}>
             {/* FAQ Section */}
-            <div className="help-faq-section">
-              <div className="section-header">
-                <h2>Frequently Asked Questions</h2>
+            <div style={{ background: 'var(--bg-elevated)', borderRadius: '20px', border: '1px solid var(--border-color)', padding: '24px', animation: 'ycCardFadeIn 0.6s ease forwards', animationDelay: '0.4s', opacity: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+                <div style={{ width: '40px', height: '40px', background: 'var(--gradient-primary)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+                  <i className="fa-solid fa-circle-question"></i>
+                </div>
+                <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>Frequently Asked Questions</h2>
               </div>
               
-              <div className="faq-categories">
+              {/* Category Tabs */}
+              <div className="yc-tabs" style={{ marginBottom: '20px', flexWrap: 'wrap' }}>
                 {categories.map((category) => (
                   <button
                     key={category}
-                    className={`faq-category-btn ${activeCategory === category ? 'active' : ''}`}
+                    className={`yc-tab ${activeCategory === category ? 'active' : ''}`}
                     onClick={() => setActiveCategory(category)}
+                    style={{ padding: '8px 16px', fontSize: '13px' }}
                   >
                     {category}
                   </button>
                 ))}
               </div>
 
-              <div className="faq-list">
+              {/* FAQ List */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {filteredFAQs.length > 0 ? (
                   filteredFAQs.map((faq, index) => (
                     <div 
                       key={index} 
-                      className={`faq-item ${expandedFAQ === index ? 'expanded' : ''}`}
+                      style={{ 
+                        border: `1px solid ${expandedFAQ === index ? 'rgba(102, 126, 234, 0.3)' : 'var(--border-color)'}`,
+                        borderRadius: '12px',
+                        overflow: 'hidden',
+                        transition: 'all 0.3s ease',
+                        background: expandedFAQ === index ? 'rgba(102, 126, 234, 0.03)' : 'transparent'
+                      }}
                     >
                       <button 
-                        className="faq-question"
                         onClick={() => setExpandedFAQ(expandedFAQ === index ? null : index)}
+                        style={{ 
+                          width: '100%', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                          background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '14px', fontWeight: 600,
+                          color: 'var(--text-primary)', textAlign: 'left'
+                        }}
                       >
                         <span>{faq.question}</span>
-                        <i className={`fa-solid fa-chevron-${expandedFAQ === index ? 'up' : 'down'}`}></i>
+                        <i className={`fa-solid fa-chevron-${expandedFAQ === index ? 'up' : 'down'}`} style={{ color: 'var(--primary)', fontSize: '12px' }}></i>
                       </button>
                       {expandedFAQ === index && (
-                        <div className="faq-answer">
-                          <p>{faq.answer}</p>
+                        <div style={{ padding: '0 20px 16px' }}>
+                          <p style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.6, margin: 0 }}>{faq.answer}</p>
                         </div>
                       )}
                     </div>
                   ))
                 ) : (
-                  <div className="no-results">
-                    <i className="fa-solid fa-search"></i>
-                    <p>No results found for "{searchQuery}"</p>
+                  <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)' }}>
+                    <i className="fa-solid fa-search" style={{ fontSize: '32px', marginBottom: '12px', opacity: 0.5 }}></i>
+                    <p style={{ margin: 0 }}>No results found for "{searchQuery}"</p>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Contact Support Section */}
-            <div className="help-contact-section">
-              <div className="section-header">
-                <h2>Contact Support</h2>
+            <div style={{ background: 'var(--bg-elevated)', borderRadius: '20px', border: '1px solid var(--border-color)', padding: '24px', height: 'fit-content', animation: 'ycCardFadeIn 0.6s ease forwards', animationDelay: '0.5s', opacity: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+                <div style={{ width: '40px', height: '40px', background: 'var(--gradient-success)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+                  <i className="fa-solid fa-paper-plane"></i>
+                </div>
+                <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>Contact Support</h2>
               </div>
               
-              <form onSubmit={handleSubmitTicket} className="contact-form">
-                <div className="form-group">
-                  <label>Subject</label>
+              <form onSubmit={handleSubmitTicket} style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>Subject</label>
                   <input
                     type="text"
                     value={contactForm.subject}
                     onChange={(e) => setContactForm({ ...contactForm, subject: e.target.value })}
                     placeholder="Brief description of your issue"
                     required
+                    style={{ width: '100%', padding: '12px 16px', border: '1px solid var(--border-color)', borderRadius: '10px', fontSize: '14px', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
                   />
                 </div>
 
-                <div className="form-group">
-                  <label>Category</label>
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>Category</label>
                   <select
                     value={contactForm.category}
                     onChange={(e) => setContactForm({ ...contactForm, category: e.target.value })}
+                    className="yc-filter-select"
+                    style={{ width: '100%' }}
                   >
                     <option value="general">General Inquiry</option>
                     <option value="technical">Technical Issue</option>
@@ -258,515 +277,63 @@ export default function HelpSupportPage() {
                   </select>
                 </div>
 
-                <div className="form-group">
-                  <label>Message</label>
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>Message</label>
                   <textarea
                     value={contactForm.message}
                     onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
                     placeholder="Describe your issue or question in detail..."
-                    rows={6}
+                    rows={5}
                     required
+                    style={{ width: '100%', padding: '12px 16px', border: '1px solid var(--border-color)', borderRadius: '10px', fontSize: '14px', background: 'var(--bg-primary)', color: 'var(--text-primary)', resize: 'vertical', fontFamily: 'inherit' }}
                   />
                 </div>
 
                 {submitMessage && (
-                  <div className={`form-message ${submitMessage.type}`}>
+                  <div style={{ padding: '12px 16px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', background: submitMessage.type === 'success' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)', color: submitMessage.type === 'success' ? '#22c55e' : '#ef4444' }}>
                     <i className={`fa-solid fa-${submitMessage.type === 'success' ? 'check-circle' : 'exclamation-circle'}`}></i>
                     {submitMessage.text}
                   </div>
                 )}
 
-                <button type="submit" className="submit-btn" disabled={isSubmitting}>
+                <button type="submit" className="yc-btn-primary" disabled={isSubmitting} style={{ width: '100%', justifyContent: 'center' }}>
                   {isSubmitting ? (
-                    <>
-                      <i className="fa-solid fa-spinner fa-spin"></i>
-                      Submitting...
-                    </>
+                    <><i className="fa-solid fa-spinner fa-spin"></i> Submitting...</>
                   ) : (
-                    <>
-                      <i className="fa-solid fa-paper-plane"></i>
-                      Submit Ticket
-                    </>
+                    <><i className="fa-solid fa-paper-plane"></i> Submit Ticket</>
                   )}
                 </button>
               </form>
 
-              <div className="contact-info">
-                <h3>Other Ways to Reach Us</h3>
-                <div className="contact-methods">
-                  <div className="contact-method">
-                    <i className="fa-solid fa-envelope"></i>
-                    <div>
-                      <span>Email</span>
-                      <a href="mailto:support@vibevetting.com">support@vibevetting.com</a>
+              {/* Contact Info */}
+              <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '20px' }}>
+                <h3 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', margin: '0 0 16px' }}>Other Ways to Reach Us</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {[
+                    { icon: 'fa-envelope', label: 'Email', value: 'support@vibevetting.com', href: 'mailto:support@vibevetting.com' },
+                    { icon: 'fa-clock', label: 'Response Time', value: 'Within 24 hours' },
+                    { icon: 'fa-brands fa-twitter', label: 'Twitter', value: '@vibevetting', href: 'https://twitter.com/vibevetting' },
+                  ].map((contact, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{ width: '36px', height: '36px', background: 'rgba(102, 126, 234, 0.1)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#667eea' }}>
+                        <i className={contact.icon.startsWith('fa-brands') ? contact.icon : `fa-solid ${contact.icon}`}></i>
+                      </div>
+                      <div>
+                        <span style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{contact.label}</span>
+                        {contact.href ? (
+                          <a href={contact.href} target="_blank" rel="noopener noreferrer" style={{ display: 'block', fontSize: '13px', color: 'var(--text-primary)', textDecoration: 'none' }}>{contact.value}</a>
+                        ) : (
+                          <p style={{ fontSize: '13px', color: 'var(--text-primary)', margin: 0 }}>{contact.value}</p>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                  <div className="contact-method">
-                    <i className="fa-solid fa-clock"></i>
-                    <div>
-                      <span>Response Time</span>
-                      <p>Within 24 hours</p>
-                    </div>
-                  </div>
-                  <div className="contact-method">
-                    <i className="fa-brands fa-twitter"></i>
-                    <div>
-                      <span>Twitter</span>
-                      <a href="https://twitter.com/vibevetting" target="_blank" rel="noopener noreferrer">@vibevetting</a>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </main>
-
-      <style jsx>{`
-        .page-content {
-          padding: 0 24px 24px;
-        }
-
-        .help-hero {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          border-radius: 20px;
-          padding: 48px;
-          margin-bottom: 24px;
-          text-align: center;
-          position: relative;
-          overflow: hidden;
-        }
-
-        .help-hero::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-          pointer-events: none;
-        }
-
-        .help-hero-content {
-          position: relative;
-          z-index: 1;
-        }
-
-        .help-hero h1 {
-          color: white;
-          font-size: 32px;
-          font-weight: 700;
-          margin: 0 0 8px;
-        }
-
-        .help-hero p {
-          color: rgba(255, 255, 255, 0.9);
-          font-size: 16px;
-          margin: 0 0 24px;
-        }
-
-        .help-search-box {
-          max-width: 500px;
-          margin: 0 auto;
-          position: relative;
-        }
-
-        .help-search-box i {
-          position: absolute;
-          left: 20px;
-          top: 50%;
-          transform: translateY(-50%);
-          color: #667eea;
-          font-size: 16px;
-        }
-
-        .help-search-box input {
-          width: 100%;
-          padding: 16px 20px 16px 50px;
-          border: none;
-          border-radius: 12px;
-          font-size: 16px;
-          background: #ffffff;
-          color: #1a202c;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .help-search-box input:focus {
-          outline: none;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .help-search-box input::placeholder {
-          color: #a0aec0;
-        }
-
-        .help-quick-links {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 16px;
-          margin-bottom: 32px;
-        }
-
-        .quick-link-card {
-          background: #ffffff;
-          border-radius: 16px;
-          padding: 24px;
-          text-align: center;
-          border: 1px solid #e2e8f0;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-
-        .quick-link-card:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-          border-color: #667eea;
-        }
-
-        .quick-link-icon {
-          width: 56px;
-          height: 56px;
-          background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-          border-radius: 16px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin: 0 auto 16px;
-        }
-
-        .quick-link-icon i {
-          font-size: 24px;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-
-        .quick-link-card h3 {
-          font-size: 16px;
-          font-weight: 600;
-          color: #1a202c;
-          margin: 0 0 4px;
-        }
-
-        .quick-link-card p {
-          font-size: 13px;
-          color: #718096;
-          margin: 0;
-        }
-
-        .help-content-grid {
-          display: grid;
-          grid-template-columns: 1fr 400px;
-          gap: 24px;
-        }
-
-        .section-header {
-          margin-bottom: 20px;
-        }
-
-        .section-header h2 {
-          font-size: 20px;
-          font-weight: 600;
-          color: #1a202c;
-          margin: 0;
-        }
-
-        .help-faq-section {
-          background: #ffffff;
-          border-radius: 16px;
-          padding: 24px;
-          border: 1px solid #e2e8f0;
-        }
-
-        .faq-categories {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-          margin-bottom: 20px;
-        }
-
-        .faq-category-btn {
-          padding: 8px 16px;
-          border: 1px solid #e2e8f0;
-          border-radius: 20px;
-          background: #ffffff;
-          color: #718096;
-          font-size: 13px;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-
-        .faq-category-btn:hover {
-          border-color: #667eea;
-          color: #667eea;
-        }
-
-        .faq-category-btn.active {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          border-color: transparent;
-          color: white;
-        }
-
-        .faq-list {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
-
-        .faq-item {
-          border: 1px solid #e2e8f0;
-          border-radius: 12px;
-          overflow: hidden;
-          transition: all 0.2s ease;
-          background: #ffffff;
-        }
-
-        .faq-item.expanded {
-          border-color: #667eea;
-          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
-        }
-
-        .faq-question {
-          width: 100%;
-          padding: 16px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          background: transparent;
-          border: none;
-          cursor: pointer;
-          font-size: 14px;
-          font-weight: 500;
-          color: #1a202c;
-          text-align: left;
-        }
-
-        .faq-question:hover {
-          background: #f7fafc;
-        }
-
-        .faq-question i {
-          color: #667eea;
-          font-size: 12px;
-        }
-
-        .faq-answer {
-          padding: 0 16px 16px;
-          animation: fadeIn 0.2s ease;
-        }
-
-        .faq-answer p {
-          font-size: 14px;
-          color: #718096;
-          line-height: 1.6;
-          margin: 0;
-        }
-
-        .no-results {
-          text-align: center;
-          padding: 40px 20px;
-          color: #a0aec0;
-        }
-
-        .no-results i {
-          font-size: 32px;
-          margin-bottom: 12px;
-        }
-
-        .help-contact-section {
-          background: #ffffff;
-          border-radius: 16px;
-          padding: 24px;
-          border: 1px solid #e2e8f0;
-          height: fit-content;
-        }
-
-        .contact-form {
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
-          margin-bottom: 24px;
-        }
-
-        .form-group {
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-        }
-
-        .form-group label {
-          font-size: 13px;
-          font-weight: 500;
-          color: #4a5568;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-          padding: 12px;
-          border: 1px solid #e2e8f0;
-          border-radius: 8px;
-          font-size: 14px;
-          transition: all 0.2s ease;
-          background: #ffffff;
-          color: #1a202c;
-        }
-
-        .form-group input::placeholder,
-        .form-group textarea::placeholder {
-          color: #a0aec0;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-          outline: none;
-          border-color: #667eea;
-          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .form-group textarea {
-          resize: vertical;
-          font-family: inherit;
-        }
-
-        .form-message {
-          padding: 12px;
-          border-radius: 8px;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 13px;
-        }
-
-        .form-message.success {
-          background: #ecfdf5;
-          color: #059669;
-        }
-
-        .form-message.error {
-          background: #fef2f2;
-          color: #dc2626;
-        }
-
-        .submit-btn {
-          padding: 14px 24px;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-          border: none;
-          border-radius: 10px;
-          font-size: 14px;
-          font-weight: 600;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          transition: all 0.2s ease;
-        }
-
-        .submit-btn:hover:not(:disabled) {
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        }
-
-        .submit-btn:disabled {
-          opacity: 0.7;
-          cursor: not-allowed;
-        }
-
-        .contact-info {
-          border-top: 1px solid #e2e8f0;
-          padding-top: 20px;
-        }
-
-        .contact-info h3 {
-          font-size: 14px;
-          font-weight: 600;
-          color: #1a202c;
-          margin: 0 0 16px;
-        }
-
-        .contact-methods {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
-
-        .contact-method {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-
-        .contact-method > i {
-          width: 36px;
-          height: 36px;
-          background: #edf2f7;
-          border-radius: 8px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: #667eea;
-        }
-
-        .contact-method span {
-          font-size: 11px;
-          color: #a0aec0;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-          display: block;
-        }
-
-        .contact-method a,
-        .contact-method p {
-          font-size: 13px;
-          color: #1a202c;
-          margin: 0;
-          text-decoration: none;
-        }
-
-        .contact-method a:hover {
-          color: #667eea;
-        }
-
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(-4px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @media (max-width: 1024px) {
-          .help-quick-links {
-            grid-template-columns: repeat(2, 1fr);
-          }
-
-          .help-content-grid {
-            grid-template-columns: 1fr;
-          }
-        }
-
-        @media (max-width: 640px) {
-          .help-quick-links {
-            grid-template-columns: 1fr;
-          }
-
-          .help-hero {
-            padding: 32px 20px;
-          }
-
-          .help-hero h1 {
-            font-size: 24px;
-          }
-        }
-      `}</style>
+      </div>
     </div>
   );
 }

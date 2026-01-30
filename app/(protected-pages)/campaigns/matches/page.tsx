@@ -1,9 +1,8 @@
 "use client";
 
 import { Sidebar } from '@/components/common/Sidebar';
-import { TopBar } from '@/components/common/TopBar';
 import Link from 'next/link';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 
 interface CampaignData {
   name: string;
@@ -84,6 +83,13 @@ export default function MatchesPage() {
   const [riskFilter, setRiskFilter] = useState('all');
   const [allCreators, setAllCreators] = useState<Creator[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
+  const pageRef = useRef<HTMLDivElement>(null);
+
+  // Animation trigger
+  useEffect(() => {
+    setTimeout(() => setIsVisible(true), 50);
+  }, []);
 
   // Fetch real creators from database
   useEffect(() => {
@@ -227,11 +233,33 @@ export default function MatchesPage() {
     <div className="dashboard-wrapper">
       <Sidebar />
       <div className="main-content">
-        <div className="container">
-          <TopBar
-            title={campaignData?.name ? `Matches for "${campaignData.name}"` : "Influencer Matches"}
-            subtitle={loading ? 'Loading creators...' : `AI-vetted creators aligned with your brand • ${filteredInfluencers.length} creators found`}
-          />
+        <div className="yc-page" ref={pageRef}>
+          {/* YC Background Effects */}
+          <div className="yc-page-bg">
+            <div className="yc-page-orb yc-page-orb-1"></div>
+            <div className="yc-page-orb yc-page-orb-2"></div>
+            <div className="yc-page-grid"></div>
+          </div>
+
+          {/* YC Page Header */}
+          <div className={`yc-page-header ${isVisible ? 'visible' : ''}`}>
+            <div className="yc-page-header-content">
+              <div className="yc-page-title-section">
+                <div className="yc-page-icon" style={{ background: 'linear-gradient(135deg, #22c55e 0%, #10b981 100%)' }}>
+                  <i className="fa-solid fa-user-check"></i>
+                </div>
+                <div>
+                  <h1 className="yc-page-title">{campaignData?.name ? `Matches for "${campaignData.name}"` : "Influencer Matches"}</h1>
+                  <p className="yc-page-subtitle">{loading ? 'Loading creators...' : `AI-vetted creators aligned with your brand • ${filteredInfluencers.length} creators found`}</p>
+                </div>
+              </div>
+              <div className="yc-page-actions">
+                <Link href="/campaigns" className="yc-btn-secondary">
+                  <i className="fa-solid fa-arrow-left"></i> Back to Campaigns
+                </Link>
+              </div>
+            </div>
+          </div>
 
           {/* Campaign Criteria Summary */}
           {campaignData && (
@@ -347,7 +375,7 @@ export default function MatchesPage() {
 
                   {influencer.matchReason && (
                     <div className="match-reason">
-                      <i className="fa-solid fa-sparkles"></i>
+                      <i className="fa-solid fa-star"></i>
                       {influencer.matchReason}
                     </div>
                   )}
@@ -440,12 +468,12 @@ export default function MatchesPage() {
           align-items: center;
           gap: 6px;
           padding: 6px 12px;
-          background: white;
-          border: 1px solid #e2e8f0;
+          background: var(--bg-elevated);
+          border: 1px solid var(--border-color);
           border-radius: 20px;
           font-size: 12px;
           font-weight: 500;
-          color: #4a5568;
+          color: var(--text-secondary);
         }
 
         .criteria-tag i {

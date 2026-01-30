@@ -255,9 +255,9 @@ export function AutoNegotiationModal({
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
       minimumFractionDigits: 0,
     }).format(amount);
   };
@@ -276,8 +276,25 @@ export function AutoNegotiationModal({
         {/* Header */}
         <div className="modal-header">
           <div className="header-content">
-            <div className="header-icon">
-              <i className="fa-solid fa-robot"></i>
+            <div className="header-icon ai-brain-logo">
+              <div className="brain-core">
+                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <linearGradient id="brainGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#fff" stopOpacity="1"/>
+                      <stop offset="100%" stopColor="#e0e7ff" stopOpacity="0.9"/>
+                    </linearGradient>
+                  </defs>
+                  <path d="M20 4C14.5 4 10 8.5 10 14c0 2.5 1 4.8 2.5 6.5L10 28h8v8h4v-8h8l-2.5-7.5C29 18.8 30 16.5 30 14c0-5.5-4.5-10-10-10z" fill="url(#brainGrad)" className="brain-path"/>
+                  <circle cx="15" cy="13" r="2" fill="rgba(102, 126, 234, 0.8)" className="neuron n1"/>
+                  <circle cx="25" cy="13" r="2" fill="rgba(168, 85, 247, 0.8)" className="neuron n2"/>
+                  <circle cx="20" cy="18" r="2.5" fill="rgba(236, 72, 153, 0.8)" className="neuron n3"/>
+                  <line x1="15" y1="13" x2="20" y2="18" stroke="rgba(255,255,255,0.6)" strokeWidth="1" className="synapse"/>
+                  <line x1="25" y1="13" x2="20" y2="18" stroke="rgba(255,255,255,0.6)" strokeWidth="1" className="synapse"/>
+                </svg>
+              </div>
+              <div className="pulse-ring"></div>
+              <div className="pulse-ring delay"></div>
             </div>
             <div className="header-text">
               <h2>AI Negotiation</h2>
@@ -403,7 +420,7 @@ export function AutoNegotiationModal({
                       </>
                     ) : (
                       <>
-                        <i className="fa-solid fa-wand-magic-sparkles"></i>
+                        <i className="fa-solid fa-wand-magic"></i>
                         AI Suggest
                       </>
                     )}
@@ -530,7 +547,7 @@ export function AutoNegotiationModal({
           }
 
           .modal-container {
-            background: white;
+            background: var(--bg-elevated);
             border-radius: 20px;
             max-width: 600px;
             width: 100%;
@@ -538,7 +555,8 @@ export function AutoNegotiationModal({
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
           }
 
           .modal-header {
@@ -546,7 +564,7 @@ export function AutoNegotiationModal({
             align-items: center;
             justify-content: space-between;
             padding: 20px 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--gradient-primary);
             color: white;
             flex-shrink: 0;
           }
@@ -566,6 +584,79 @@ export function AutoNegotiationModal({
             align-items: center;
             justify-content: center;
             font-size: 24px;
+          }
+
+          .header-icon.ai-brain-logo {
+            position: relative;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(168, 85, 247, 0.3) 50%, rgba(236, 72, 153, 0.2) 100%);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            overflow: visible;
+          }
+
+          .brain-core {
+            width: 32px;
+            height: 32px;
+            position: relative;
+            z-index: 2;
+          }
+
+          .brain-core svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+          }
+
+          .brain-path {
+            animation: brainGlow 2s ease-in-out infinite;
+          }
+
+          .neuron {
+            animation: neuronPulse 1.5s ease-in-out infinite;
+          }
+
+          .neuron.n1 { animation-delay: 0s; }
+          .neuron.n2 { animation-delay: 0.5s; }
+          .neuron.n3 { animation-delay: 1s; }
+
+          .synapse {
+            animation: synapseFlow 2s ease-in-out infinite;
+          }
+
+          .pulse-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            animation: pulseExpand 2s ease-out infinite;
+          }
+
+          .pulse-ring.delay {
+            animation-delay: 1s;
+          }
+
+          @keyframes brainGlow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.85; }
+          }
+
+          @keyframes neuronPulse {
+            0%, 100% { r: 2; opacity: 0.8; }
+            50% { r: 2.5; opacity: 1; }
+          }
+
+          @keyframes synapseFlow {
+            0%, 100% { stroke-opacity: 0.6; }
+            50% { stroke-opacity: 1; }
+          }
+
+          @keyframes pulseExpand {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+            100% { transform: translate(-50%, -50%) scale(1.4); opacity: 0; }
           }
 
           .header-text h2 {
@@ -603,7 +694,7 @@ export function AutoNegotiationModal({
           }
 
           .creator-card {
-            background: linear-gradient(135deg, #f6f8fc 0%, #f1f5f9 100%);
+            background: var(--bg-hover);
             border-radius: 16px;
             padding: 20px;
             margin-bottom: 20px;
@@ -621,7 +712,7 @@ export function AutoNegotiationModal({
             height: 56px;
             border-radius: 14px;
             overflow: hidden;
-            background: #667eea;
+            background: var(--primary);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -639,7 +730,7 @@ export function AutoNegotiationModal({
             margin: 0 0 8px;
             font-size: 18px;
             font-weight: 600;
-            color: #1a202c;
+            color: var(--text-primary);
           }
 
           .creator-stats {
@@ -652,11 +743,11 @@ export function AutoNegotiationModal({
             align-items: center;
             gap: 6px;
             font-size: 13px;
-            color: #64748b;
+            color: var(--text-secondary);
           }
 
           .creator-stats .stat i {
-            color: #667eea;
+            color: var(--primary);
           }
 
           .creator-stats .platform {
@@ -670,7 +761,7 @@ export function AutoNegotiationModal({
           }
 
           .price-item {
-            background: white;
+            background: var(--bg-elevated);
             padding: 12px;
             border-radius: 12px;
             text-align: center;
@@ -680,7 +771,7 @@ export function AutoNegotiationModal({
             display: block;
             font-size: 11px;
             font-weight: 500;
-            color: #94a3b8;
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 4px;
@@ -693,15 +784,15 @@ export function AutoNegotiationModal({
           }
 
           .price-value.asking {
-            color: #ef4444;
+            color: var(--accent-red, #ef4444);
           }
 
           .price-value.offer {
-            color: #22c55e;
+            color: var(--accent-green);
           }
 
           .price-value.gap {
-            color: #f59e0b;
+            color: var(--accent-orange);
           }
 
           .status-badge {
@@ -717,18 +808,18 @@ export function AutoNegotiationModal({
           }
 
           .status-accepted {
-            background: #dcfce7;
-            color: #166534;
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--accent-green);
           }
 
           .status-declined {
-            background: #fee2e2;
-            color: #991b1b;
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--accent-red, #ef4444);
           }
 
           .status-negotiating {
-            background: #fef3c7;
-            color: #92400e;
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--accent-orange);
           }
 
           .history-section {
@@ -742,11 +833,11 @@ export function AutoNegotiationModal({
             margin: 0 0 16px;
             font-size: 14px;
             font-weight: 600;
-            color: #1a202c;
+            color: var(--text-primary);
           }
 
           .history-section h4 i {
-            color: #667eea;
+            color: var(--primary);
           }
 
           .history-timeline {
@@ -775,14 +866,14 @@ export function AutoNegotiationModal({
           }
 
           .history-item.brand .history-bubble {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--gradient-primary);
             color: white;
             border-bottom-right-radius: 4px;
           }
 
           .history-item.creator .history-bubble {
-            background: #f1f5f9;
-            color: #1a202c;
+            background: var(--bg-hover);
+            color: var(--text-primary);
             border-bottom-left-radius: 4px;
           }
 
@@ -804,7 +895,7 @@ export function AutoNegotiationModal({
           }
 
           .offer-section {
-            background: #f8fafc;
+            background: var(--bg-hover);
             border-radius: 16px;
             padding: 20px;
           }
@@ -816,11 +907,11 @@ export function AutoNegotiationModal({
             margin: 0 0 16px;
             font-size: 14px;
             font-weight: 600;
-            color: #1a202c;
+            color: var(--text-primary);
           }
 
           .offer-section h4 i {
-            color: #667eea;
+            color: var(--primary);
           }
 
           .offer-input-group {
@@ -831,7 +922,7 @@ export function AutoNegotiationModal({
             display: block;
             font-size: 12px;
             font-weight: 500;
-            color: #64748b;
+            color: var(--text-secondary);
             margin-bottom: 8px;
           }
 
@@ -844,16 +935,16 @@ export function AutoNegotiationModal({
             flex: 1;
             display: flex;
             align-items: center;
-            background: white;
-            border: 1px solid #e2e8f0;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
             border-radius: 10px;
             overflow: hidden;
           }
 
           .currency-input span {
             padding: 12px;
-            background: #f1f5f9;
-            color: #64748b;
+            background: var(--bg-hover);
+            color: var(--text-secondary);
             font-weight: 500;
           }
 
@@ -863,10 +954,12 @@ export function AutoNegotiationModal({
             padding: 12px;
             font-size: 16px;
             outline: none;
+            background: transparent;
+            color: var(--text-primary);
           }
 
           .ai-suggestion {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.3) 100%);
             border-radius: 12px;
             padding: 16px;
             margin-bottom: 16px;
@@ -878,7 +971,7 @@ export function AutoNegotiationModal({
             gap: 8px;
             font-size: 12px;
             font-weight: 600;
-            color: #92400e;
+            color: var(--accent-orange);
             margin-bottom: 12px;
           }
 
@@ -887,24 +980,24 @@ export function AutoNegotiationModal({
             align-items: center;
             gap: 12px;
             font-size: 14px;
-            color: #78350f;
+            color: var(--text-primary);
           }
 
           .suggestion-amount strong {
             font-size: 24px;
-            color: #92400e;
+            color: var(--accent-orange);
           }
 
           .ai-reasoning {
             margin-top: 12px;
             padding-top: 12px;
-            border-top: 1px solid rgba(146, 64, 14, 0.2);
+            border-top: 1px solid rgba(245, 158, 11, 0.3);
           }
 
           .ai-reasoning p {
             margin: 0;
             font-size: 13px;
-            color: #78350f;
+            color: var(--text-secondary);
             line-height: 1.5;
           }
 
@@ -918,19 +1011,21 @@ export function AutoNegotiationModal({
             gap: 8px;
             font-size: 12px;
             font-weight: 500;
-            color: #64748b;
+            color: var(--text-secondary);
             margin-bottom: 8px;
           }
 
           .message-section textarea {
             width: 100%;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border-color);
             border-radius: 10px;
             padding: 12px;
             font-size: 14px;
             resize: none;
             outline: none;
             font-family: inherit;
+            background: var(--bg-elevated);
+            color: var(--text-primary);
           }
 
           .message-section textarea:focus {
@@ -949,13 +1044,13 @@ export function AutoNegotiationModal({
           }
 
           .alert-error {
-            background: #fee2e2;
-            color: #991b1b;
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
           }
 
           .alert-success {
-            background: #dcfce7;
-            color: #166534;
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
           }
 
           .modal-footer {
@@ -963,8 +1058,8 @@ export function AutoNegotiationModal({
             align-items: center;
             justify-content: space-between;
             padding: 20px 24px;
-            border-top: 1px solid #e2e8f0;
-            background: #f8fafc;
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-hover);
             flex-shrink: 0;
           }
 
@@ -1030,13 +1125,13 @@ export function AutoNegotiationModal({
           }
 
           .btn-outline {
-            background: white;
+            background: var(--bg-elevated);
             color: #667eea;
             border: 1px solid #667eea;
           }
 
           .btn-outline:hover {
-            background: #f8fafc;
+            background: var(--bg-hover);
           }
 
           .btn-sm {

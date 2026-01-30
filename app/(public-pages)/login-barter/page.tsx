@@ -16,15 +16,33 @@ function LoginBarterContent() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    const user = localStorage.getItem('user');
-    if (token && user) {
-      const userData = JSON.parse(user);
-      if (userData.userType === 'barter_creator') {
-        window.location.href = '/creator-dashboard';
-      } else {
-        window.location.href = '/dashboard';
+    const userStr = localStorage.getItem('user');
+    
+    if (token && userStr) {
+      try {
+        const userData = JSON.parse(userStr);
+        if (userData.userType === 'barter_creator') {
+          // Barter creator already logged in, go to creator dashboard
+          window.location.href = '/creator-dashboard';
+          return;
+        } else if (userData.userType === 'barter_company') {
+          // Barter company logged in - redirect to company dashboard
+          window.location.href = '/barter-company-dashboard';
+          return;
+        } else {
+          // Regular brand user is logged in - clear and let them login as barter
+          // They need to use the correct login page for their account type
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+        }
+      } catch (e) {
+        // Invalid user data, clear and let them login fresh
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
       }
-      return;
+    } else if (token) {
+      // Token but no user data, clear and let them login fresh
+      localStorage.removeItem('token');
     }
 
     const errorParam = searchParams.get('error');
@@ -67,12 +85,8 @@ function LoginBarterContent() {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
 
-      // Redirect based on user type
-      if (data.user.userType === 'barter_creator') {
-        router.push('/creator-dashboard');
-      } else {
-        router.push('/dashboard');
-      }
+      // Always redirect to creator dashboard for barter login
+      window.location.href = '/creator-dashboard';
     } catch (err) {
       setError('Something went wrong. Please try again.');
       setLoading(false);

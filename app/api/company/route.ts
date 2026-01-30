@@ -24,7 +24,7 @@ Industry: ${company.industry || 'Not specified'}
 Location: ${company.location || 'Not specified'}, ${company.continent || ''}
 Employee Range: ${company.employee_range || 'Not specified'}
 Revenue Range: ${company.revenue_range || 'Not specified'}
-Total Funding: ${company.total_funding_amount_usd ? `$${company.total_funding_amount_usd.toLocaleString()}` : 'Not disclosed'}
+Total Funding: ${company.total_funding_amount_usd ? `₹${(company.total_funding_amount_usd * 83.5).toLocaleString('en-IN')}` : 'Not disclosed'}
 Last Funding Date: ${company.last_funding_date || 'Not specified'}
 Funding Type: ${company.last_equity_funding_type || company.last_funding_type || 'Not specified'}
 
@@ -187,6 +187,25 @@ export async function POST(request: NextRequest) {
         { error: 'Company name is required' },
         { status: 400 }
       );
+    }
+
+    // Check if blueprint is locked (prevent updates to locked blueprints)
+    const existingCompany = await CompanyModel.findByName(companyName);
+    if (existingCompany?.blueprintLocked) {
+      // Allow only specific fields to be updated even when locked (like non-brand fields)
+      const protectedFields = ['industry', 'brandVoice', 'targetAudience', 'brandSafetyScore', 'riskTolerance', 'brandInsights'];
+      const hasProtectedFields = protectedFields.some(field => field in companyData);
+      
+      if (hasProtectedFields) {
+        return NextResponse.json(
+          { 
+            error: 'Blueprint is locked', 
+            message: 'This company\'s brand blueprint is locked. Please unlock it from the Brand Compatibility & Risk page before making changes.',
+            blueprintLocked: true 
+          },
+          { status: 403 }
+        );
+      }
     }
 
     const company = await CompanyModel.upsertByName(companyName, companyData);

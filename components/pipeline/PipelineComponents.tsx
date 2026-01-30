@@ -54,7 +54,7 @@ export function NegotiationModal({
   onStartNegotiation,
 }: NegotiationModalProps) {
   const [initialOffer, setInitialOffer] = useState(1000);
-  const [currency, setCurrency] = useState("USD");
+  const [currency, setCurrency] = useState("INR");
   const [paymentTerms, setPaymentTerms] = useState(PAYMENT_TERMS[0]);
   const [deliverables, setDeliverables] = useState<DeliverableItem[]>([
     { type: "instagram_post", quantity: 1, description: "Feed post with product showcase" },
@@ -109,7 +109,7 @@ export function NegotiationModal({
           ×
         </button>
 
-        <h2>💰 Start Negotiation with {creatorName}</h2>
+        <h2><i className="fa-solid fa-handshake" style={{ marginRight: '12px', color: 'var(--accent-green)' }}></i>Start Negotiation with {creatorName}</h2>
         <p className="modal-subtitle">
           Set your initial offer and deliverables for this collaboration.
         </p>
@@ -127,10 +127,7 @@ export function NegotiationModal({
                     onChange={(e) => setCurrency(e.target.value)}
                     className="currency-select"
                   >
-                    <option value="USD">$</option>
-                    <option value="EUR">€</option>
-                    <option value="GBP">£</option>
-                    <option value="INR">₹</option>
+                    <option value="INR">₹ INR</option>
                   </select>
                   <input
                     type="number"
@@ -219,14 +216,7 @@ export function NegotiationModal({
               <div className="summary-row">
                 <span>Total Compensation:</span>
                 <span className="summary-value">
-                  {currency === "USD"
-                    ? "$"
-                    : currency === "EUR"
-                    ? "€"
-                    : currency === "GBP"
-                    ? "£"
-                    : "₹"}
-                  {initialOffer.toLocaleString()}
+                  ₹{initialOffer.toLocaleString('en-IN')}
                 </span>
               </div>
               <div className="summary-row">
@@ -268,7 +258,7 @@ export function NegotiationModal({
           }
 
           .modal-content {
-            background: white;
+            background: var(--bg-elevated);
             border-radius: 16px;
             max-width: 600px;
             width: 100%;
@@ -276,6 +266,7 @@ export function NegotiationModal({
             overflow-y: auto;
             padding: 32px;
             position: relative;
+            border: 1px solid var(--border-color);
           }
 
           .modal-content.large {
@@ -289,34 +280,34 @@ export function NegotiationModal({
             width: 32px;
             height: 32px;
             border: none;
-            background: #f7fafc;
+            background: var(--bg-hover);
             border-radius: 50%;
             cursor: pointer;
             font-size: 20px;
-            color: #718096;
+            color: var(--text-muted);
           }
 
           h2 {
             margin: 0 0 8px;
             font-size: 24px;
-            color: #1a202c;
+            color: var(--text-primary);
           }
 
           .modal-subtitle {
-            color: #718096;
+            color: var(--text-muted);
             margin: 0 0 24px;
           }
 
           .form-section {
             margin-bottom: 24px;
             padding-bottom: 24px;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--border-color);
           }
 
           .form-section h3 {
             margin: 0 0 16px;
             font-size: 16px;
-            color: #1a202c;
+            color: var(--text-primary);
           }
 
           .section-header {
@@ -345,12 +336,12 @@ export function NegotiationModal({
           .form-group label {
             font-size: 14px;
             font-weight: 500;
-            color: #4a5568;
+            color: var(--text-secondary);
           }
 
           .currency-input {
             display: flex;
-            border: 2px solid #e2e8f0;
+            border: 2px solid var(--border-color);
             border-radius: 8px;
             overflow: hidden;
           }
@@ -358,10 +349,11 @@ export function NegotiationModal({
           .currency-select {
             width: 60px;
             border: none;
-            background: #f7fafc;
+            background: var(--bg-hover);
             padding: 12px;
             font-size: 16px;
             font-weight: 600;
+            color: var(--text-primary);
           }
 
           .currency-input input {
@@ -370,19 +362,22 @@ export function NegotiationModal({
             padding: 12px;
             font-size: 18px;
             font-weight: 600;
+            background: var(--bg-elevated);
+            color: var(--text-primary);
           }
 
           select {
             padding: 12px;
-            border: 2px solid #e2e8f0;
+            border: 2px solid var(--border-color);
             border-radius: 8px;
             font-size: 14px;
-            background: white;
+            background: var(--bg-elevated);
+            color: var(--text-primary);
           }
 
           .add-btn {
             padding: 8px 16px;
-            background: #667eea;
+            background: var(--gradient-primary);
             color: white;
             border: none;
             border-radius: 8px;
@@ -410,33 +405,37 @@ export function NegotiationModal({
           .quantity-input {
             width: 70px;
             padding: 12px;
-            border: 2px solid #e2e8f0;
+            border: 2px solid var(--border-color);
             border-radius: 8px;
             font-size: 14px;
             text-align: center;
+            background: var(--bg-input);
+            color: var(--text-primary);
           }
 
           .description-input {
             flex: 1;
             padding: 12px;
-            border: 2px solid #e2e8f0;
+            border: 2px solid var(--border-color);
             border-radius: 8px;
             font-size: 14px;
+            background: var(--bg-input);
+            color: var(--text-primary);
           }
 
           .remove-btn {
             width: 32px;
             height: 32px;
             border: none;
-            background: #fee2e2;
-            color: #ef4444;
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--accent-red, #ef4444);
             border-radius: 8px;
             cursor: pointer;
             font-size: 18px;
           }
 
           .offer-summary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--gradient-primary);
             border-radius: 12px;
             padding: 20px;
             color: white;
@@ -481,13 +480,13 @@ export function NegotiationModal({
           }
 
           .btn.primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--gradient-primary);
             color: white;
           }
 
           .btn.secondary {
-            background: #f7fafc;
-            color: #4a5568;
+            background: var(--bg-hover);
+            color: var(--text-secondary);
           }
 
           .btn:disabled {
@@ -720,7 +719,8 @@ export function ReviewModal({
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -729,7 +729,8 @@ export function ReviewModal({
           }
 
           .modal-content {
-            background: white;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
             border-radius: 16px;
             max-width: 600px;
             width: 100%;
@@ -737,6 +738,7 @@ export function ReviewModal({
             overflow-y: auto;
             padding: 32px;
             position: relative;
+            box-shadow: var(--shadow-lg);
           }
 
           .modal-content.large {
@@ -750,34 +752,40 @@ export function ReviewModal({
             width: 32px;
             height: 32px;
             border: none;
-            background: #f7fafc;
+            background: var(--bg-hover);
             border-radius: 50%;
             cursor: pointer;
             font-size: 20px;
-            color: #718096;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+          }
+
+          .modal-close:hover {
+            background: var(--bg-active);
+            color: var(--text-primary);
           }
 
           h2 {
             margin: 0 0 8px;
             font-size: 24px;
-            color: #1a202c;
+            color: var(--text-primary);
           }
 
           .modal-subtitle {
-            color: #718096;
+            color: var(--text-secondary);
             margin: 0 0 24px;
           }
 
           .form-section {
             margin-bottom: 24px;
             padding-bottom: 24px;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--border-color);
           }
 
           .form-section h3 {
             margin: 0 0 16px;
             font-size: 16px;
-            color: #1a202c;
+            color: var(--text-primary);
           }
 
           .overall-rating {
@@ -790,13 +798,13 @@ export function ReviewModal({
             background: none;
             border: none;
             font-size: 24px;
-            color: #e2e8f0;
+            color: var(--border-color);
             cursor: pointer;
             transition: color 0.2s;
           }
 
           .star.active {
-            color: #f59e0b;
+            color: var(--accent-orange);
           }
 
           .star.large {
@@ -804,14 +812,14 @@ export function ReviewModal({
           }
 
           .star:hover {
-            color: #f59e0b;
+            color: var(--accent-orange);
           }
 
           .rating-text {
             margin-left: 16px;
             font-size: 24px;
             font-weight: 700;
-            color: #1a202c;
+            color: var(--text-primary);
           }
 
           .ratings-grid {
@@ -825,13 +833,14 @@ export function ReviewModal({
             justify-content: space-between;
             align-items: center;
             padding: 12px;
-            background: #f7fafc;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
             border-radius: 8px;
           }
 
           .rating-label {
             font-weight: 500;
-            color: #4a5568;
+            color: var(--text-secondary);
           }
 
           .stars {
@@ -847,21 +856,23 @@ export function ReviewModal({
           .form-group label {
             font-size: 14px;
             font-weight: 500;
-            color: #4a5568;
+            color: var(--text-secondary);
           }
 
           textarea {
             padding: 12px;
-            border: 2px solid #e2e8f0;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             font-size: 14px;
             resize: vertical;
             font-family: inherit;
+            background: var(--bg-input);
+            color: var(--text-primary);
           }
 
           textarea:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--primary);
           }
 
           .two-columns {
@@ -879,25 +890,26 @@ export function ReviewModal({
           .option-btn {
             flex: 1;
             padding: 16px;
-            border: 2px solid #e2e8f0;
+            border: 1px solid var(--border-color);
             border-radius: 12px;
-            background: white;
+            background: var(--bg-elevated);
             cursor: pointer;
             font-size: 16px;
             font-weight: 500;
             transition: all 0.2s;
+            color: var(--text-primary);
           }
 
           .option-btn.active.yes {
-            border-color: #10b981;
-            background: #ecfdf5;
-            color: #10b981;
+            border-color: var(--accent-green);
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--accent-green);
           }
 
           .option-btn.active.no {
-            border-color: #ef4444;
-            background: #fef2f2;
-            color: #ef4444;
+            border-color: var(--accent-red, #ef4444);
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-red, #ef4444);
           }
 
           .modal-actions {
@@ -913,16 +925,27 @@ export function ReviewModal({
             cursor: pointer;
             border: none;
             font-size: 13px;
+            transition: all 0.2s;
           }
 
           .btn.primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--gradient-primary);
             color: white;
           }
 
+          .btn.primary:hover {
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+          }
+
           .btn.secondary {
-            background: #f7fafc;
-            color: #4a5568;
+            background: var(--bg-hover);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+          }
+
+          .btn.secondary:hover {
+            background: var(--bg-active);
+            color: var(--text-primary);
           }
 
           .btn:disabled {
@@ -1028,7 +1051,8 @@ export function EmailPreview({
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1037,7 +1061,8 @@ export function EmailPreview({
           }
 
           .modal-content.email {
-            background: white;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
             border-radius: 16px;
             max-width: 800px;
             width: 100%;
@@ -1045,6 +1070,7 @@ export function EmailPreview({
             overflow-y: auto;
             padding: 32px;
             position: relative;
+            box-shadow: var(--shadow-lg);
           }
 
           .modal-close {
@@ -1054,21 +1080,28 @@ export function EmailPreview({
             width: 32px;
             height: 32px;
             border: none;
-            background: #f7fafc;
+            background: var(--bg-hover);
             border-radius: 50%;
             cursor: pointer;
             font-size: 20px;
-            color: #718096;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+          }
+
+          .modal-close:hover {
+            background: var(--bg-active);
+            color: var(--text-primary);
           }
 
           h2 {
             margin: 0 0 24px;
             font-size: 24px;
-            color: #1a202c;
+            color: var(--text-primary);
           }
 
           .email-header {
-            background: #f7fafc;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
             padding: 16px;
             border-radius: 8px;
             margin-bottom: 16px;
@@ -1081,11 +1114,11 @@ export function EmailPreview({
 
           .field-label {
             font-weight: 600;
-            color: #4a5568;
+            color: var(--text-secondary);
           }
 
           .field-value {
-            color: #1a202c;
+            color: var(--text-primary);
           }
 
           .view-toggle {
@@ -1096,25 +1129,28 @@ export function EmailPreview({
 
           .view-toggle button {
             padding: 8px 16px;
-            border: 2px solid #e2e8f0;
-            background: white;
+            border: 1px solid var(--border-color);
+            background: var(--bg-elevated);
             border-radius: 8px;
             cursor: pointer;
             font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.2s;
           }
 
           .view-toggle button.active {
-            border-color: #667eea;
-            background: #667eea;
+            border-color: var(--primary);
+            background: var(--primary);
             color: white;
           }
 
           .email-body {
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             min-height: 400px;
             max-height: 500px;
             overflow-y: auto;
+            background: var(--bg-card);
           }
 
           .html-preview {
@@ -1128,6 +1164,7 @@ export function EmailPreview({
             font-family: inherit;
             font-size: 14px;
             line-height: 1.6;
+            color: var(--text-primary);
           }
 
           .modal-actions {
@@ -1144,16 +1181,27 @@ export function EmailPreview({
             cursor: pointer;
             border: none;
             font-size: 13px;
+            transition: all 0.2s;
           }
 
           .btn.primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--gradient-primary);
             color: white;
           }
 
+          .btn.primary:hover {
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+          }
+
           .btn.secondary {
-            background: #f7fafc;
-            color: #4a5568;
+            background: var(--bg-hover);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+          }
+
+          .btn.secondary:hover {
+            background: var(--bg-active);
+            color: var(--text-primary);
           }
         `}</style>
       </div>
@@ -1177,13 +1225,13 @@ export function SentimentBadge({
     switch (sentiment) {
       case "positive":
       case "interested":
-        return { bg: "#dcfce7", color: "#16a34a" };
+        return { bg: "rgba(34, 197, 94, 0.15)", color: "var(--accent-green)" };
       case "negative":
-        return { bg: "#fee2e2", color: "#dc2626" };
+        return { bg: "rgba(239, 68, 68, 0.15)", color: "var(--accent-red, #ef4444)" };
       case "hesitant":
-        return { bg: "#fef3c7", color: "#d97706" };
+        return { bg: "rgba(245, 158, 11, 0.15)", color: "var(--accent-orange)" };
       default:
-        return { bg: "#f3f4f6", color: "#6b7280" };
+        return { bg: "var(--bg-hover)", color: "var(--text-muted)" };
     }
   };
 
@@ -1261,8 +1309,9 @@ export function StageProgress({ currentStage, stages }: StageProgressProps) {
           width: 28px;
           height: 28px;
           border-radius: 50%;
-          background: #e2e8f0;
-          color: #718096;
+          background: var(--bg-hover);
+          border: 1px solid var(--border-color);
+          color: var(--text-secondary);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1271,12 +1320,14 @@ export function StageProgress({ currentStage, stages }: StageProgressProps) {
         }
 
         .stage-step.completed .step-dot {
-          background: #10b981;
+          background: var(--accent-green);
+          border-color: var(--accent-green);
           color: white;
         }
 
         .stage-step.current .step-dot {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: var(--gradient-primary);
+          border-color: var(--primary);
           color: white;
           box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
         }
@@ -1284,12 +1335,12 @@ export function StageProgress({ currentStage, stages }: StageProgressProps) {
         .step-line {
           width: 40px;
           height: 2px;
-          background: #e2e8f0;
+          background: var(--border-color);
           margin: 0 4px;
         }
 
         .stage-step.completed .step-line {
-          background: #10b981;
+          background: var(--accent-green);
         }
       `}</style>
     </div>

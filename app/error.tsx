@@ -45,7 +45,7 @@ export default function Error({
         <p style={{ color: '#9ca3af', marginBottom: '30px', lineHeight: 1.6 }}>
           We encountered an unexpected error. Please try again.
         </p>
-        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
           <button
             onClick={() => reset()}
             style={{

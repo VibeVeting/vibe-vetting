@@ -65,7 +65,7 @@ const howItWorks = [
   { step: "5", title: "Outreach", desc: "AI writes personalized collaboration emails", icon: "fa-envelope" },
   { step: "6", title: "Negotiate", desc: "AI auto-negotiates the best rates for you", icon: "fa-handshake" },
   { step: "7", title: "Contract", desc: "Generate professional contracts instantly", icon: "fa-file-signature" },
-  { step: "8", title: "Track & Analyze", desc: "Monitor reach, engagement & campaign performance", icon: "fa-chart-pie" },
+  { step: "8", title: "Track Engagement", desc: "Monitor likes, comments, shares & audience growth", icon: "fa-chart-pie" },
 ];
 
 const supportedPlatforms = [
@@ -255,8 +255,6 @@ const pricingPlans = [
     name: "Starter",
     price: "₹4,999",
     originalPrice: "₹9,999",
-    priceUSD: "$60",
-    originalPriceUSD: "$120",
     period: "/mo",
     description: "For D2C brands & small teams",
     features: [
@@ -271,8 +269,6 @@ const pricingPlans = [
     name: "Growth",
     price: "₹14,999",
     originalPrice: "₹29,999",
-    priceUSD: "$180",
-    originalPriceUSD: "$360",
     period: "/mo",
     description: "For agencies & mid-size brands",
     featured: true,
@@ -410,13 +406,13 @@ export default function LandingPage() {
             <a href="#problem" className="nav-link">Problem</a>
             <a href="#superpowers" className="nav-link" style={{ color: '#ef4444' }}>🔥 Superpowers</a>
             <a href="#barter-deals" className="nav-link" style={{ color: '#f472b6' }}>🎁 Barter Deals</a>
-            <a href="#how-it-works" className="nav-link">How It Works</a>
+            <a href="#get-started" className="nav-link" style={{ color: '#8b5cf6' }}>🚀 Get Started</a>
             <a href="#pricing" className="nav-link">Pricing</a>
           </div>
           <div className="nav-actions">
             <Link href="/login" className="nav-link signin">Sign In</Link>
             <Link href="/register" className="nav-cta glow-btn">
-              <span>Start Free</span>
+              <span>Get Started</span>
               <i className="fa-solid fa-arrow-right" />
             </Link>
           </div>
@@ -455,7 +451,7 @@ export default function LandingPage() {
           {/* CTA Buttons */}
           <div className="hero-buttons">
             <Link href="/register" className="btn-primary-glow">
-              <span>Start Free Trial</span>
+              <span>Get Started</span>
               <i className="fa-solid fa-arrow-right" />
             </Link>
             <Link href="/book-demo" className="btn-secondary-glass">
@@ -874,6 +870,177 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* 🎯 GET STARTED - Choose Your Path Section */}
+      <section className="choose-path-section" id="get-started">
+        <div className="section-container">
+          <div className="section-header">
+            <div className="section-badge glass" style={{ background: 'rgba(139, 92, 246, 0.1)', border: '1px solid rgba(139, 92, 246, 0.3)' }}>
+              <span className="badge-pulse" style={{ background: '#8b5cf6' }} />
+              <span>🚀</span>
+              <span style={{ color: '#8b5cf6' }}>Get Started</span>
+            </div>
+            <h2 className="section-title">
+              <span className="title-gradient">Choose Your Path</span>
+              <span className="title-sub">Two Ways to Join the Barter Revolution</span>
+            </h2>
+            <p className="section-desc">
+              Whether you're a brand looking for creators or a creator seeking collaborations — we've got you covered
+            </p>
+          </div>
+
+          <div className="path-cards-container">
+            {/* Barter Company Path */}
+            <div className="path-card company-path glass">
+              <div className="path-ribbon">FOR BRANDS</div>
+              <div className="path-icon-wrapper company">
+                <div className="path-icon-bg"></div>
+                <div className="path-icon">
+                  <i className="fa-solid fa-building"></i>
+                </div>
+                <div className="path-icon-ring"></div>
+              </div>
+              
+              <h3 className="path-title">Barter Company</h3>
+              <p className="path-subtitle">Post barter deals & find creators</p>
+              
+              <div className="path-how-it-works">
+                <div className="path-step">
+                  <div className="step-num">1</div>
+                  <div className="step-content">
+                    <span className="step-icon">📝</span>
+                    <span className="step-text">Create Account</span>
+                  </div>
+                </div>
+                <div className="path-arrow"><i className="fa-solid fa-chevron-down"></i></div>
+                <div className="path-step">
+                  <div className="step-num">2</div>
+                  <div className="step-content">
+                    <span className="step-icon">🎁</span>
+                    <span className="step-text">Post Barter Offers</span>
+                  </div>
+                </div>
+                <div className="path-arrow"><i className="fa-solid fa-chevron-down"></i></div>
+                <div className="path-step">
+                  <div className="step-num">3</div>
+                  <div className="step-content">
+                    <span className="step-icon">👀</span>
+                    <span className="step-text">Review Applications</span>
+                  </div>
+                </div>
+                <div className="path-arrow"><i className="fa-solid fa-chevron-down"></i></div>
+                <div className="path-step">
+                  <div className="step-num">4</div>
+                  <div className="step-content">
+                    <span className="step-icon">🤝</span>
+                    <span className="step-text">Collaborate & Grow</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="path-benefits">
+                <div className="benefit-item"><i className="fa-solid fa-check"></i> Zero cash investment</div>
+                <div className="benefit-item"><i className="fa-solid fa-check"></i> AI-vetted creators</div>
+                <div className="benefit-item"><i className="fa-solid fa-check"></i> Authentic content</div>
+              </div>
+
+              <div className="path-buttons">
+                <Link href="/login-barter-company" className="path-btn login">
+                  <i className="fa-solid fa-sign-in-alt"></i>
+                  <span>Login</span>
+                </Link>
+                <Link href="/register-barter-company" className="path-btn register">
+                  <span>Register</span>
+                  <i className="fa-solid fa-arrow-right"></i>
+                </Link>
+              </div>
+            </div>
+
+            {/* Center VS Divider */}
+            <div className="path-divider">
+              <div className="divider-line"></div>
+              <div className="divider-circle">
+                <span>OR</span>
+              </div>
+              <div className="divider-line"></div>
+            </div>
+
+            {/* Creator Path */}
+            <div className="path-card creator-path glass">
+              <div className="path-ribbon creator">FOR CREATORS</div>
+              <div className="path-icon-wrapper creator">
+                <div className="path-icon-bg"></div>
+                <div className="path-icon">
+                  <i className="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <div className="path-icon-ring"></div>
+              </div>
+              
+              <h3 className="path-title">Barter Creator</h3>
+              <p className="path-subtitle">Get free products & create content</p>
+              
+              <div className="path-how-it-works">
+                <div className="path-step">
+                  <div className="step-num">1</div>
+                  <div className="step-content">
+                    <span className="step-icon">✨</span>
+                    <span className="step-text">Join Network</span>
+                  </div>
+                </div>
+                <div className="path-arrow"><i className="fa-solid fa-chevron-down"></i></div>
+                <div className="path-step">
+                  <div className="step-num">2</div>
+                  <div className="step-content">
+                    <span className="step-icon">🔍</span>
+                    <span className="step-text">Browse Offers</span>
+                  </div>
+                </div>
+                <div className="path-arrow"><i className="fa-solid fa-chevron-down"></i></div>
+                <div className="path-step">
+                  <div className="step-num">3</div>
+                  <div className="step-content">
+                    <span className="step-icon">📦</span>
+                    <span className="step-text">Receive Products</span>
+                  </div>
+                </div>
+                <div className="path-arrow"><i className="fa-solid fa-chevron-down"></i></div>
+                <div className="path-step">
+                  <div className="step-num">4</div>
+                  <div className="step-content">
+                    <span className="step-icon">📸</span>
+                    <span className="step-text">Create & Shine</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="path-benefits">
+                <div className="benefit-item"><i className="fa-solid fa-check"></i> Free products</div>
+                <div className="benefit-item"><i className="fa-solid fa-check"></i> Build portfolio</div>
+                <div className="benefit-item"><i className="fa-solid fa-check"></i> Grow your reach</div>
+              </div>
+
+              <div className="path-buttons">
+                <Link href="/login-barter" className="path-btn login creator">
+                  <i className="fa-solid fa-sign-in-alt"></i>
+                  <span>Login</span>
+                </Link>
+                <Link href="/register-barter" className="path-btn register creator">
+                  <span>Register</span>
+                  <i className="fa-solid fa-arrow-right"></i>
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Info */}
+          <div className="path-info-banner glass">
+            <div className="info-icon">💡</div>
+            <div className="info-content">
+              <p><strong>How does barter work?</strong> Brands send free products to creators, who create authentic content in return. No money changes hands — just great products and genuine content!</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Why Choose Us Section */}
       <section className="differentiators-section" id="why-us">
         <div className="section-container">
@@ -914,10 +1081,10 @@ export default function LandingPage() {
             <div className="urgency-icon">🎯</div>
             <div className="urgency-content">
               <h3>Ready to Stop Wasting Money?</h3>
-              <p>Start vetting creators <strong>for free</strong>. No credit card required.</p>
+              <p>Start vetting creators <strong>today</strong>. Book a demo to see it in action.</p>
             </div>
-            <Link href="/register" className="urgency-cta">
-              Start Free Trial
+            <Link href="/book-demo" className="urgency-cta">
+              Book Demo
               <i className="fa-solid fa-arrow-right"></i>
             </Link>
           </div>
@@ -1111,7 +1278,7 @@ export default function LandingPage() {
               <span className="title-sub">No Hidden Fees</span>
             </h2>
             <p className="section-desc">
-              Start free. Upgrade when you need more.
+              Choose the plan that fits your needs.
             </p>
           </div>
 
@@ -1124,9 +1291,6 @@ export default function LandingPage() {
                   <div className="pricing-price">
                     {plan.price}<span>{plan.period}</span>
                   </div>
-                  {plan.priceUSD && (
-                    <div className="usd-price">≈ {plan.priceUSD}/mo</div>
-                  )}
                   <p className="pricing-desc">{plan.description}</p>
                 </div>
                 <ul className="pricing-features">
@@ -1247,7 +1411,7 @@ export default function LandingPage() {
               </div>
               
               <p className="cta-subtext">
-                <i className="fa-solid fa-sparkles"></i>
+                <i className="fa-solid fa-star"></i>
                 Limited beta spots available
               </p>
             </div>

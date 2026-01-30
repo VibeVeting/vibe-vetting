@@ -1,18 +1,23 @@
 "use client";
 
 import { Sidebar } from '@/components/common/Sidebar';
-import { TopBar } from '@/components/common/TopBar';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function AddCreatorPage() {
   const router = useRouter();
+  const [isVisible, setIsVisible] = useState(false);
+  const pageRef = useRef<HTMLDivElement>(null);
   const [formData, setFormData] = useState({
     campaignId: '',
     compensationType: 'paid',
     budget: '',
     notes: '',
   });
+
+  useEffect(() => {
+    setTimeout(() => setIsVisible(true), 50);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,12 +29,33 @@ export default function AddCreatorPage() {
       <div className="dashboard-wrapper">
         <Sidebar />
         <div className="main-content">
-          <div className="container">
-            <TopBar
-              title="Add Creator to Campaign"
-              subtitle="Configure partnership details"
-              showSearch={false}
-            />
+          <div className="yc-page" ref={pageRef}>
+            {/* YC Background Effects */}
+            <div className="yc-page-bg">
+              <div className="yc-page-orb yc-page-orb-1"></div>
+              <div className="yc-page-orb yc-page-orb-2"></div>
+              <div className="yc-page-grid"></div>
+            </div>
+
+            {/* YC Page Header */}
+            <div className={`yc-page-header ${isVisible ? 'visible' : ''}`}>
+              <div className="yc-page-header-content">
+                <div className="yc-page-title-section">
+                  <div className="yc-page-icon" style={{ background: 'linear-gradient(135deg, #22c55e 0%, #10b981 100%)' }}>
+                    <i className="fa-solid fa-user-plus"></i>
+                  </div>
+                  <div>
+                    <h1 className="yc-page-title">Add Creator to Campaign</h1>
+                    <p className="yc-page-subtitle">Configure partnership details</p>
+                  </div>
+                </div>
+                <div className="yc-page-actions">
+                  <button className="yc-btn-secondary" onClick={() => router.back()}>
+                    <i className="fa-solid fa-arrow-left"></i> Back
+                  </button>
+                </div>
+              </div>
+            </div>
 
           {/* Form Card */}
           <div className="form-card">

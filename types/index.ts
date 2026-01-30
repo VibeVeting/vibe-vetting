@@ -1,5 +1,13 @@
 import { ObjectId } from "mongodb";
 
+// Notification preferences
+export interface NotificationPreferences {
+  email: boolean;
+  push: boolean;
+  sms: boolean;
+  weekly: boolean;
+}
+
 // User types
 export interface User {
   _id?: ObjectId;
@@ -10,6 +18,7 @@ export interface User {
   image?: string;
   currentPlan?: string; // Current subscription plan id (starter, growth, enterprise)
   planUpdatedAt?: Date; // When the plan was last changed
+  notificationPreferences?: NotificationPreferences; // User's notification settings
   createdAt: Date;
   updatedAt: Date;
 }

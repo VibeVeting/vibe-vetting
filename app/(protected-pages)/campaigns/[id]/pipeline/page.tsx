@@ -1,9 +1,8 @@
 "use client";
 
 import { Sidebar } from "@/components/common/Sidebar";
-import { TopBar } from "@/components/common/TopBar";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { AutoNegotiationModal } from "@/components/pipeline/AutoNegotiationModal";
 import { AutoNegotiationSettings } from "@/components/pipeline/AutoNegotiationSettings";
 import { ContractManager } from "@/components/pipeline/ContractManager";
@@ -119,6 +118,8 @@ export default function CampaignPipelinePage() {
   const params = useParams();
   const router = useRouter();
   const campaignId = params.id as string;
+  const pageRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   const [creators, setCreators] = useState<PipelineCreator[]>([]);
   const [summary, setSummary] = useState<PipelineSummary | null>(null);
@@ -143,6 +144,7 @@ export default function CampaignPipelinePage() {
   });
 
   useEffect(() => {
+    setTimeout(() => setIsVisible(true), 50);
     fetchCampaignDetails();
     fetchPipelineData();
   }, [campaignId]);
@@ -240,7 +242,7 @@ export default function CampaignPipelinePage() {
         brandName: campaign.brandName,
         campaignName: campaign.name,
         deliverables: "• 1 Instagram Post\n• 2 Stories\n• 1 Reel",
-        budgetRange: "$500 - $2,000",
+        budgetRange: "₹40,000 - ₹1,60,000",
         senderName: "Marketing Team",
       },
     });
@@ -302,9 +304,9 @@ export default function CampaignPipelinePage() {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("en-IN", {
       style: "currency",
-      currency: "USD",
+      currency: "INR",
       maximumFractionDigits: 0,
     }).format(amount);
   };
@@ -314,11 +316,15 @@ export default function CampaignPipelinePage() {
       <div className="app-container">
         <Sidebar />
         <main className="main-content">
-          <TopBar title="Loading Pipeline..." />
-          <div className="page-content">
-            <div className="loading-container">
-              <div className="loading-spinner"></div>
-              <p>Loading pipeline data...</p>
+          <div className="yc-page">
+            <div className="yc-page-bg">
+              <div className="yc-page-orb yc-page-orb-1"></div>
+              <div className="yc-page-orb yc-page-orb-2"></div>
+              <div className="yc-page-grid"></div>
+            </div>
+            <div className="loading-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: '20px' }}>
+              <div className="loading-spinner" style={{ width: '48px', height: '48px', border: '3px solid rgba(102, 126, 234, 0.2)', borderTopColor: '#667eea', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '15px' }}>Loading pipeline data...</p>
             </div>
           </div>
         </main>
@@ -331,19 +337,31 @@ export default function CampaignPipelinePage() {
     <div className="app-container">
       <Sidebar />
       <main className="main-content">
-        <TopBar title={`Pipeline: ${campaign.name}`} />
-        <div className="page-content">
-          {/* Header */}
-          <div className="pipeline-header">
-            <div className="header-left">
-              <button className="back-btn" onClick={() => router.push('/campaigns')}>
-                <i className="fa-solid fa-arrow-left"></i> Back to Campaigns
-              </button>
-            </div>
-            <div className="header-actions">
-              <button
-                className="action-btn secondary"
-                onClick={() => {
+        <div className="yc-page" ref={pageRef}>
+          {/* YC Background Effects */}
+          <div className="yc-page-bg">
+            <div className="yc-page-orb yc-page-orb-1"></div>
+            <div className="yc-page-orb yc-page-orb-2"></div>
+            <div className="yc-page-grid"></div>
+          </div>
+
+          {/* YC Page Header */}
+          <div className={`yc-page-header ${isVisible ? 'visible' : ''}`}>
+            <div className="yc-page-header-content">
+              <div className="yc-page-title-section">
+                <div className="yc-page-icon" style={{ background: 'linear-gradient(135deg, #ec4899 0%, #f59e0b 100%)' }}>
+                  <i className="fa-solid fa-diagram-project"></i>
+                </div>
+                <div>
+                  <h1 className="yc-page-title">Pipeline: {campaign.name}</h1>
+                  <p className="yc-page-subtitle">Manage creator outreach, negotiations, and contracts</p>
+                </div>
+              </div>
+              <div className="yc-page-actions">
+                <button className="yc-btn-secondary" onClick={() => router.push('/campaigns')}>
+                  <i className="fa-solid fa-arrow-left"></i> Back to Campaigns
+                </button>
+                <button className="yc-btn-secondary" onClick={() => {
                   if (!creators || creators.length === 0) {
                     alert('No creators to export');
                     return;
@@ -360,26 +378,17 @@ export default function CampaignPipelinePage() {
                     'Agreed Price': c.agreedPrice || c.negotiation?.finalPrice || c.negotiation?.initialOffer || 'N/A'
                   }));
                   exportAsCSV(exportData, `pipeline-${campaign.name}-${new Date().toISOString().split('T')[0]}`);
-                }}
-              >
-                📊 Export CSV
-              </button>
-              <button
-                className="action-btn primary"
-                onClick={sendOutreachEmails}
-                disabled={actionLoading}
-              >
-                📧 Send Outreach Emails
-              </button>
-              <button
-                className="action-btn secondary"
-                onClick={sendFollowUps}
-                disabled={actionLoading}
-              >
-                🔄 Send Follow-ups
-              </button>
+                }}>
+                  <i className="fa-solid fa-file-export"></i> Export CSV
+                </button>
+                <button className="yc-btn-primary" onClick={sendOutreachEmails} disabled={actionLoading}>
+                  <i className="fa-solid fa-paper-plane"></i> Send Outreach
+                </button>
+              </div>
             </div>
           </div>
+
+          <div className="page-content">
 
           {/* Summary Stats */}
           {summary && (
@@ -1120,6 +1129,7 @@ export default function CampaignPipelinePage() {
             />
           )}
         </div>
+        </div>
       </main>
       <style jsx>{styles}</style>
     </div>
@@ -1130,7 +1140,7 @@ const styles = `
   .app-container {
     display: flex;
     min-height: 100vh;
-    background: #f8fafc;
+    background: var(--bg-page);
   }
 
   .main-content {
@@ -1158,8 +1168,8 @@ const styles = `
   .loading-spinner {
     width: 40px;
     height: 40px;
-    border: 3px solid #e2e8f0;
-    border-top-color: #667eea;
+    border: 3px solid var(--border-color);
+    border-top-color: var(--primary);
     border-radius: 50%;
     animation: spin 1s linear infinite;
   }
@@ -1180,20 +1190,20 @@ const styles = `
     margin: 8px 0 4px;
     font-size: 28px;
     font-weight: 700;
-    color: #1a202c;
+    color: var(--text-primary);
   }
 
   .back-btn {
     background: none;
     border: none;
-    color: #667eea;
+    color: var(--primary);
     cursor: pointer;
     font-size: 14px;
     padding: 0;
   }
 
   .campaign-name {
-    color: #718096;
+    color: var(--text-secondary);
     font-size: 14px;
   }
 
@@ -1212,23 +1222,23 @@ const styles = `
   }
 
   .action-btn.primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--gradient-primary);
     color: white;
   }
 
   .action-btn.secondary {
-    background: white;
-    color: #667eea;
-    border: 2px solid #667eea;
+    background: var(--bg-elevated);
+    color: var(--primary);
+    border: 1px solid var(--primary);
   }
 
   .action-btn.success {
-    background: #10b981;
+    background: var(--accent-green);
     color: white;
   }
 
   .action-btn.ai-gradient {
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    background: linear-gradient(135deg, var(--accent-orange) 0%, #d97706 100%);
     color: white;
   }
 
@@ -1256,13 +1266,14 @@ const styles = `
   }
 
   .stat-card {
-    background: white;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 20px;
     display: flex;
     align-items: center;
     gap: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--shadow-sm);
   }
 
   .stat-icon {
@@ -1277,12 +1288,12 @@ const styles = `
   .stat-value {
     font-size: 24px;
     font-weight: 700;
-    color: #1a202c;
+    color: var(--text-primary);
   }
 
   .stat-label {
     font-size: 13px;
-    color: #718096;
+    color: var(--text-secondary);
   }
 
   /* Tabs */
@@ -1290,7 +1301,8 @@ const styles = `
     display: flex;
     gap: 8px;
     margin-bottom: 24px;
-    background: white;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
     padding: 8px;
     border-radius: 12px;
     width: fit-content;
@@ -1303,17 +1315,18 @@ const styles = `
     background: transparent;
     cursor: pointer;
     font-weight: 500;
-    color: #718096;
+    color: var(--text-secondary);
     transition: all 0.2s;
   }
 
   .tab.active {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--gradient-primary);
     color: white;
   }
 
   .tab:hover:not(.active) {
-    background: #f7fafc;
+    background: var(--bg-hover);
+    color: var(--text-primary);
   }
 
   /* Pipeline Board */
@@ -1326,7 +1339,8 @@ const styles = `
 
   .pipeline-column {
     min-width: 280px;
-    background: #f7fafc;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     display: flex;
     flex-direction: column;
@@ -1338,7 +1352,7 @@ const styles = `
     display: flex;
     align-items: center;
     gap: 8px;
-    background: white;
+    background: var(--bg-elevated);
     border-radius: 12px 12px 0 0;
   }
 
@@ -1348,7 +1362,7 @@ const styles = `
 
   .stage-label {
     font-weight: 600;
-    color: #1a202c;
+    color: var(--text-primary);
     flex: 1;
   }
 
@@ -1371,24 +1385,26 @@ const styles = `
   }
 
   .creator-card {
-    background: white;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
     border-radius: 10px;
     padding: 12px;
     cursor: pointer;
     transition: all 0.2s;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-sm);
   }
 
   .creator-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary);
   }
 
   .creator-avatar {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--gradient-primary);
     color: white;
     display: flex;
     align-items: center;
@@ -1417,7 +1433,7 @@ const styles = `
   .creator-name {
     display: block;
     font-weight: 600;
-    color: #1a202c;
+    color: var(--text-primary);
     font-size: 14px;
     white-space: nowrap;
     overflow: hidden;
@@ -1426,7 +1442,7 @@ const styles = `
 
   .creator-handle {
     display: block;
-    color: #718096;
+    color: var(--text-secondary);
     font-size: 12px;
   }
 
@@ -1440,9 +1456,10 @@ const styles = `
   .platform-badge {
     font-size: 11px;
     padding: 2px 6px;
-    background: #e2e8f0;
+    background: var(--bg-hover);
+    border: 1px solid var(--border-color);
     border-radius: 4px;
-    color: #4a5568;
+    color: var(--text-secondary);
   }
 
   .sentiment-badge {
@@ -1455,7 +1472,7 @@ const styles = `
   .agreed-price {
     margin-top: 8px;
     font-weight: 700;
-    color: #10b981;
+    color: var(--accent-green);
     font-size: 14px;
     display: flex;
     align-items: center;
@@ -1469,12 +1486,12 @@ const styles = `
   .creator-pricing {
     margin-top: 8px;
     padding-top: 8px;
-    border-top: 1px solid #f1f5f9;
+    border-top: 1px solid var(--border-color);
   }
 
   .offer-price {
     font-size: 12px;
-    color: #64748b;
+    color: var(--text-secondary);
     display: flex;
     flex-wrap: wrap;
     gap: 4px;
@@ -1482,13 +1499,13 @@ const styles = `
   }
 
   .offer-price .price-label {
-    color: #94a3b8;
+    color: var(--text-muted);
   }
 
   .offer-price .ask-price {
     font-size: 11px;
-    color: #f59e0b;
-    background: #fef3c7;
+    color: var(--accent-orange);
+    background: rgba(245, 158, 11, 0.15);
     padding: 2px 6px;
     border-radius: 4px;
   }
@@ -1527,17 +1544,18 @@ const styles = `
 
   .empty-column {
     text-align: center;
-    color: #a0aec0;
+    color: var(--text-muted);
     padding: 24px;
     font-size: 13px;
   }
 
   /* List View */
   .list-view {
-    background: white;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--shadow-sm);
   }
 
   .creators-table {
@@ -1549,13 +1567,14 @@ const styles = `
   .creators-table td {
     padding: 14px 16px;
     text-align: left;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
   }
 
   .creators-table th {
-    background: #f7fafc;
+    background: var(--bg-card);
     font-weight: 600;
-    color: #4a5568;
+    color: var(--text-secondary);
     font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -1579,18 +1598,23 @@ const styles = `
 
   .sentiment-score {
     font-weight: 600;
-    color: #667eea;
+    color: var(--primary);
   }
 
   .view-btn {
     padding: 6px 12px;
-    background: #667eea;
+    background: var(--primary);
     color: white;
     border: none;
     border-radius: 6px;
     cursor: pointer;
     font-size: 12px;
     font-weight: 500;
+    transition: all 0.2s;
+  }
+
+  .view-btn:hover {
+    background: var(--primary-dark);
   }
 
   /* Analytics View */
@@ -1601,20 +1625,21 @@ const styles = `
   }
 
   .analytics-card {
-    background: white;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 24px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--shadow-sm);
   }
 
   .analytics-card h3 {
     margin: 0 0 20px;
     font-size: 16px;
-    color: #1a202c;
+    color: var(--text-primary);
   }
 
   .analytics-card.warning {
-    border: 2px solid #fbd38d;
+    border: 2px solid var(--accent-orange);
   }
 
   .stage-bars {
@@ -1632,13 +1657,13 @@ const styles = `
   .bar-label {
     width: 160px;
     font-size: 13px;
-    color: #4a5568;
+    color: var(--text-secondary);
   }
 
   .bar-container {
     flex: 1;
     height: 20px;
-    background: #e2e8f0;
+    background: var(--bg-hover);
     border-radius: 10px;
     overflow: hidden;
   }
@@ -1653,7 +1678,7 @@ const styles = `
     width: 30px;
     text-align: right;
     font-weight: 600;
-    color: #1a202c;
+    color: var(--text-primary);
   }
 
   .funnel {
@@ -1670,7 +1695,7 @@ const styles = `
   }
 
   .funnel-bar {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--gradient-primary);
     padding: 12px 20px;
     border-radius: 8px;
     display: flex;
@@ -1696,16 +1721,16 @@ const styles = `
     display: flex;
     justify-content: space-between;
     padding-bottom: 12px;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border-color);
   }
 
   .metric-label {
-    color: #718096;
+    color: var(--text-secondary);
   }
 
   .metric-value {
     font-weight: 700;
-    color: #1a202c;
+    color: var(--text-primary);
   }
 
   .attention-stats {
@@ -1728,12 +1753,12 @@ const styles = `
   .attention-value {
     font-size: 28px;
     font-weight: 700;
-    color: #1a202c;
+    color: var(--text-primary);
   }
 
   .attention-label {
     font-size: 13px;
-    color: #718096;
+    color: var(--text-secondary);
   }
 
   /* Modal */
@@ -1743,7 +1768,8 @@ const styles = `
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1752,7 +1778,8 @@ const styles = `
   }
 
   .modal-content {
-    background: white;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
     border-radius: 16px;
     max-width: 600px;
     width: 100%;
@@ -1760,6 +1787,7 @@ const styles = `
     overflow-y: auto;
     padding: 24px;
     position: relative;
+    box-shadow: var(--shadow-lg);
   }
 
   .modal-close {
@@ -1769,11 +1797,17 @@ const styles = `
     width: 32px;
     height: 32px;
     border: none;
-    background: #f7fafc;
+    background: var(--bg-hover);
     border-radius: 50%;
     cursor: pointer;
     font-size: 20px;
-    color: #718096;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+  }
+
+  .modal-close:hover {
+    background: var(--bg-active);
+    color: var(--text-primary);
   }
 
   .creator-detail-header {
@@ -1782,17 +1816,18 @@ const styles = `
     align-items: flex-start;
     margin-bottom: 24px;
     padding-bottom: 24px;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border-color);
   }
 
   .creator-detail-info h2 {
     margin: 0 0 4px;
     font-size: 24px;
+    color: var(--text-primary);
   }
 
   .creator-detail-info p {
     margin: 0 0 8px;
-    color: #718096;
+    color: var(--text-secondary);
   }
 
   .creator-tags {
@@ -1803,10 +1838,11 @@ const styles = `
 
   .tag {
     padding: 4px 10px;
-    background: #e2e8f0;
+    background: var(--bg-hover);
+    border: 1px solid var(--border-color);
     border-radius: 16px;
     font-size: 12px;
-    color: #4a5568;
+    color: var(--text-secondary);
   }
 
   .stage-badge {
@@ -1820,13 +1856,13 @@ const styles = `
   .detail-section {
     margin-bottom: 24px;
     padding-bottom: 24px;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border-color);
   }
 
   .detail-section h3 {
     margin: 0 0 16px;
     font-size: 16px;
-    color: #1a202c;
+    color: var(--text-primary);
   }
 
   .timeline {
@@ -1834,7 +1870,7 @@ const styles = `
     flex-direction: column;
     gap: 16px;
     padding-left: 20px;
-    border-left: 2px solid #e2e8f0;
+    border-left: 2px solid var(--border-color);
   }
 
   .timeline-item {
@@ -1860,15 +1896,16 @@ const styles = `
 
   .timeline-stage {
     font-weight: 500;
+    color: var(--text-primary);
   }
 
   .timeline-date {
-    color: #718096;
+    color: var(--text-secondary);
     font-size: 13px;
   }
 
   .timeline-duration {
-    color: #a0aec0;
+    color: var(--text-muted);
     font-size: 12px;
   }
 
@@ -1881,7 +1918,7 @@ const styles = `
   .sentiment-score-large {
     text-align: center;
     padding: 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--gradient-primary);
     border-radius: 12px;
     color: white;
   }
@@ -1905,7 +1942,12 @@ const styles = `
     display: flex;
     justify-content: space-between;
     padding: 8px 0;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+  }
+
+  .sentiment-row span:first-child {
+    color: var(--text-secondary);
   }
 
   .sentiment-value {
@@ -1916,8 +1958,10 @@ const styles = `
   .concerns-list {
     margin-top: 16px;
     padding: 12px;
-    background: #fff5f5;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
     border-radius: 8px;
+    color: var(--text-primary);
   }
 
   .concerns-list ul {
@@ -1926,7 +1970,8 @@ const styles = `
   }
 
   .negotiation-details {
-    background: #f7fafc;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 16px;
   }
@@ -1935,11 +1980,16 @@ const styles = `
     display: flex;
     justify-content: space-between;
     padding: 8px 0;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+  }
+
+  .price-row span:first-child {
+    color: var(--text-secondary);
   }
 
   .price-row.final {
-    background: #f0fff4;
+    background: rgba(34, 197, 94, 0.1);
     margin: 8px -16px -16px;
     padding: 16px;
     border-radius: 0 0 12px 12px;
@@ -1949,18 +1999,18 @@ const styles = `
   .price-row.final span:last-child {
     font-size: 20px;
     font-weight: 700;
-    color: #10b981;
+    color: var(--accent-green);
   }
 
   .negotiation-status {
     margin-top: 12px;
     font-size: 13px;
-    color: #718096;
+    color: var(--text-secondary);
   }
 
-  .status-pending { color: #f59e0b; }
-  .status-counter_offered { color: #8b5cf6; }
-  .status-accepted { color: #10b981; }
+  .status-pending { color: var(--accent-orange); }
+  .status-counter_offered { color: var(--accent-purple); }
+  .status-accepted { color: var(--accent-green); }
   .status-rejected { color: #ef4444; }
 
   .review-details {
@@ -1973,14 +2023,14 @@ const styles = `
 
   .stars {
     font-size: 32px;
-    color: #f59e0b;
+    color: var(--accent-orange);
     letter-spacing: 4px;
   }
 
   .rating {
     display: block;
     font-size: 14px;
-    color: #718096;
+    color: var(--text-secondary);
     margin-top: 4px;
   }
 
@@ -1999,30 +2049,32 @@ const styles = `
   }
 
   .review-item span:first-child {
-    color: #718096;
+    color: var(--text-secondary);
   }
 
   .review-item span:last-child {
     font-weight: 600;
-    color: #1a202c;
+    color: var(--text-primary);
   }
 
   .review-text {
     padding: 16px;
-    background: #f7fafc;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     font-style: italic;
-    color: #4a5568;
+    color: var(--text-secondary);
     margin-bottom: 12px;
   }
 
   .would-work-again {
     font-weight: 600;
+    color: var(--text-primary);
   }
 
   .detail-section.summary {
     border: none;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--gradient-primary);
     border-radius: 12px;
     padding: 20px;
     color: white;
@@ -2061,7 +2113,7 @@ const styles = `
     justify-content: flex-end;
     margin-top: 24px;
     padding-top: 24px;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--border-color);
   }
 
   /* Settings View */

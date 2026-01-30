@@ -81,9 +81,9 @@ Best,
     return JSON.stringify({
       campaignFit: 'High',
       recommendations: [
-        { name: 'Emma Wilson', handle: '@emmawilson', followers: '67K', engagement: '5.4%', matchScore: 96, niche: 'Fashion & Lifestyle', estimatedRate: '$1,200-1,800' },
-        { name: 'Mike Chen', handle: '@mikefoodie', followers: '89K', engagement: '4.9%', matchScore: 92, niche: 'Lifestyle', estimatedRate: '$1,500-2,200' },
-        { name: 'Sofia Rodriguez', handle: '@sofiastyle', followers: '43K', engagement: '7.1%', matchScore: 90, niche: 'Fashion', estimatedRate: '$800-1,200' }
+        { name: 'Emma Wilson', handle: '@emmawilson', followers: '67K', engagement: '5.4%', matchScore: 96, niche: 'Fashion & Lifestyle', estimatedRate: '₹1,00,000-1,50,000' },
+        { name: 'Mike Chen', handle: '@mikefoodie', followers: '89K', engagement: '4.9%', matchScore: 92, niche: 'Lifestyle', estimatedRate: '₹1,25,000-1,80,000' },
+        { name: 'Sofia Rodriguez', handle: '@sofiastyle', followers: '43K', engagement: '7.1%', matchScore: 90, niche: 'Fashion', estimatedRate: '₹65,000-1,00,000' }
       ],
       insights: 'For your campaign budget, we recommend 3-5 micro-influencers over 1 macro influencer for better engagement and ROI.'
     });
@@ -162,7 +162,7 @@ Best,
   
   if (prompt.includes('negotiate') || prompt.includes('rate') || prompt.includes('pricing')) {
     return JSON.stringify({
-      suggestedRate: '$2,500 - $3,500',
+      suggestedRate: '₹2,00,000 - ₹2,90,000',
       marketComparison: 'Slightly below market average for this follower count',
       negotiationTips: [
         'Their engagement rate justifies a premium - consider offering bonus for performance',
@@ -170,9 +170,9 @@ Best,
         'Offer exclusivity period in exchange for rate discount'
       ],
       dealStructure: {
-        base: '$2,800',
-        performanceBonus: '+$500 if post exceeds 5% engagement',
-        usage: '+$800 for 6-month usage rights'
+        base: '₹2,30,000',
+        performanceBonus: '+₹40,000 if post exceeds 5% engagement',
+        usage: '+₹65,000 for 6-month usage rights'
       }
     });
   }

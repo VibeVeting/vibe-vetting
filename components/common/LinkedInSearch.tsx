@@ -379,7 +379,7 @@ export function LinkedInSearch({ onSelectPerson }: LinkedInSearchProps) {
         }
 
         .linkedin-modal {
-          background: white;
+          background: var(--bg-elevated);
           border-radius: 20px;
           width: 100%;
           max-width: 800px;
@@ -387,7 +387,8 @@ export function LinkedInSearch({ onSelectPerson }: LinkedInSearchProps) {
           overflow: hidden;
           display: flex;
           flex-direction: column;
-          box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+          border: 1px solid var(--border-color);
         }
 
         .modal-header {
@@ -448,16 +449,16 @@ export function LinkedInSearch({ onSelectPerson }: LinkedInSearchProps) {
 
         .search-section {
           padding: 20px 24px;
-          background: #f8fafc;
-          border-bottom: 1px solid #e2e8f0;
+          background: var(--bg-hover);
+          border-bottom: 1px solid var(--border-color);
         }
 
         .search-input-wrapper {
           display: flex;
           align-items: center;
           gap: 12px;
-          background: white;
-          border: 2px solid #e2e8f0;
+          background: var(--bg-elevated);
+          border: 2px solid var(--border-color);
           border-radius: 12px;
           padding: 12px 16px;
           transition: all 0.2s;
@@ -470,7 +471,7 @@ export function LinkedInSearch({ onSelectPerson }: LinkedInSearchProps) {
         }
 
         .search-input-wrapper i {
-          color: #718096;
+          color: var(--text-muted);
           font-size: 16px;
         }
 
@@ -480,11 +481,11 @@ export function LinkedInSearch({ onSelectPerson }: LinkedInSearchProps) {
           background: transparent;
           font-size: 15px;
           outline: none;
-          color: #1a202c;
+          color: var(--text-primary);
         }
 
         .search-input-wrapper input::placeholder {
-          color: #a0aec0;
+          color: var(--text-muted);
         }
 
         .filters-row {
@@ -503,7 +504,7 @@ export function LinkedInSearch({ onSelectPerson }: LinkedInSearchProps) {
         .filter-group label {
           font-size: 12px;
           font-weight: 600;
-          color: #4a5568;
+          color: var(--text-secondary);
           display: flex;
           align-items: center;
           gap: 6px;
@@ -516,11 +517,11 @@ export function LinkedInSearch({ onSelectPerson }: LinkedInSearchProps) {
 
         .filter-group select {
           padding: 10px 12px;
-          border: 2px solid #e2e8f0;
+          border: 2px solid var(--border-color);
           border-radius: 8px;
           font-size: 14px;
-          color: #1a202c;
-          background: white;
+          color: var(--text-primary);
+          background: var(--bg-elevated);
           cursor: pointer;
           transition: all 0.2s;
         }
@@ -541,12 +542,12 @@ export function LinkedInSearch({ onSelectPerson }: LinkedInSearchProps) {
           align-items: center;
           gap: 6px;
           padding: 10px 16px;
-          background: white;
-          border: 2px solid #e2e8f0;
+          background: var(--bg-elevated);
+          border: 2px solid var(--border-color);
           border-radius: 8px;
           font-size: 14px;
           font-weight: 600;
-          color: #4a5568;
+          color: var(--text-secondary);
           cursor: pointer;
           transition: all 0.2s;
         }
@@ -586,8 +587,8 @@ export function LinkedInSearch({ onSelectPerson }: LinkedInSearchProps) {
           align-items: center;
           gap: 8px;
           padding: 12px 24px;
-          background: #fff5f5;
-          color: #c53030;
+          background: rgba(239, 68, 68, 0.15);
+          color: #ef4444;
           font-size: 14px;
         }
 
@@ -608,7 +609,7 @@ export function LinkedInSearch({ onSelectPerson }: LinkedInSearchProps) {
         .results-count {
           font-size: 14px;
           font-weight: 600;
-          color: #4a5568;
+          color: var(--text-secondary);
         }
 
         .loading-state {
@@ -638,12 +639,12 @@ export function LinkedInSearch({ onSelectPerson }: LinkedInSearchProps) {
         .loading-state span {
           font-size: 16px;
           font-weight: 600;
-          color: #1a202c;
+          color: var(--text-primary);
         }
 
         .loading-state p {
           font-size: 14px;
-          color: #718096;
+          color: var(--text-muted);
           margin-top: 4px;
         }
 
@@ -675,13 +676,13 @@ export function LinkedInSearch({ onSelectPerson }: LinkedInSearchProps) {
         .empty-state h3 {
           font-size: 18px;
           font-weight: 700;
-          color: #1a202c;
+          color: var(--text-primary);
           margin: 0 0 8px 0;
         }
 
         .empty-state > p {
           font-size: 14px;
-          color: #718096;
+          color: var(--text-muted);
           margin: 0 0 24px 0;
           max-width: 300px;
         }
@@ -697,7 +698,7 @@ export function LinkedInSearch({ onSelectPerson }: LinkedInSearchProps) {
           align-items: center;
           gap: 8px;
           font-size: 13px;
-          color: #4a5568;
+          color: var(--text-secondary);
           background: #f7fafc;
           padding: 10px 16px;
           border-radius: 8px;

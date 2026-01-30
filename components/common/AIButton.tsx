@@ -13,7 +13,7 @@ interface AIButtonProps {
   className?: string;
 }
 
-export function AIButton({ type, data, label, icon = 'fa-wand-magic-sparkles', onResult, variant = 'button', className = '' }: AIButtonProps) {
+export function AIButton({ type, data, label, icon = 'fa-wand-magic', onResult, variant = 'button', className = '' }: AIButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<unknown>(null);
   const [showResult, setShowResult] = useState(false);
@@ -404,7 +404,7 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
           </div>
           {searchTips && searchTips.length > 0 && (
             <div className="search-tips">
-              <h4><i className="fa-solid fa-wand-magic-sparkles"></i> Pro Tips</h4>
+              <h4><i className="fa-solid fa-wand-magic"></i> Pro Tips</h4>
               <ul>
                 {searchTips.map((tip: string, i: number) => <li key={i}>{tip}</li>)}
               </ul>
@@ -536,7 +536,7 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
         <div className="modal-header">
           <div className="header-title">
             <div className="ai-icon">
-              <i className="fa-solid fa-wand-magic-sparkles"></i>
+              <i className="fa-solid fa-wand-magic"></i>
             </div>
             <h2>{titles[type] || 'AI Analysis'}</h2>
           </div>
@@ -578,7 +578,7 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
           }
 
           .ai-modal {
-            background: white;
+            background: var(--bg-elevated);
             border-radius: 20px;
             width: 100%;
             max-width: 600px;
@@ -586,8 +586,9 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
             animation: slideUp 0.3s ease;
+            border: 1px solid var(--border-color);
           }
 
           @keyframes slideUp {
@@ -600,7 +601,7 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
             align-items: center;
             justify-content: space-between;
             padding: 20px 24px;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--border-color);
             background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
           }
 
@@ -625,7 +626,7 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
           .modal-header h2 {
             font-size: 18px;
             font-weight: 700;
-            color: #1a202c;
+            color: var(--text-primary);
             margin: 0;
           }
 
@@ -634,8 +635,8 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
             height: 34px;
             border-radius: 10px;
             border: none;
-            background: rgba(0, 0, 0, 0.05);
-            color: #718096;
+            background: var(--bg-hover);
+            color: var(--text-muted);
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -644,8 +645,8 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
           }
 
           .close-btn:hover {
-            background: rgba(0, 0, 0, 0.1);
-            color: #1a202c;
+            background: var(--bg-active);
+            color: var(--text-primary);
           }
 
           .modal-content {
@@ -659,8 +660,8 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
             justify-content: flex-end;
             gap: 12px;
             padding: 16px 24px;
-            border-top: 1px solid #e2e8f0;
-            background: #f8fafc;
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-elevated);
           }
 
           .btn-secondary, .btn-primary {
@@ -676,13 +677,13 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
           }
 
           .btn-secondary {
-            border: 1px solid #e2e8f0;
-            background: white;
-            color: #4a5568;
+            border: 1px solid var(--border-color);
+            background: var(--bg-elevated);
+            color: var(--text-secondary);
           }
 
           .btn-secondary:hover {
-            background: #f1f5f9;
+            background: var(--bg-hover);
           }
 
           .btn-primary {
@@ -712,7 +713,7 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
           }
 
           .text-result pre {
-            background: #f8fafc;
+            background: var(--bg-hover);
             padding: 20px;
             border-radius: 12px;
             overflow-x: auto;
@@ -720,6 +721,7 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
             line-height: 1.6;
             white-space: pre-wrap;
             word-wrap: break-word;
+            color: var(--text-primary);
           }
 
           .copy-btn {
@@ -727,8 +729,8 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
             top: 10px;
             right: 10px;
             padding: 8px 14px;
-            background: white;
-            border: 1px solid #e2e8f0;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             font-size: 12px;
             font-weight: 600;
@@ -754,7 +756,7 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
           }
 
           .analysis-item {
-            background: #f8fafc;
+            background: var(--bg-hover);
             padding: 16px;
             border-radius: 12px;
             display: flex;
@@ -768,7 +770,7 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
 
           .analysis-item .label {
             font-size: 11px;
-            color: #718096;
+            color: var(--text-muted);
             text-transform: uppercase;
             font-weight: 600;
           }
@@ -776,7 +778,7 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
           .analysis-item .value {
             font-size: 15px;
             font-weight: 600;
-            color: #1a202c;
+            color: var(--text-primary);
           }
 
           .analysis-item .value.score {
@@ -790,7 +792,7 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
 
           .analysis-section h4 {
             font-size: 14px;
-            color: #1a202c;
+            color: var(--text-primary);
             margin: 0 0 10px 0;
             display: flex;
             align-items: center;
@@ -804,7 +806,7 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
 
           .analysis-section li {
             font-size: 14px;
-            color: #4a5568;
+            color: var(--text-secondary);
             margin-bottom: 6px;
           }
 
@@ -826,7 +828,7 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
           .recommendation-box p {
             margin: 0;
             font-size: 14px;
-            color: #1a202c;
+            color: var(--text-primary);
             line-height: 1.5;
           }
 
@@ -837,7 +839,7 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
 
           .ideas-section h4 {
             font-size: 14px;
-            color: #1a202c;
+            color: var(--text-primary);
             margin: 0 0 12px 0;
             display: flex;
             align-items: center;
@@ -847,7 +849,7 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
           .idea-card {
             position: relative;
             padding: 16px;
-            background: #f8fafc;
+            background: var(--bg-hover);
             border-radius: 12px;
             margin-bottom: 10px;
             cursor: pointer;
@@ -856,7 +858,7 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
           }
 
           .idea-card:hover {
-            background: #f1f5f9;
+            background: var(--bg-active);
             border-color: #667eea;
           }
 
@@ -867,7 +869,7 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
           .idea-card p {
             margin: 0;
             font-size: 14px;
-            color: #1a202c;
+            color: var(--text-primary);
             line-height: 1.5;
             padding-right: 30px;
           }
@@ -893,7 +895,7 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
 
           .hashtag-group h4 {
             font-size: 14px;
-            color: #1a202c;
+            color: var(--text-primary);
             margin: 0 0 12px 0;
             display: flex;
             align-items: center;
@@ -935,7 +937,7 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
             align-items: center;
             gap: 20px;
             padding: 20px;
-            background: #f8fafc;
+            background: var(--bg-hover);
             border-radius: 16px;
             margin-bottom: 20px;
           }
@@ -960,7 +962,7 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            background: white;
+            background: var(--bg-elevated);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
           }
 
@@ -972,7 +974,7 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
 
           .score-label {
             font-size: 9px;
-            color: #718096;
+            color: var(--text-muted);
             text-transform: uppercase;
           }
 
@@ -996,7 +998,7 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
 
           .factor-item {
             padding: 14px;
-            background: #f8fafc;
+            background: var(--bg-hover);
             border-radius: 12px;
           }
 
@@ -1010,7 +1012,7 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
           .factor-name {
             font-size: 14px;
             font-weight: 600;
-            color: #1a202c;
+            color: var(--text-primary);
           }
 
           .factor-status {
@@ -1032,7 +1034,7 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
 
           .factor-detail {
             font-size: 13px;
-            color: #718096;
+            color: var(--text-muted);
             margin: 0;
           }
 
@@ -1048,7 +1050,7 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
           .suggested-rate .label {
             display: block;
             font-size: 12px;
-            color: #718096;
+            color: var(--text-muted);
             text-transform: uppercase;
             margin-bottom: 8px;
           }
@@ -1072,7 +1074,7 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
 
           .tips-section h4, .deal-structure h4 {
             font-size: 14px;
-            color: #1a202c;
+            color: var(--text-primary);
             margin: 0 0 12px 0;
             display: flex;
             align-items: center;
@@ -1086,7 +1088,7 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
 
           .tips-section li {
             font-size: 14px;
-            color: #4a5568;
+            color: var(--text-secondary);
             margin-bottom: 8px;
             line-height: 1.5;
           }
@@ -1101,20 +1103,20 @@ function AIResultModal({ type, result, error, onClose }: AIResultModalProps) {
             display: flex;
             justify-content: space-between;
             padding: 12px 16px;
-            background: #f8fafc;
+            background: var(--bg-hover);
             border-radius: 10px;
           }
 
           .deal-label {
             font-size: 14px;
-            color: #4a5568;
+            color: var(--text-secondary);
             text-transform: capitalize;
           }
 
           .deal-value {
             font-size: 14px;
             font-weight: 600;
-            color: #1a202c;
+            color: var(--text-primary);
           }
 
           /* Find Creators Result */
@@ -1602,16 +1604,16 @@ export function AIQuickAction({ title, description, icon, type, defaultData = {}
             align-items: center;
             gap: 14px;
             padding: 16px;
-            background: white;
+            background: var(--bg-elevated);
             border-radius: 14px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border-color);
             cursor: pointer;
             transition: all 0.2s;
           }
 
           .ai-quick-action:hover {
             border-color: #667eea;
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
             transform: translateY(-2px);
           }
 
@@ -1635,13 +1637,13 @@ export function AIQuickAction({ title, description, icon, type, defaultData = {}
           .action-content h4 {
             font-size: 14px;
             font-weight: 600;
-            color: #1a202c;
+            color: var(--text-primary);
             margin: 0 0 4px 0;
           }
 
           .action-content p {
             font-size: 12px;
-            color: #718096;
+            color: var(--text-muted);
             margin: 0;
           }
 

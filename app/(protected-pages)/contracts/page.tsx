@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { Sidebar } from '@/components/common/Sidebar';
-import { TopBar } from '@/components/common/TopBar';
 import { exportAsCSV } from '@/lib/export-utils';
 
 interface TemplateVariable {
@@ -98,6 +97,12 @@ export default function ContractsPage() {
   const [showGenerator, setShowGenerator] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [formValues, setFormValues] = useState<Record<string, string>>({});
+  const [isVisible, setIsVisible] = useState(false);
+  const pageRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setTimeout(() => setIsVisible(true), 50);
+  }, []);
   const [generatedContent, setGeneratedContent] = useState('');
   const [saving, setSaving] = useState(false);
   const [filterCategory, setFilterCategory] = useState<string>('all');
@@ -366,92 +371,92 @@ export default function ContractsPage() {
     <div className="dashboard-wrapper">
       <Sidebar />
       <div className="main-content">
-        <div className="container">
-          <TopBar
-            title="Contract Templates"
-            subtitle="Professional legal agreements for creator partnerships"
-            secondaryButton={{
-              label: 'Export Contracts',
-              icon: 'fa-file-csv',
-              onClick: () => {
-                if (contracts.length === 0) {
-                  alert('No contracts to export');
-                  return;
-                }
-                const exportData = contracts.map((c: GeneratedContract) => ({
-                  'Template': c.templateName,
-                  'Creator': c.creatorName,
-                  'Status': c.status,
-                  'Created': new Date(c.createdAt).toLocaleDateString(),
-                  'Signed': c.signedAt ? new Date(c.signedAt).toLocaleDateString() : 'N/A'
-                }));
-                exportAsCSV(exportData, `contracts-${new Date().toISOString().split('T')[0]}`);
-              },
-            }}
-          />
-          
-          <div className="contracts-page">
-            {/* Header Actions */}
-            <div className="page-header-actions">
-              <button className="btn-secondary" onClick={() => setShowCustomModal(true)}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                  <polyline points="14 2 14 8 20 8"/>
-                  <line x1="12" y1="18" x2="12" y2="12"/>
-                  <line x1="9" y1="15" x2="15" y2="15"/>
-                </svg>
-                Create Custom Template
-              </button>
-            </div>
+        <div className="yc-page" ref={pageRef}>
+          {/* YC Background Effects */}
+          <div className="yc-page-bg">
+            <div className="yc-page-orb yc-page-orb-1"></div>
+            <div className="yc-page-orb yc-page-orb-2"></div>
+            <div className="yc-page-grid"></div>
+          </div>
 
-      {/* Tabs */}
-      <div className="tabs-container">
-        <div className="tabs">
-          <button 
-            className={`tab ${activeTab === 'templates' ? 'active' : ''}`}
-            onClick={() => setActiveTab('templates')}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-              <line x1="3" y1="9" x2="21" y2="9"/>
-              <line x1="9" y1="21" x2="9" y2="9"/>
-            </svg>
-            Templates
-            <span className="tab-count">{templates.length}</span>
-          </button>
-          <button 
-            className={`tab ${activeTab === 'contracts' ? 'active' : ''}`}
-            onClick={() => setActiveTab('contracts')}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-            </svg>
-            My Contracts
-            <span className="tab-count">{contracts.length}</span>
-          </button>
-        </div>
+          {/* YC Page Header */}
+          <div className={`yc-page-header ${isVisible ? 'visible' : ''}`}>
+            <div className="yc-page-header-content">
+              <div className="yc-page-title-section">
+                <div className="yc-page-icon" style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%)' }}>
+                  <i className="fa-solid fa-file-contract"></i>
+                </div>
+                <div>
+                  <h1 className="yc-page-title">Contract Templates</h1>
+                  <p className="yc-page-subtitle">Professional legal agreements for creator partnerships</p>
+                </div>
+              </div>
+              <div className="yc-page-actions">
+                <button className="yc-btn-secondary" onClick={() => setShowCustomModal(true)}>
+                  <i className="fa-solid fa-plus"></i> Create Custom
+                </button>
+                <button className="yc-btn-primary" onClick={() => {
+                  if (contracts.length === 0) {
+                    alert('No contracts to export');
+                    return;
+                  }
+                  const exportData = contracts.map((c: GeneratedContract) => ({
+                    'Template': c.templateName,
+                    'Creator': c.creatorName,
+                    'Status': c.status,
+                    'Created': new Date(c.createdAt).toLocaleDateString(),
+                    'Signed': c.signedAt ? new Date(c.signedAt).toLocaleDateString() : 'N/A'
+                  }));
+                  exportAsCSV(exportData, `contracts-${new Date().toISOString().split('T')[0]}`);
+                }}>
+                  <i className="fa-solid fa-file-csv"></i> Export
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div className="contracts-page" style={{ position: 'relative', zIndex: 10 }}>
+
+      {/* YC Tabs */}
+      <div className="yc-tabs" style={{ marginBottom: '24px' }}>
+        <button 
+          className={`yc-tab ${activeTab === 'templates' ? 'active' : ''}`}
+          onClick={() => setActiveTab('templates')}
+        >
+          <i className="fa-solid fa-layer-group"></i>
+          <span>Templates</span>
+          <span className="yc-tab-count">{templates.length}</span>
+        </button>
+        <button 
+          className={`yc-tab ${activeTab === 'contracts' ? 'active' : ''}`}
+          onClick={() => setActiveTab('contracts')}
+        >
+          <i className="fa-solid fa-file-signature"></i>
+          <span>My Contracts</span>
+          <span className="yc-tab-count">{contracts.length}</span>
+        </button>
       </div>
 
       {/* Templates Tab */}
       {activeTab === 'templates' && (
         <div className="templates-section">
-          {/* Category Filter */}
-          <div className="category-filter">
+          {/* YC Category Filter */}
+          <div className="yc-filters" style={{ marginBottom: '24px', flexWrap: 'wrap' }}>
             <button 
-              className={`filter-btn ${filterCategory === 'all' ? 'active' : ''}`}
+              className={`yc-tab ${filterCategory === 'all' ? 'active' : ''}`}
               onClick={() => setFilterCategory('all')}
+              style={{ padding: '8px 16px', fontSize: '13px' }}
             >
               All Templates
             </button>
             {Object.entries(CATEGORY_CONFIG).map(([key, config]) => (
               <button
                 key={key}
-                className={`filter-btn ${filterCategory === key ? 'active' : ''}`}
+                className={`yc-tab ${filterCategory === key ? 'active' : ''}`}
                 onClick={() => setFilterCategory(key)}
-                style={{ '--accent-color': config.color } as React.CSSProperties}
+                style={{ padding: '8px 16px', fontSize: '13px' }}
               >
-                {config.icon}
+                <span style={{ width: '16px', height: '16px', display: 'inline-flex', color: config.color }}>{config.icon}</span>
                 {config.label}
               </button>
             ))}
@@ -459,63 +464,47 @@ export default function ContractsPage() {
 
           {/* Templates Grid */}
           {loading ? (
-            <div className="loading-grid">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
               {[1, 2, 3, 4, 5, 6].map(i => (
-                <div key={i} className="shimmer-card"></div>
+                <div key={i} style={{ height: '280px', background: 'var(--bg-elevated)', borderRadius: '20px', border: '1px solid var(--border-color)', animation: 'pulse 1.5s ease-in-out infinite' }}></div>
               ))}
             </div>
           ) : (
-            <div className="templates-grid">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
               {filteredTemplates.map((template, idx) => {
                 const config = CATEGORY_CONFIG[template.category] || CATEGORY_CONFIG.custom;
                 return (
                   <div 
                     key={template._id || `${template.uuid}-${idx}`} 
-                    className="template-card"
                     style={{ 
-                      '--card-accent': config.color,
-                      '--card-gradient': config.gradient,
-                      animationDelay: `${idx * 0.05}s`
-                    } as React.CSSProperties}
+                      background: 'var(--bg-elevated)', borderRadius: '20px', border: '1px solid var(--border-color)',
+                      padding: '24px', position: 'relative', overflow: 'hidden', transition: 'all 0.3s ease',
+                      animation: 'ycCardFadeIn 0.6s ease forwards', animationDelay: `${idx * 0.05}s`, opacity: 0
+                    }}
                   >
-                    <div className="card-accent-bar"></div>
-                    <div className="card-header">
-                      <div className="card-icon" style={{ background: config.gradient }}>
+                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: config.gradient }}></div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                      <div style={{ width: '44px', height: '44px', background: config.gradient, borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
                         {config.icon}
                       </div>
-                      <span className="card-category">{config.label}</span>
+                      <span style={{ padding: '4px 12px', borderRadius: '16px', fontSize: '11px', fontWeight: 600, background: `${config.color}15`, color: config.color }}>{config.label}</span>
                     </div>
-                    <h3 className="card-title">{template.name}</h3>
-                    <p className="card-description">{template.description}</p>
-                    <div className="card-meta">
-                      <span className="meta-item">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                          <polyline points="22,6 12,13 2,6"/>
-                        </svg>
-                        {template.variables.length} fields
+                    <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 8px' }}>{template.name}</h3>
+                    <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '0 0 16px', lineHeight: 1.5 }}>{template.description}</p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--text-muted)' }}>
+                        <i className="fa-solid fa-list-check"></i> {template.variables.length} fields
                       </span>
-                      <span className="meta-item">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-                        </svg>
-                        {template.usageCount} uses
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--text-muted)' }}>
+                        <i className="fa-solid fa-chart-line"></i> {template.usageCount} uses
                       </span>
                     </div>
-                    <div className="card-actions">
-                      <button className="btn-preview" onClick={() => { setSelectedTemplate(template); setGeneratedContent(template.content); setShowPreview(true); }}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                          <circle cx="12" cy="12" r="3"/>
-                        </svg>
-                        Preview
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <button className="yc-btn-secondary" style={{ flex: 1, padding: '10px 14px', fontSize: '13px' }} onClick={() => { setSelectedTemplate(template); setGeneratedContent(template.content); setShowPreview(true); }}>
+                        <i className="fa-solid fa-eye"></i> Preview
                       </button>
-                      <button className="btn-use" onClick={() => handleUseTemplate(template)}>
-                        Use Template
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <line x1="5" y1="12" x2="19" y2="12"/>
-                          <polyline points="12 5 19 12 12 19"/>
-                        </svg>
+                      <button className="yc-btn-primary" style={{ flex: 1, padding: '10px 14px', fontSize: '13px' }} onClick={() => handleUseTemplate(template)}>
+                        Use <i className="fa-solid fa-arrow-right"></i>
                       </button>
                     </div>
                   </div>
@@ -530,68 +519,59 @@ export default function ContractsPage() {
       {activeTab === 'contracts' && (
         <div className="contracts-section">
           {contracts.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                  <polyline points="14 2 14 8 20 8"/>
+            <div className="yc-empty-state-card">
+              <div className="yc-empty-icon">
+                <svg viewBox="0 0 100 100" fill="none">
+                  <circle cx="50" cy="50" r="40" stroke="url(#contractGrad)" strokeWidth="2" strokeDasharray="4 4"/>
+                  <rect x="35" y="30" width="30" height="40" rx="4" stroke="url(#contractGrad)" strokeWidth="2"/>
+                  <line x1="42" y1="42" x2="58" y2="42" stroke="url(#contractGrad)" strokeWidth="2"/>
+                  <line x1="42" y1="50" x2="58" y2="50" stroke="url(#contractGrad)" strokeWidth="2"/>
+                  <line x1="42" y1="58" x2="52" y2="58" stroke="url(#contractGrad)" strokeWidth="2"/>
+                  <defs>
+                    <linearGradient id="contractGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#8b5cf6"/>
+                      <stop offset="100%" stopColor="#ec4899"/>
+                    </linearGradient>
+                  </defs>
                 </svg>
               </div>
               <h3>No Contracts Yet</h3>
               <p>Generate your first contract using a template</p>
-              <button className="btn-primary" onClick={() => setActiveTab('templates')}>
-                Browse Templates
+              <button className="yc-btn-primary" onClick={() => setActiveTab('templates')}>
+                <i className="fa-solid fa-layer-group"></i> Browse Templates
               </button>
             </div>
           ) : (
-            <div className="contracts-table">
-              <div className="table-header">
-                <div className="th">Contract</div>
-                <div className="th">Creator</div>
-                <div className="th">Status</div>
-                <div className="th">Created</div>
-                <div className="th">Actions</div>
+            <div style={{ background: 'var(--bg-elevated)', borderRadius: '20px', border: '1px solid var(--border-color)', overflow: 'hidden' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.5fr 1fr 1fr 1fr', padding: '16px 24px', background: 'rgba(102, 126, 234, 0.03)', borderBottom: '1px solid var(--border-color)', gap: '16px' }}>
+                <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Contract</div>
+                <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Creator</div>
+                <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Status</div>
+                <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Created</div>
+                <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Actions</div>
               </div>
               {contracts.map(contract => {
                 const status = STATUS_CONFIG[contract.status];
                 return (
-                  <div key={contract._id} className="table-row">
-                    <div className="td">
-                      <span className="contract-name">{contract.templateName}</span>
+                  <div key={contract._id} style={{ display: 'grid', gridTemplateColumns: '2fr 1.5fr 1fr 1fr 1fr', padding: '16px 24px', borderBottom: '1px solid var(--border-color)', gap: '16px', alignItems: 'center', transition: 'background 0.2s' }}>
+                    <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>{contract.templateName}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '13px', fontWeight: 600 }}>{contract.creatorName.charAt(0)}</div>
+                      <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>{contract.creatorName}</span>
                     </div>
-                    <div className="td">
-                      <div className="creator-info">
-                        <div className="creator-avatar">{contract.creatorName.charAt(0)}</div>
-                        <span>{contract.creatorName}</span>
-                      </div>
+                    <div>
+                      <span style={{ padding: '6px 12px', borderRadius: '16px', fontSize: '12px', fontWeight: 600, color: status.color, background: status.bg }}>{status.label}</span>
                     </div>
-                    <div className="td">
-                      <span className="status-badge" style={{ color: status.color, background: status.bg }}>
-                        {status.label}
-                      </span>
-                    </div>
-                    <div className="td">
-                      <span className="date">{new Date(contract.createdAt).toLocaleDateString()}</span>
-                    </div>
-                    <div className="td actions">
-                      <button className="action-btn" title="View" onClick={() => handleViewContract(contract)}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                          <circle cx="12" cy="12" r="3"/>
-                        </svg>
+                    <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{new Date(contract.createdAt).toLocaleDateString()}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <button style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(102, 126, 234, 0.1)', border: '1px solid rgba(102, 126, 234, 0.2)', borderRadius: '8px', color: '#667eea', cursor: 'pointer' }} title="View" onClick={() => handleViewContract(contract)}>
+                        <i className="fa-solid fa-eye"></i>
                       </button>
-                      <button className="action-btn" title="Download" onClick={() => handleDownloadPDF(contract)}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                          <polyline points="7 10 12 15 17 10"/>
-                          <line x1="12" y1="15" x2="12" y2="3"/>
-                        </svg>
+                      <button style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(102, 126, 234, 0.1)', border: '1px solid rgba(102, 126, 234, 0.2)', borderRadius: '8px', color: '#667eea', cursor: 'pointer' }} title="Download" onClick={() => handleDownloadPDF(contract)}>
+                        <i className="fa-solid fa-download"></i>
                       </button>
-                      <button className="action-btn" title="Send" onClick={() => { setSendingContract(contract); setSendEmail(contract.creatorEmail || ''); }}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <line x1="22" y1="2" x2="11" y2="13"/>
-                          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-                        </svg>
+                      <button style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '8px', color: '#10b981', cursor: 'pointer' }} title="Send" onClick={() => { setSendingContract(contract); setSendEmail(contract.creatorEmail || ''); }}>
+                        <i className="fa-solid fa-paper-plane"></i>
                       </button>
                     </div>
                   </div>
@@ -650,13 +630,13 @@ export default function ContractsPage() {
                       />
                     ) : variable.type === 'currency' ? (
                       <div className="currency-input">
-                        <span className="currency-symbol">$</span>
+                        <span className="currency-symbol">₹</span>
                         <input
                           type="number"
                           className="form-input"
                           placeholder="0.00"
                           value={formValues[variable.key] || ''}
-                          onChange={e => handleFormChange(variable.key, `$${e.target.value}`)}
+                          onChange={e => handleFormChange(variable.key, `₹${e.target.value}`)}
                         />
                       </div>
                     ) : (
@@ -1023,27 +1003,27 @@ Duration: {{contract_duration}}"
           gap: 20px;
           margin-bottom: 20px;
           padding: 16px;
-          background: #f7fafc;
+          background: var(--bg-secondary);
           border-radius: 12px;
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--border-color);
         }
 
         /* Send Preview */
         .send-preview {
           margin-top: 20px;
           padding: 16px;
-          background: #f7fafc;
+          background: var(--bg-secondary);
           border-radius: 12px;
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--border-color);
         }
         .send-preview h4 {
           margin: 0 0 8px 0;
-          color: #1a202c;
+          color: var(--text-primary);
           font-size: 15px;
         }
         .send-preview p {
           margin: 0;
-          color: #718096;
+          color: var(--text-secondary);
           font-size: 14px;
         }
 
@@ -1078,8 +1058,8 @@ Duration: {{contract_duration}}"
           align-items: center;
           gap: 6px;
           padding: 8px 14px;
-          background: #ffffff;
-          border: 1px solid #e2e8f0;
+          background: var(--bg-elevated);
+          border: 1px solid var(--border-color);
           border-radius: 8px;
           color: #667eea;
           font-size: 13px;
@@ -1088,7 +1068,7 @@ Duration: {{contract_duration}}"
           transition: all 0.2s ease;
         }
         .btn-secondary:hover {
-          background: #f7fafc;
+          background: var(--bg-secondary);
           border-color: #667eea;
         }
         .btn-primary {
@@ -1123,7 +1103,7 @@ Duration: {{contract_duration}}"
         .tabs {
           display: inline-flex;
           gap: 4px;
-          background: #f1f5f9;
+          background: var(--bg-secondary);
           padding: 4px;
           border-radius: 8px;
         }
@@ -1135,7 +1115,7 @@ Duration: {{contract_duration}}"
           background: transparent;
           border: none;
           border-radius: 6px;
-          color: #64748b;
+          color: var(--text-secondary);
           font-size: 13px;
           font-weight: 500;
           cursor: pointer;
@@ -1146,17 +1126,17 @@ Duration: {{contract_duration}}"
           height: 14px;
         }
         .tab:hover {
-          color: #475569;
+          color: var(--text-primary);
         }
         .tab.active {
-          background: #ffffff;
-          color: #1e293b;
+          background: var(--bg-elevated);
+          color: var(--text-primary);
           font-weight: 600;
-          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
         .tab-count {
           background: rgba(100, 116, 139, 0.15);
-          color: #64748b;
+          color: var(--text-secondary);
           padding: 2px 6px;
           border-radius: 4px;
           font-size: 11px;
@@ -1174,19 +1154,19 @@ Duration: {{contract_duration}}"
           gap: 6px;
           margin-bottom: 16px;
           padding: 10px 12px;
-          background: #ffffff;
+          background: var(--bg-elevated);
           border-radius: 10px;
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--border-color);
         }
         .filter-btn {
           display: flex;
           align-items: center;
           gap: 5px;
           padding: 6px 12px;
-          background: #f7fafc;
+          background: var(--bg-secondary);
           border: 1px solid transparent;
           border-radius: 6px;
-          color: #64748b;
+          color: var(--text-secondary);
           font-size: 12px;
           font-weight: 500;
           cursor: pointer;
@@ -1199,7 +1179,7 @@ Duration: {{contract_duration}}"
         .filter-btn:hover {
           border-color: var(--accent-color, #667eea);
           color: var(--accent-color, #667eea);
-          background: #edf2f7;
+          background: var(--bg-tertiary);
         }
         .filter-btn.active {
           background: #667eea;
@@ -1222,7 +1202,7 @@ Duration: {{contract_duration}}"
         }
         .shimmer-card {
           height: 180px;
-          background: linear-gradient(110deg, #f7fafc 8%, #edf2f7 18%, #f7fafc 33%);
+          background: linear-gradient(110deg, var(--bg-secondary) 8%, var(--bg-tertiary) 18%, var(--bg-secondary) 33%);
           background-size: 200% 100%;
           animation: shimmer 1.5s linear infinite;
           border-radius: 12px;
@@ -1239,11 +1219,11 @@ Duration: {{contract_duration}}"
         }
 
         .template-card {
-          background: #ffffff;
+          background: var(--bg-elevated);
           border-radius: 12px;
           padding: 16px;
-          border: 1px solid #e2e8f0;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+          border: 1px solid var(--border-color);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
           position: relative;
           overflow: hidden;
           transition: all 0.2s ease;
@@ -1309,13 +1289,13 @@ Duration: {{contract_duration}}"
         .card-title {
           font-size: 15px;
           font-weight: 700;
-          color: #1a202c !important;
+          color: var(--text-primary) !important;
           margin: 0 0 6px 0;
           line-height: 1.3;
         }
         .card-description {
           font-size: 12px;
-          color: #64748b !important;
+          color: var(--text-secondary) !important;
           line-height: 1.5;
           margin: 0 0 12px 0;
           min-height: 36px;
@@ -1325,15 +1305,15 @@ Duration: {{contract_duration}}"
           gap: 16px;
           margin-bottom: 12px;
           padding: 10px 0;
-          border-top: 1px solid #edf2f7;
-          border-bottom: 1px solid #edf2f7;
+          border-top: 1px solid var(--border-color);
+          border-bottom: 1px solid var(--border-color);
         }
         .meta-item {
           display: flex;
           align-items: center;
           gap: 5px;
           font-size: 11px;
-          color: #718096;
+          color: var(--text-secondary);
           font-weight: 500;
         }
         .meta-item svg {
@@ -1352,8 +1332,8 @@ Duration: {{contract_duration}}"
           justify-content: center;
           gap: 6px;
           padding: 8px;
-          background: #f7fafc;
-          border: 1px solid #e2e8f0;
+          background: var(--bg-secondary);
+          border: 1px solid var(--border-color);
           border-radius: 8px;
           color: #667eea;
           font-size: 12px;
@@ -1366,7 +1346,7 @@ Duration: {{contract_duration}}"
           height: 12px;
         }
         .btn-preview:hover {
-          background: #edf2f7;
+          background: var(--bg-tertiary);
           border-color: #667eea;
         }
         .btn-use {
@@ -1402,19 +1382,19 @@ Duration: {{contract_duration}}"
 
         /* Contracts Table */
         .contracts-table {
-          background: #ffffff;
+          background: var(--bg-elevated);
           border-radius: 12px;
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--border-color);
           overflow: hidden;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
         .table-header {
           display: grid;
           grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr;
           gap: 12px;
           padding: 12px 16px;
-          background: #f7fafc;
-          border-bottom: 1px solid #e2e8f0;
+          background: var(--bg-secondary);
+          border-bottom: 1px solid var(--border-color);
         }
         .table-row {
           display: grid;
@@ -1422,18 +1402,18 @@ Duration: {{contract_duration}}"
           gap: 12px;
           padding: 12px 16px;
           align-items: center;
-          border-bottom: 1px solid #edf2f7;
+          border-bottom: 1px solid var(--border-color);
           transition: all 0.2s ease;
         }
         .table-row:hover {
-          background: #f7fafc;
+          background: var(--bg-secondary);
         }
         .table-row:last-child {
           border-bottom: none;
         }
         .contract-name {
           font-weight: 600;
-          color: #1a202c !important;
+          color: var(--text-primary) !important;
           font-size: 13px;
         }
         .creator-info {
@@ -1455,7 +1435,7 @@ Duration: {{contract_duration}}"
         }
         .creator-info span {
           font-weight: 500;
-          color: #2d3748 !important;
+          color: var(--text-primary) !important;
           font-size: 13px;
         }
         .status-badge {
@@ -1470,11 +1450,11 @@ Duration: {{contract_duration}}"
           display: flex;
           align-items: center;
           font-size: 13px;
-          color: #4a5568 !important;
+          color: var(--text-secondary) !important;
         }
         .date {
           font-size: 12px;
-          color: #718096 !important;
+          color: var(--text-muted) !important;
           font-weight: 500;
         }
         .th {
@@ -1491,8 +1471,8 @@ Duration: {{contract_duration}}"
         .action-btn {
           width: 28px;
           height: 28px;
-          background: #f7fafc;
-          border: 1px solid #e2e8f0;
+          background: var(--bg-secondary);
+          border: 1px solid var(--border-color);
           border-radius: 6px;
           color: #667eea;
           cursor: pointer;
@@ -1516,14 +1496,14 @@ Duration: {{contract_duration}}"
         .empty-state {
           text-align: center;
           padding: 80px 20px;
-          background: #ffffff;
+          background: var(--bg-elevated);
           border-radius: 24px;
-          border: 2px dashed #e2e8f0;
+          border: 2px dashed var(--border-color);
         }
         .empty-icon {
           width: 100px;
           height: 100px;
-          background: rgba(102, 126, 234, 0.1);
+          background: rgba(102, 126, 234, 0.15);
           border-radius: 28px;
           display: flex;
           align-items: center;
@@ -1534,12 +1514,12 @@ Duration: {{contract_duration}}"
         .empty-state h3 {
           font-size: 22px;
           font-weight: 700;
-          color: #1a202c !important;
+          color: var(--text-primary) !important;
           margin: 0 0 10px 0;
         }
         .empty-state p {
           font-size: 15px;
-          color: #718096 !important;
+          color: var(--text-secondary) !important;
           margin: 0 0 28px 0;
         }
 
@@ -1557,16 +1537,16 @@ Duration: {{contract_duration}}"
           animation: fadeIn 0.2s ease;
         }
         .modal {
-          background: #ffffff;
+          background: var(--bg-elevated);
           border-radius: 24px;
           width: 100%;
           max-height: 90vh;
           overflow: hidden;
           display: flex;
           flex-direction: column;
-          box-shadow: 0 32px 64px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 32px 64px rgba(0, 0, 0, 0.4);
           animation: modalSlideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--border-color);
           position: relative;
           z-index: 10000;
         }
@@ -1588,8 +1568,8 @@ Duration: {{contract_duration}}"
           align-items: center;
           justify-content: space-between;
           padding: 24px 28px;
-          background: #ffffff;
-          border-bottom: 1px solid #e2e8f0;
+          background: var(--bg-elevated);
+          border-bottom: 1px solid var(--border-color);
           position: relative;
           z-index: 1;
         }
@@ -1611,21 +1591,21 @@ Duration: {{contract_duration}}"
         .modal-title {
           font-size: 20px;
           font-weight: 700;
-          color: #1a202c !important;
+          color: var(--text-primary) !important;
           margin: 0;
         }
         .modal-subtitle {
           font-size: 13px;
-          color: #718096 !important;
+          color: var(--text-secondary) !important;
           margin: 4px 0 0 0;
         }
         .modal-close {
           width: 40px;
           height: 40px;
-          background: #f7fafc;
+          background: var(--bg-secondary);
           border: none;
           border-radius: 12px;
-          color: #4a5568;
+          color: var(--text-secondary);
           cursor: pointer;
           display: flex;
           align-items: center;
@@ -1641,15 +1621,15 @@ Duration: {{contract_duration}}"
           padding: 28px;
           overflow-y: auto;
           flex: 1;
-          background: #ffffff;
+          background: var(--bg-elevated);
         }
         .modal-footer {
           display: flex;
           justify-content: flex-end;
           gap: 14px;
           padding: 20px 28px;
-          background: #ffffff;
-          border-top: 1px solid #e2e8f0;
+          background: var(--bg-elevated);
+          border-top: 1px solid var(--border-color);
         }
 
         /* Form */
@@ -1668,7 +1648,7 @@ Duration: {{contract_duration}}"
           display: block;
           font-size: 13px;
           font-weight: 700;
-          color: #2d3748 !important;
+          color: var(--text-primary) !important;
           margin-bottom: 8px;
           letter-spacing: 0.2px;
         }
@@ -1679,22 +1659,27 @@ Duration: {{contract_duration}}"
         .form-input, .form-select {
           width: 100%;
           padding: 14px 18px;
-          background: #ffffff !important;
-          border: 2px solid #e2e8f0;
+          background: var(--bg-primary) !important;
+          border: 2px solid var(--border-color);
           border-radius: 12px;
           font-size: 14px;
           font-weight: 500;
-          color: #1a202c !important;
+          color: var(--text-primary) !important;
           transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .form-input:focus, .form-select:focus {
           outline: none;
           border-color: #667eea;
-          background: #ffffff !important;
+          background: var(--bg-primary) !important;
           box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
         }
         .form-input::placeholder {
-          color: #a0aec0;
+          color: var(--text-muted);
+        }
+        .form-select option {
+          background: var(--bg-elevated);
+          color: var(--text-primary);
+          padding: 8px;
         }
         .currency-input {
           position: relative;
@@ -1716,12 +1701,12 @@ Duration: {{contract_duration}}"
         .form-textarea {
           width: 100%;
           padding: 14px 18px;
-          background: #ffffff !important;
-          border: 2px solid #e2e8f0;
+          background: var(--bg-primary) !important;
+          border: 2px solid var(--border-color);
           border-radius: 12px;
           font-size: 14px;
           font-weight: 500;
-          color: #1a202c !important;
+          color: var(--text-primary) !important;
           resize: vertical;
           min-height: 200px;
           font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
@@ -1734,12 +1719,12 @@ Duration: {{contract_duration}}"
           box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
         }
         .form-textarea::placeholder {
-          color: #a0aec0;
+          color: var(--text-muted);
           font-family: inherit;
         }
         .form-hint {
           font-size: 12px;
-          color: #718096;
+          color: var(--text-secondary);
           margin: 0 0 10px 0;
         }
 
@@ -1773,13 +1758,13 @@ Duration: {{contract_duration}}"
         }
         .variable-label {
           font-size: 13px;
-          color: #2d3748 !important;
+          color: var(--text-primary) !important;
           font-weight: 500;
         }
         .variable-type {
           font-size: 11px;
-          color: #718096;
-          background: #edf2f7;
+          color: var(--text-secondary);
+          background: var(--bg-secondary);
           padding: 2px 8px;
           border-radius: 6px;
           text-transform: uppercase;
@@ -1806,9 +1791,9 @@ Duration: {{contract_duration}}"
           grid-template-columns: 1fr 1fr 120px auto;
           gap: 12px;
           padding: 16px;
-          background: #f7fafc;
+          background: var(--bg-secondary);
           border-radius: 12px;
-          border: 1px dashed #cbd5e0;
+          border: 1px dashed var(--border-color);
         }
         .btn-add-variable {
           display: flex;
@@ -1832,25 +1817,25 @@ Duration: {{contract_duration}}"
 
         /* Preview */
         .preview-body {
-          background: #f7fafc;
+          background: var(--bg-secondary);
           padding: 32px;
         }
         .contract-preview {
-          background: #ffffff;
-          border: 1px solid #e2e8f0;
+          background: var(--bg-elevated);
+          border: 1px solid var(--border-color);
           border-radius: 16px;
           padding: 40px;
           font-family: 'Georgia', serif;
           max-height: 60vh;
           overflow-y: auto;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
         }
         .contract-preview pre {
           white-space: pre-wrap;
           font-family: inherit;
           font-size: 15px;
           line-height: 1.9;
-          color: #2d3748 !important;
+          color: var(--text-primary) !important;
           margin: 0;
         }
 

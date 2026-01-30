@@ -12,7 +12,7 @@ interface Campaign {
   userId: ObjectId;
   name: string;
   description: string;
-  status: "active" | "completed" | "draft";
+  status: "active" | "completed" | "draft" | "deleted";
   budget: number;
   startDate: Date;
   endDate?: Date;

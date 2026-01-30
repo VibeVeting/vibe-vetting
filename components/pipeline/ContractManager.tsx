@@ -64,7 +64,7 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
     ]
   );
   const [paymentTerms, setPaymentTerms] = useState(creator.negotiation?.paymentTerms || '50% upfront, 50% on completion');
-  const [currency, setCurrency] = useState(creator.negotiation?.currency || 'USD');
+  const [currency, setCurrency] = useState(creator.negotiation?.currency || 'INR');
   
   // Contract state
   const [contractTerms, setContractTerms] = useState({
@@ -183,8 +183,7 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
   };
 
   const formatCurrency = (amount: number) => {
-    const symbols: Record<string, string> = { USD: '$', EUR: '€', GBP: '£', INR: '₹' };
-    return `${symbols[currency] || '$'}${amount.toLocaleString()}`;
+    return `₹${amount.toLocaleString('en-IN')}`;
   };
 
   const getStatusColor = (status: string) => {
@@ -270,7 +269,7 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
                         className="qty-input"
                       />
                       <div className="price-input-wrapper">
-                        <span className="currency-symbol">{currency === 'USD' ? '$' : currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : '₹'}</span>
+                        <span className="currency-symbol">₹</span>
                         <input
                           type="number"
                           value={item.price}
@@ -299,9 +298,6 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
                   <div className="form-group">
                     <label>Currency</label>
                     <select value={currency} onChange={e => setCurrency(e.target.value)}>
-                      <option value="USD">USD ($)</option>
-                      <option value="EUR">EUR (€)</option>
-                      <option value="GBP">GBP (£)</option>
                       <option value="INR">INR (₹)</option>
                     </select>
                   </div>
@@ -537,7 +533,8 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
           }
 
           .contract-manager-modal {
-            background: white;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
             border-radius: 20px;
             width: 100%;
             max-width: 800px;
@@ -545,7 +542,7 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.25);
+            box-shadow: var(--shadow-lg);
           }
 
           .close-button {
@@ -555,19 +552,20 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
             width: 32px;
             height: 32px;
             border: none;
-            background: rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.2);
             border-radius: 50%;
             font-size: 20px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #64748b;
+            color: white;
             z-index: 10;
+            transition: all 0.2s;
           }
 
           .close-button:hover {
-            background: rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.3);
           }
 
           .modal-header {
@@ -628,7 +626,8 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
           .tabs {
             display: flex;
             gap: 0;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-card);
           }
 
           .tab {
@@ -638,7 +637,7 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
             background: transparent;
             font-size: 13px;
             font-weight: 600;
-            color: #64748b;
+            color: var(--text-secondary);
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -649,17 +648,17 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
           }
 
           .tab:hover {
-            color: #667eea;
-            background: rgba(102, 126, 234, 0.05);
+            color: var(--primary);
+            background: var(--bg-hover);
           }
 
           .tab.active {
-            color: #667eea;
-            border-bottom-color: #667eea;
+            color: var(--primary);
+            border-bottom-color: var(--primary);
           }
 
           .tab .badge {
-            background: #667eea;
+            background: var(--primary);
             color: white;
             font-size: 10px;
             padding: 2px 6px;
@@ -679,7 +678,7 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
           .section h3 {
             font-size: 14px;
             font-weight: 700;
-            color: #1e293b;
+            color: var(--text-primary);
             margin-bottom: 16px;
             display: flex;
             align-items: center;
@@ -687,7 +686,7 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
           }
 
           .section h3 i {
-            color: #667eea;
+            color: var(--primary);
           }
 
           .section-header {
@@ -703,21 +702,22 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
 
           .add-btn {
             padding: 6px 12px;
-            border: 1px dashed #cbd5e1;
+            border: 1px dashed var(--border-color);
             background: transparent;
             border-radius: 6px;
             font-size: 12px;
             font-weight: 500;
-            color: #64748b;
+            color: var(--text-secondary);
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 6px;
+            transition: all 0.2s;
           }
 
           .add-btn:hover {
-            border-color: #667eea;
-            color: #667eea;
+            border-color: var(--primary);
+            color: var(--primary);
           }
 
           .deliverables-list {
@@ -731,40 +731,44 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
             align-items: center;
             gap: 10px;
             padding: 10px;
-            background: #f8fafc;
+            background: var(--bg-hover);
             border-radius: 10px;
           }
 
           .type-input {
             flex: 2;
             padding: 8px 12px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border-color);
             border-radius: 6px;
             font-size: 13px;
+            background: var(--bg-elevated);
+            color: var(--text-primary);
           }
 
           .qty-input {
             width: 60px;
             padding: 8px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border-color);
             border-radius: 6px;
             font-size: 13px;
             text-align: center;
+            background: var(--bg-elevated);
+            color: var(--text-primary);
           }
 
           .price-input-wrapper {
             display: flex;
             align-items: center;
-            background: white;
-            border: 1px solid #e2e8f0;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
             border-radius: 6px;
             overflow: hidden;
           }
 
           .currency-symbol {
             padding: 8px;
-            background: #f1f5f9;
-            color: #64748b;
+            background: var(--bg-hover);
+            color: var(--text-secondary);
             font-size: 13px;
           }
 
@@ -773,13 +777,15 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
             padding: 8px;
             border: none;
             font-size: 13px;
+            background: transparent;
+            color: var(--text-primary);
           }
 
           .line-total {
             min-width: 80px;
             text-align: right;
             font-weight: 600;
-            color: #1e293b;
+            color: var(--text-primary);
             font-size: 13px;
           }
 
@@ -788,7 +794,7 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
             height: 32px;
             border: none;
             background: transparent;
-            color: #94a3b8;
+            color: var(--text-muted);
             cursor: pointer;
             border-radius: 6px;
             display: flex;
@@ -836,16 +842,17 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
           .form-group label {
             font-size: 12px;
             font-weight: 600;
-            color: #64748b;
+            color: var(--text-secondary);
           }
 
           .form-group input,
           .form-group select {
             padding: 10px 12px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             font-size: 13px;
-            color: #1e293b;
+            color: var(--text-primary);
+            background: var(--bg-elevated);
           }
 
           .toggle-row {
@@ -853,7 +860,7 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
             justify-content: space-between;
             align-items: center;
             padding: 14px;
-            background: #f8fafc;
+            background: var(--bg-hover);
             border-radius: 10px;
             margin-bottom: 12px;
           }
@@ -867,12 +874,12 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
           .toggle-label {
             font-size: 13px;
             font-weight: 600;
-            color: #1e293b;
+            color: var(--text-primary);
           }
 
           .toggle-description {
             font-size: 11px;
-            color: #64748b;
+            color: var(--text-secondary);
           }
 
           .toggle {
@@ -891,7 +898,7 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
             position: absolute;
             cursor: pointer;
             inset: 0;
-            background: #cbd5e1;
+            background: var(--border-color);
             border-radius: 24px;
             transition: 0.3s;
           }
@@ -909,7 +916,7 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
           }
 
           input:checked + .slider {
-            background: #667eea;
+            background: var(--primary);
           }
 
           input:checked + .slider:before {
@@ -919,7 +926,7 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
           .sub-option {
             margin: -4px 0 12px 0;
             padding: 12px;
-            background: #f1f5f9;
+            background: var(--bg-hover);
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -928,15 +935,17 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
 
           .sub-option label {
             font-size: 12px;
-            color: #64748b;
+            color: var(--text-secondary);
           }
 
           .sub-option input {
             width: 80px;
             padding: 6px 10px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border-color);
             border-radius: 6px;
             font-size: 13px;
+            background: var(--bg-elevated);
+            color: var(--text-primary);
           }
 
           .action-buttons {
@@ -945,7 +954,7 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
             gap: 12px;
             margin-top: 24px;
             padding-top: 24px;
-            border-top: 1px solid #e2e8f0;
+            border-top: 1px solid var(--border-color);
           }
 
           .btn {
@@ -972,13 +981,13 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
           }
 
           .btn-secondary {
-            background: #f1f5f9;
-            color: #475569;
-            border: 1px solid #e2e8f0;
+            background: var(--bg-hover);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
           }
 
           .btn-secondary:hover:not(:disabled) {
-            background: #e2e8f0;
+            background: var(--bg-active);
           }
 
           .btn:disabled {
@@ -995,7 +1004,7 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
           .empty-state {
             text-align: center;
             padding: 48px 24px;
-            color: #64748b;
+            color: var(--text-secondary);
           }
 
           .empty-state i {
@@ -1006,7 +1015,7 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
 
           .empty-state h4 {
             font-size: 16px;
-            color: #1e293b;
+            color: var(--text-primary);
             margin-bottom: 8px;
           }
 
@@ -1025,26 +1034,27 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
             align-items: center;
             gap: 14px;
             padding: 14px;
-            background: #f8fafc;
+            background: var(--bg-hover);
             border-radius: 12px;
             transition: all 0.2s;
           }
 
           .document-card:hover {
-            background: #f1f5f9;
+            background: var(--bg-active);
           }
 
           .doc-icon {
             width: 42px;
             height: 42px;
-            background: white;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #667eea;
+            color: var(--primary);
             font-size: 18px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            box-shadow: var(--shadow-sm);
           }
 
           .doc-info {
@@ -1057,12 +1067,12 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
           .doc-name {
             font-size: 13px;
             font-weight: 600;
-            color: #1e293b;
+            color: var(--text-primary);
           }
 
           .doc-meta {
             font-size: 11px;
-            color: #64748b;
+            color: var(--text-secondary);
           }
 
           .doc-status {
@@ -1082,29 +1092,29 @@ export function ContractManager({ creator, campaignName, brandName, onClose, onU
             width: 32px;
             height: 32px;
             border: none;
-            background: white;
+            background: var(--bg-elevated);
             border-radius: 8px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #64748b;
+            color: var(--text-secondary);
             font-size: 13px;
             text-decoration: none;
             transition: all 0.2s;
           }
 
           .action-btn:hover {
-            background: #667eea;
+            background: var(--primary);
             color: white;
           }
 
           .action-btn.send:hover {
-            background: #22c55e;
+            background: var(--accent-green);
           }
 
           .action-btn.remind:hover {
-            background: #f59e0b;
+            background: var(--accent-orange);
           }
         `}</style>
       </div>

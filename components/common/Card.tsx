@@ -25,11 +25,11 @@ export function Card({ children, className = '', title, menu, onMenuClick }: Car
 
       <style jsx>{`
         .card {
-          background: #ffffff;
+          background: var(--bg-elevated);
           border-radius: 16px;
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--border-color);
           padding: 30px;
-          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+          box-shadow: var(--shadow-md);
         }
 
         .card-header {
@@ -38,20 +38,20 @@ export function Card({ children, className = '', title, menu, onMenuClick }: Car
           align-items: center;
           margin-bottom: 24px;
           padding-bottom: 16px;
-          border-bottom: 2px solid #e2e8f0;
+          border-bottom: 2px solid var(--border-color);
         }
 
         .card-title {
           font-size: 18px;
           font-weight: 800;
-          color: #1a202c;
+          color: var(--text-primary);
           letter-spacing: -0.3px;
         }
 
         .card-menu {
           background: none;
           border: none;
-          color: #718096;
+          color: var(--text-muted);
           cursor: pointer;
           font-size: 20px;
           transition: color 0.3s ease;

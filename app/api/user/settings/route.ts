@@ -1,5 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { UserModel } from "@/lib/models/user";
+import { NotificationPreferences } from "@/types";
+
+// Default notification preferences
+const defaultNotificationPreferences: NotificationPreferences = {
+  email: true,
+  push: true,
+  sms: false,
+  weekly: true,
+};
 
 // GET - Fetch user settings
 export async function GET(request: NextRequest) {
@@ -32,6 +41,7 @@ export async function GET(request: NextRequest) {
         image: user.image || "",
         currentPlan: user.currentPlan || "starter",
         planUpdatedAt: user.planUpdatedAt || null,
+        notificationPreferences: user.notificationPreferences || defaultNotificationPreferences,
       },
     });
   } catch (error) {
@@ -56,7 +66,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, company } = body;
+    const { name, company, notificationPreferences } = body;
 
     // Find user by email first (lowercase for case-insensitive match)
     const existingUser = await UserModel.findByEmail(userId.toLowerCase());
@@ -69,9 +79,18 @@ export async function PUT(request: NextRequest) {
     }
 
     // Update the user
-    const updateData: { name?: string; company?: string } = {};
+    const updateData: { name?: string; company?: string; notificationPreferences?: NotificationPreferences } = {};
     if (name !== undefined) updateData.name = name;
     if (company !== undefined) updateData.company = company;
+    if (notificationPreferences !== undefined) {
+      // Validate notification preferences
+      updateData.notificationPreferences = {
+        email: typeof notificationPreferences.email === 'boolean' ? notificationPreferences.email : true,
+        push: typeof notificationPreferences.push === 'boolean' ? notificationPreferences.push : true,
+        sms: typeof notificationPreferences.sms === 'boolean' ? notificationPreferences.sms : false,
+        weekly: typeof notificationPreferences.weekly === 'boolean' ? notificationPreferences.weekly : true,
+      };
+    }
 
     const updatedUser = await UserModel.update(
       existingUser._id!.toString(),
@@ -92,6 +111,7 @@ export async function PUT(request: NextRequest) {
         name: updatedUser.name,
         email: updatedUser.email,
         company: updatedUser.company || "",
+        notificationPreferences: updatedUser.notificationPreferences || defaultNotificationPreferences,
       },
     });
   } catch (error) {

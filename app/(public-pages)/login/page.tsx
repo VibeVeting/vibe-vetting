@@ -46,9 +46,31 @@ function LoginContent() {
     }
 
     const token = localStorage.getItem('token');
-    if (token) {
-      window.location.href = '/dashboard';
-      return;
+    const userStr = localStorage.getItem('user');
+    
+    if (token && userStr) {
+      try {
+        const userData = JSON.parse(userStr);
+        // Redirect based on user type - never mix flows
+        if (userData.userType === 'barter_creator') {
+          window.location.href = '/creator-dashboard';
+          return;
+        }
+        if (userData.userType === 'barter_company') {
+          window.location.href = '/barter-company-dashboard';
+          return;
+        }
+        // Regular brand user - go to dashboard
+        window.location.href = '/dashboard';
+        return;
+      } catch (e) {
+        // Invalid user data, clear and let them login fresh
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      }
+    } else if (token) {
+      // Token but no user data, clear and let them login fresh
+      localStorage.removeItem('token');
     }
 
     // Check for OAuth errors

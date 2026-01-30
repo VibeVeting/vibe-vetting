@@ -67,7 +67,7 @@ export function CardMenu({ items }: CardMenuProps) {
         .card-menu-btn {
           background: none;
           border: none;
-          color: #718096;
+          color: var(--text-muted);
           cursor: pointer;
           font-size: 18px;
           padding: 8px;
@@ -79,7 +79,7 @@ export function CardMenu({ items }: CardMenuProps) {
         }
 
         .card-menu-btn:hover {
-          background: #f1f5f9;
+          background: var(--bg-hover);
           color: #667eea;
         }
 
@@ -88,8 +88,8 @@ export function CardMenu({ items }: CardMenuProps) {
           top: 100%;
           right: 0;
           margin-top: 4px;
-          background: #ffffff;
-          border: 1px solid #e2e8f0;
+          background: var(--bg-elevated);
+          border: 1px solid var(--border-color);
           border-radius: 12px;
           box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
           min-width: 200px;
@@ -120,24 +120,24 @@ export function CardMenu({ items }: CardMenuProps) {
           border: none;
           cursor: pointer;
           font-size: 14px;
-          color: #4a5568;
+          color: var(--text-secondary);
           text-align: left;
           transition: all 0.2s ease;
           font-family: inherit;
         }
 
         .menu-item:hover {
-          background: #f7fafc;
+          background: var(--bg-hover);
           color: #667eea;
         }
 
         .menu-item.danger {
-          color: #e53e3e;
+          color: #ef4444;
         }
 
         .menu-item.danger:hover {
-          background: #fff5f5;
-          color: #c53030;
+          background: rgba(239, 68, 68, 0.1);
+          color: #ef4444;
         }
 
         .menu-item.disabled {

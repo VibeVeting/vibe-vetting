@@ -69,9 +69,31 @@ function RegisterContent() {
     }
 
     const token = localStorage.getItem('token');
-    if (token) {
-      window.location.href = '/dashboard';
-      return;
+    const userStr = localStorage.getItem('user');
+    
+    if (token && userStr) {
+      try {
+        const userData = JSON.parse(userStr);
+        // Redirect based on user type - never mix flows
+        if (userData.userType === 'barter_creator') {
+          window.location.href = '/creator-dashboard';
+          return;
+        }
+        if (userData.userType === 'barter_company') {
+          window.location.href = '/barter-company-dashboard';
+          return;
+        }
+        // Regular brand user - go to dashboard
+        window.location.href = '/dashboard';
+        return;
+      } catch (e) {
+        // Invalid user data, clear and let them register fresh
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      }
+    } else if (token) {
+      // Token but no user data, clear it
+      localStorage.removeItem('token');
     }
 
     const oauthError = searchParams.get('error');
@@ -110,6 +132,7 @@ function RegisterContent() {
     setLoading(true);
 
     try {
+      // First, register the user
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
@@ -131,12 +154,33 @@ function RegisterContent() {
         return;
       }
 
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      // Send verification email via AWS SES
+      const verifyResponse = await fetch('/api/auth/send-verification', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          name: formData.name,
+          userType: 'brand',
+        }),
+      });
+
+      if (!verifyResponse.ok) {
+        console.warn('Failed to send verification email, but user registered');
+      }
+
+      // Store user data (but don't log in until email is verified)
+      localStorage.setItem('pendingVerification', JSON.stringify({
+        email: formData.email,
+        name: formData.name,
+        userType: 'brand',
+      }));
 
       setSuccess(true);
       setTimeout(() => {
-        router.push('/dashboard');
+        router.push(`/verify-email?email=${encodeURIComponent(formData.email)}&type=brand`);
       }, 1500);
     } catch (err) {
       setError('Something went wrong. Please try again.');
@@ -245,9 +289,9 @@ function RegisterContent() {
               {/* Success State */}
               {success && (
                 <div className="brand-success-state">
-                  <div className="success-icon">🎉</div>
-                  <h2>Welcome to VibeVetting!</h2>
-                  <p>Your account has been created. Redirecting to dashboard...</p>
+                  <div className="success-icon">✉️</div>
+                  <h2>Check Your Email!</h2>
+                  <p>We&apos;ve sent a verification link to your email. Please verify to continue.</p>
                   <div className="success-loader">
                     <i className="fa-solid fa-spinner fa-spin"></i>
                   </div>

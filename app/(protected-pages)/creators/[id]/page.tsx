@@ -6,32 +6,131 @@ import { AIButton } from '@/components/common/AIButton';
 import { AddToPipelineModal } from '@/components/pipeline/AddToPipelineModal';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { exportCreatorReport } from '@/lib/export-utils';
 
-// Creator Data - Enhanced
-const creatorData = {
-  name: 'Jessica Davis',
-  handle: '@jessicad',
-  username: 'jessicad',
-  platform: 'Instagram',
-  followers: '245.3K',
-  following: '892',
-  posts: '1,247',
-  engagement: '4.2%',
-  avgViews: '45.2K',
-  avgLikes: '12.4K',
-  avgComments: '847',
-  avgShares: '234',
-  score: 96,
-  recommendation: 'perfect',
-  isRisingStar: true,
-  growthRate: '+23%',
-  joinedDate: 'March 2019',
-  niche: 'Lifestyle & Fashion',
-  location: 'Los Angeles, CA',
-  bio: 'Fashion enthusiast | Lifestyle blogger | Sharing my journey through style, travel & wellness ✨',
-};
+// Interfaces for API data
+interface CoreMetric {
+  label: string;
+  value: number;
+  description: string;
+  icon: string;
+}
+
+interface EngagementData {
+  likes: { value: number; percentage: number; trend: string };
+  comments: { value: number; percentage: number; trend: string };
+  shares: { value: number; percentage: number; trend: string };
+  saves: { value: number; percentage: number; trend: string };
+}
+
+interface ContentAnalysis {
+  totalPosts: number;
+  avgPostsPerWeek: number;
+  topPerformingType: string;
+  contentTypes: { type: string; count: number; percentage: number }[];
+  topHashtags: string[];
+  postingSchedule: string;
+}
+
+interface BrandAlignment {
+  overallScore: number;
+  vision: { score: number; description: string };
+  mission: { score: number; description: string };
+  values: { score: number; description: string };
+  audience: { score: number; description: string };
+  tone: { score: number; description: string };
+}
+
+interface FuturePrediction {
+  overall: string;
+  confidence: number;
+  prediction: string;
+  factors: { factor: string; impact: string; score: number; description: string }[];
+}
+
+interface RisingStarData {
+  isRisingStar: boolean;
+  starScore: number;
+  indicators: { label: string; value: boolean; detail: string }[];
+  projectedReach: string;
+  recommendedAction: string;
+}
+
+interface AuthenticityData {
+  score: number;
+  realFollowers: number;
+  suspiciousActivity: number;
+  engagementQuality: number;
+  audienceGrowth: string;
+  checks: { check: string; status: string; detail: string }[];
+}
+
+interface RecentPost {
+  id: number;
+  type: string;
+  thumbnail: string;
+  likes: number;
+  comments: number;
+  shares: number;
+  views: number;
+}
+
+interface Strength {
+  title: string;
+  description: string;
+}
+
+interface Concern {
+  title: string;
+  description: string;
+  severity: string;
+}
+
+interface CreatorData {
+  _id: string;
+  creatorId: string;
+  name: string;
+  handle: string;
+  username: string;
+  platform: string;
+  profileUrl?: string;
+  followers: string;
+  following: string;
+  posts: string;
+  engagement: string;
+  avgViews: string;
+  avgLikes: string;
+  avgComments: string;
+  avgShares: string;
+  score: number;
+  alignmentScore: number;
+  recommendation: string;
+  isRisingStar: boolean;
+  growthRate: string;
+  joinedDate: string;
+  niche: string;
+  location: string;
+  bio: string;
+  riskLevel: string;
+  coreMetrics: {
+    audienceAuthenticity: number;
+    contentQuality: number;
+    brandSafety: number;
+    engagementRate: number;
+    professionalism: number;
+    growthTrajectory: number;
+  };
+  engagementData: EngagementData;
+  contentAnalysis: ContentAnalysis;
+  brandAlignment: BrandAlignment;
+  futurePrediction: FuturePrediction;
+  risingStarData: RisingStarData;
+  authenticityData: AuthenticityData;
+  recentPosts: RecentPost[];
+  strengths: Strength[];
+  concerns: Concern[];
+}
 
 // Helper function to get profile URL based on platform
 const getProfileUrl = (platform: string, username: string) => {
@@ -46,120 +145,114 @@ const getProfileUrl = (platform: string, username: string) => {
   return urls[platform.toLowerCase()] || '#';
 };
 
-// Core Metrics - 6 categories
-const coreMetrics = [
-  { label: 'Audience Authenticity', value: 94, description: 'Real followers vs bots/fake accounts', icon: 'fa-users-viewfinder' },
-  { label: 'Content Quality', value: 92, description: 'Visual & editorial excellence', icon: 'fa-star' },
-  { label: 'Brand Safety', value: 98, description: 'Content appropriateness score', icon: 'fa-shield-halved' },
-  { label: 'Engagement Rate', value: 88, description: 'Active audience participation', icon: 'fa-comments' },
-  { label: 'Professionalism', value: 95, description: 'Consistency & reliability', icon: 'fa-briefcase' },
-  { label: 'Growth Trajectory', value: 91, description: 'Account growth momentum', icon: 'fa-arrow-trend-up' },
-];
-
-// Engagement Breakdown
-const engagementData = {
-  likes: { value: 12400, percentage: 68, trend: '+12%' },
-  comments: { value: 847, percentage: 18, trend: '+8%' },
-  shares: { value: 234, percentage: 8, trend: '+15%' },
-  saves: { value: 412, percentage: 6, trend: '+22%' },
-};
-
-// Content Analysis
-const contentAnalysis = {
-  totalPosts: 1247,
-  avgPostsPerWeek: 4.2,
-  topPerformingType: 'Reels',
-  contentTypes: [
-    { type: 'Photos', count: 623, percentage: 50 },
-    { type: 'Reels/Videos', count: 436, percentage: 35 },
-    { type: 'Carousels', count: 188, percentage: 15 },
-  ],
-  topHashtags: ['#fashion', '#lifestyle', '#ootd', '#styleinspo', '#wellness'],
-  postingSchedule: 'Most active: Tue-Thu, 10AM-2PM PST',
-};
-
-// Brand Alignment Scores
-const brandAlignment = {
-  overallScore: 94,
-  vision: { score: 96, description: 'Strong alignment with forward-thinking, innovative brand vision' },
-  mission: { score: 92, description: 'Content naturally supports brand mission of authenticity' },
-  values: { score: 95, description: 'Shared values in sustainability, quality, and community' },
-  audience: { score: 93, description: 'Target demographic overlap: 87% match' },
-  tone: { score: 91, description: 'Communication style aligns with brand voice' },
-};
-
-// Future Prediction Data
-const futurePrediction = {
-  overall: 'positive',
-  confidence: 89,
-  prediction: 'High likelihood of continued growth and positive brand association',
-  factors: [
-    { factor: 'Audience Growth', impact: 'positive', score: 92, description: 'Projected to reach 500K followers in 12 months' },
-    { factor: 'Content Consistency', impact: 'positive', score: 88, description: 'Maintains regular posting schedule with quality' },
-    { factor: 'Brand Partnerships', impact: 'neutral', score: 75, description: 'Has worked with competitors, but maintains professionalism' },
-    { factor: 'Community Sentiment', impact: 'positive', score: 94, description: 'Overwhelmingly positive audience interactions' },
-    { factor: 'Trend Alignment', impact: 'positive', score: 90, description: 'Early adopter of emerging content trends' },
-  ],
-};
-
-// Rising Star Indicators
-const risingStarData = {
-  isRisingStar: true,
-  starScore: 87,
-  indicators: [
-    { label: 'Rapid Growth', value: true, detail: '+23% followers in last 30 days' },
-    { label: 'High Engagement', value: true, detail: '4.2% vs 1.5% industry average' },
-    { label: 'Viral Content', value: true, detail: '3 posts with 100K+ views this month' },
-    { label: 'Community Building', value: true, detail: 'Strong audience loyalty metrics' },
-    { label: 'Untapped Potential', value: true, detail: 'Undervalued for current reach' },
-  ],
-  projectedReach: '500K-750K in 12 months',
-  recommendedAction: 'Partner early for optimal ROI before market rates increase',
-};
-
-// Authenticity Analysis
-const authenticityData = {
-  score: 94,
-  realFollowers: 94,
-  suspiciousActivity: 2,
-  engagementQuality: 96,
-  audienceGrowth: 'organic',
-  checks: [
-    { check: 'Follower/Following Ratio', status: 'pass', detail: 'Healthy ratio of 275:1' },
-    { check: 'Engagement Pattern', status: 'pass', detail: 'Natural engagement distribution' },
-    { check: 'Comment Quality', status: 'pass', detail: '92% genuine, meaningful comments' },
-    { check: 'Growth Pattern', status: 'pass', detail: 'Organic growth, no suspicious spikes' },
-    { check: 'Bot Detection', status: 'pass', detail: 'Only 2% potential bot followers' },
-    { check: 'Audience Location', status: 'pass', detail: 'Geographic distribution matches niche' },
-  ],
-};
-
-// Recent Posts
-const recentPosts = [
-  { id: 1, type: 'reel', thumbnail: '🎬', likes: 24500, comments: 1230, shares: 456, views: 128000 },
-  { id: 2, type: 'photo', thumbnail: '📸', likes: 15200, comments: 892, shares: 234, views: 45000 },
-  { id: 3, type: 'carousel', thumbnail: '🖼️', likes: 18700, comments: 1045, shares: 312, views: 67000 },
-  { id: 4, type: 'reel', thumbnail: '🎬', likes: 31200, comments: 1567, shares: 623, views: 185000 },
-];
-
-// Strengths
-const strengths = [
-  { title: 'Exceptional Engagement', description: 'Consistently outperforms industry benchmarks by 3x' },
-  { title: 'Authentic Voice', description: 'Genuine connection with audience, no scripted content feel' },
-  { title: 'High-Quality Production', description: 'Professional photography and editing standards' },
-  { title: 'Responsive Community', description: 'Replies to 78% of comments within 24 hours' },
-  { title: 'Trend Awareness', description: 'Early adopter of platform features and trends' },
-];
-
-// Concerns
-const concerns = [
-  { title: 'Competitor Mentions', description: 'Previously worked with 2 competing brands', severity: 'low' },
+// Convert core metrics object to array format for display
+const formatCoreMetrics = (metrics: CreatorData['coreMetrics']): CoreMetric[] => [
+  { label: 'Audience Authenticity', value: metrics.audienceAuthenticity, description: 'Real followers vs bots/fake accounts', icon: 'fa-users-viewfinder' },
+  { label: 'Content Quality', value: metrics.contentQuality, description: 'Visual & editorial excellence', icon: 'fa-star' },
+  { label: 'Brand Safety', value: metrics.brandSafety, description: 'Content appropriateness score', icon: 'fa-shield-halved' },
+  { label: 'Engagement Rate', value: metrics.engagementRate, description: 'Active audience participation', icon: 'fa-comments' },
+  { label: 'Professionalism', value: metrics.professionalism, description: 'Consistency & reliability', icon: 'fa-briefcase' },
+  { label: 'Growth Trajectory', value: metrics.growthTrajectory, description: 'Account growth momentum', icon: 'fa-arrow-trend-up' },
 ];
 
 export default function CreatorProfilePage() {
   const params = useParams();
   const [activeTab, setActiveTab] = useState('overview');
   const [showPipelineModal, setShowPipelineModal] = useState(false);
+  const [creatorData, setCreatorData] = useState<CreatorData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchCreatorData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          setError('Please login to view creator analysis');
+          setLoading(false);
+          return;
+        }
+
+        const response = await fetch(`/api/creators/${params.id}`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setCreatorData(data.creator);
+        } else if (response.status === 404) {
+          setError('Creator analysis not found. This creator has not been analyzed yet.');
+        } else {
+          setError('Failed to load creator data');
+        }
+      } catch (err) {
+        console.error('Error fetching creator:', err);
+        setError('Failed to load creator data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (params.id) {
+      fetchCreatorData();
+    }
+  }, [params.id]);
+
+  if (loading) {
+    return (
+      <div className="dashboard-wrapper">
+        <Sidebar />
+        <div className="main-content">
+          <div className="container creator-analysis-page">
+            <TopBar title="Creator Analysis" subtitle="Loading..." showSearch={false} />
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+              <div style={{ textAlign: 'center' }}>
+                <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: '48px', color: '#667eea', marginBottom: '20px' }}></i>
+                <p style={{ color: '#64748b' }}>Loading creator analysis...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !creatorData) {
+    return (
+      <div className="dashboard-wrapper">
+        <Sidebar />
+        <div className="main-content">
+          <div className="container creator-analysis-page">
+            <TopBar title="Creator Analysis" subtitle="Error" showSearch={false} />
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+              <div style={{ textAlign: 'center', maxWidth: '400px' }}>
+                <i className="fa-solid fa-circle-exclamation" style={{ fontSize: '48px', color: '#ef4444', marginBottom: '20px' }}></i>
+                <h3 style={{ marginBottom: '12px', color: 'var(--text-primary)' }}>{error || 'Creator not found'}</h3>
+                <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>
+                  The creator you are looking for may not exist or has not been analyzed yet.
+                </p>
+                <Link href="/creators" className="btn btn-primary">
+                  <i className="fa-solid fa-arrow-left"></i> Back to Creators
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Format core metrics for display
+  const coreMetrics = formatCoreMetrics(creatorData.coreMetrics);
+  const engagementData = creatorData.engagementData;
+  const contentAnalysis = creatorData.contentAnalysis;
+  const brandAlignment = creatorData.brandAlignment;
+  const futurePrediction = creatorData.futurePrediction;
+  const risingStarData = creatorData.risingStarData;
+  const authenticityData = creatorData.authenticityData;
+  const recentPosts = creatorData.recentPosts;
+  const strengths = creatorData.strengths;
+  const concerns = creatorData.concerns;
 
   return (
     <div className="dashboard-wrapper">
@@ -340,7 +433,7 @@ export default function CreatorProfilePage() {
               <i className="fa-solid fa-bullseye"></i> Brand Alignment
             </button>
             <button className={`tab-btn ${activeTab === 'prediction' ? 'active' : ''}`} onClick={() => setActiveTab('prediction')}>
-              <i className="fa-solid fa-wand-magic-sparkles"></i> Future Prediction
+              <i className="fa-solid fa-wand-magic"></i> Future Prediction
             </button>
             <button className={`tab-btn ${activeTab === 'content' ? 'active' : ''}`} onClick={() => setActiveTab('content')}>
               <i className="fa-solid fa-images"></i> Content Analysis
@@ -718,7 +811,7 @@ export default function CreatorProfilePage() {
               <div className="prediction-analysis">
                 <div className="section-header-fancy">
                   <div className="header-left">
-                    <i className="fa-solid fa-wand-magic-sparkles"></i>
+                    <i className="fa-solid fa-wand-magic"></i>
                     <h2>Future Impact Prediction</h2>
                   </div>
                   <div className={`prediction-badge ${futurePrediction.overall}`}>
@@ -852,7 +945,7 @@ export default function CreatorProfilePage() {
                     </h3>
                     <div className="coming-soon-content">
                       <div className="coming-soon-icon">
-                        <i className="fa-solid fa-wand-magic-sparkles"></i>
+                        <i className="fa-solid fa-wand-magic"></i>
                       </div>
                       <p>Advanced AI-powered visual content analysis including:</p>
                       <ul>

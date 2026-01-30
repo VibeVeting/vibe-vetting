@@ -15,7 +15,6 @@ export async function GET() {
         id: plan.id,
         name: plan.name,
         price: plan.price,
-        priceUSD: plan.priceUSD,
         period: plan.period,
         features: plan.features,
         popular: plan.popular,

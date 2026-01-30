@@ -155,6 +155,7 @@ export async function POST(request: NextRequest) {
           twoFactorEnabled: user.twoFactorEnabled || false,
           currentPlan: user.currentPlan || "starter",
           planUpdatedAt: user.planUpdatedAt || null,
+          userType: 'brand',
         },
       },
       { status: 200 }

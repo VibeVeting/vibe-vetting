@@ -410,7 +410,7 @@ Total Fee: {{total_fee}}
 3. DELIVERABLES & TIMELINE
 - Content Due: {{delivery_date}}
 - Revision Rounds Included: {{revision_rounds}}
-- Additional revisions: $50 per round
+- Additional revisions: ₹4,000 per round
 
 4. CONTENT SPECIFICATIONS
 Creator will deliver:

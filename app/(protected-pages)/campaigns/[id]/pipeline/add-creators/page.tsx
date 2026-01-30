@@ -336,6 +336,7 @@ export default function AddCreatorsToPipelinePage() {
 
         .controls {
           display: flex;
+          align-items: center;
           gap: 16px;
           margin-bottom: 24px;
         }
@@ -344,14 +345,14 @@ export default function AddCreatorsToPipelinePage() {
           flex: 1;
           display: flex;
           align-items: center;
-          background: white;
-          border: 2px solid #e2e8f0;
+          background: var(--bg-elevated);
+          border: 2px solid var(--border-color);
           border-radius: 8px;
           padding: 0 16px;
         }
 
         .search-box i {
-          color: #a0aec0;
+          color: var(--text-muted);
           margin-right: 12px;
         }
 
@@ -361,16 +362,18 @@ export default function AddCreatorsToPipelinePage() {
           padding: 12px 0;
           font-size: 14px;
           outline: none;
+          background: transparent;
+          color: var(--text-primary);
         }
 
         .select-all-btn {
           padding: 12px 20px;
-          background: white;
-          border: 2px solid #e2e8f0;
+          background: var(--bg-elevated);
+          border: 2px solid var(--border-color);
           border-radius: 8px;
           cursor: pointer;
           font-weight: 500;
-          color: #4a5568;
+          color: var(--text-secondary);
         }
 
         .select-all-btn:hover {
@@ -385,8 +388,8 @@ export default function AddCreatorsToPipelinePage() {
         }
 
         .creator-card {
-          background: white;
-          border: 2px solid #e2e8f0;
+          background: var(--bg-elevated);
+          border: 2px solid var(--border-color);
           border-radius: 12px;
           padding: 20px;
           cursor: pointer;
@@ -399,18 +402,18 @@ export default function AddCreatorsToPipelinePage() {
 
         .creator-card:hover {
           border-color: #667eea;
-          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
         }
 
         .creator-card.selected {
           border-color: #667eea;
-          background: linear-gradient(to right, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+          background: rgba(102, 126, 234, 0.1);
         }
 
         .checkbox {
           width: 24px;
           height: 24px;
-          border: 2px solid #e2e8f0;
+          border: 2px solid var(--border-color);
           border-radius: 6px;
           display: flex;
           align-items: center;
@@ -445,12 +448,12 @@ export default function AddCreatorsToPipelinePage() {
         .creator-info h3 {
           margin: 0 0 4px;
           font-size: 16px;
-          color: #1a202c;
+          color: var(--text-primary);
         }
 
         .creator-info p {
           margin: 0 0 8px;
-          color: #718096;
+          color: var(--text-muted);
           font-size: 14px;
         }
 
@@ -461,25 +464,25 @@ export default function AddCreatorsToPipelinePage() {
 
         .creator-meta span {
           padding: 4px 8px;
-          background: #f7fafc;
+          background: var(--bg-hover);
           border-radius: 4px;
           font-size: 12px;
-          color: #4a5568;
+          color: var(--text-secondary);
         }
 
         .platform {
-          background: #e2e8f0 !important;
+          background: var(--bg-input) !important;
         }
 
         .engagement {
           color: #10b981 !important;
-          background: #d1fae5 !important;
+          background: rgba(16, 185, 129, 0.15) !important;
         }
 
         .no-results {
           text-align: center;
           padding: 48px;
-          color: #718096;
+          color: var(--text-muted);
         }
       `}</style>
     </div>

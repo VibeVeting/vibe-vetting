@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 const menuItems = [
-  { icon: 'fa-gauge-high', label: 'Dashboard', href: '/dashboard', badge: null },
+  { icon: 'fa-gauge', label: 'Dashboard', href: '/dashboard', badge: null },
   { icon: 'fa-chart-line', label: 'Analytics', href: '/analytics', badge: null },
   { icon: 'fa-users', label: 'Creators', href: '/creators', badge: 'NEW' },
   { icon: 'fa-bullhorn', label: 'Campaigns', href: '/campaigns', badge: null },
@@ -299,15 +299,11 @@ export function Sidebar() {
           display: flex;
           justify-content: space-around;
           padding: 16px 10px;
-          background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(247, 250, 252, 0.95) 100%);
+          background: var(--bg-elevated);
           border-radius: 16px;
           margin-bottom: 20px;
-          border: 1px solid rgba(102, 126, 234, 0.12);
-          box-shadow: 
-            0 4px 16px rgba(102, 126, 234, 0.08),
-            inset 0 1px 0 rgba(255, 255, 255, 0.9),
-            inset 0 -2px 6px rgba(102, 126, 234, 0.03);
-          border-bottom: 3px solid rgba(102, 126, 234, 0.15);
+          border: 1px solid var(--border-color);
+          box-shadow: var(--shadow-sm);
         }
 
         .circular-stat {
@@ -328,12 +324,9 @@ export function Sidebar() {
           display: flex;
           align-items: center;
           justify-content: center;
-          background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+          background: var(--bg-elevated);
           border-radius: 50%;
-          box-shadow: 
-            0 4px 12px rgba(0, 0, 0, 0.06),
-            0 1px 3px rgba(0, 0, 0, 0.04),
-            inset 0 -2px 6px rgba(0, 0, 0, 0.02);
+          box-shadow: var(--shadow-sm);
           transition: all 0.3s ease;
         }
 
@@ -378,16 +371,15 @@ export function Sidebar() {
         .circular-value {
           font-size: 11px;
           font-weight: 800;
-          color: #1a202c;
+          color: var(--text-primary);
           z-index: 1;
-          text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
           white-space: nowrap;
         }
 
         .circular-label {
           font-size: 9px;
           font-weight: 700;
-          color: #64748b;
+          color: var(--text-secondary);
           margin-top: 8px;
           text-transform: uppercase;
           letter-spacing: 0.5px;
@@ -396,7 +388,7 @@ export function Sidebar() {
         .sidebar-section-label {
           font-size: 11px;
           font-weight: 700;
-          color: #a0aec0;
+          color: var(--text-muted);
           text-transform: uppercase;
           letter-spacing: 1px;
           padding: 16px 16px 8px;
@@ -409,7 +401,7 @@ export function Sidebar() {
           gap: 12px;
           padding: 12px 16px;
           border-radius: 12px;
-          color: #4a5568;
+          color: var(--text-primary);
           text-decoration: none;
           font-weight: 600;
           font-size: 14px;
@@ -554,7 +546,7 @@ export function Sidebar() {
         .sidebar-upgrade-card h4 {
           font-size: 15px;
           font-weight: 700;
-          color: #1a202c;
+          color: var(--text-primary);
           margin-bottom: 6px;
           position: relative;
           z-index: 2;
@@ -562,7 +554,7 @@ export function Sidebar() {
 
         .sidebar-upgrade-card p {
           font-size: 12px;
-          color: #718096;
+          color: var(--text-secondary);
           line-height: 1.5;
           margin-bottom: 14px;
           position: relative;
@@ -643,7 +635,7 @@ export function Sidebar() {
         .premium-content h4 {
           font-size: 15px;
           font-weight: 700;
-          color: #1a202c;
+          color: var(--text-primary);
           margin: 0 0 2px 0;
           text-transform: capitalize;
         }
@@ -679,7 +671,7 @@ export function Sidebar() {
           align-items: center;
           gap: 12px;
           padding: 12px 14px;
-          background: #f7fafc;
+          background: var(--bg-hover);
           border-radius: 14px;
         }
 
@@ -705,7 +697,7 @@ export function Sidebar() {
         .sidebar-user-name {
           display: block;
           font-weight: 600;
-          color: #1a202c;
+          color: var(--text-primary);
           font-size: 13px;
           white-space: nowrap;
           overflow: hidden;
@@ -715,7 +707,7 @@ export function Sidebar() {
         .sidebar-user-email {
           display: block;
           font-size: 11px;
-          color: #718096;
+          color: var(--text-secondary);
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -729,7 +721,7 @@ export function Sidebar() {
           justify-content: center;
           border: none;
           background: transparent;
-          color: #a0aec0;
+          color: var(--text-muted);
           border-radius: 8px;
           cursor: pointer;
           transition: all 0.2s ease;

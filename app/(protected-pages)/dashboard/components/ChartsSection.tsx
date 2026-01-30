@@ -399,7 +399,7 @@ export function ChartsSection() {
           <div className="ai-insights-section">
             <div className="ai-insights-header">
               <div className="ai-badge">
-                <i className="fa-solid fa-sparkles"></i>
+                <i className="fa-solid fa-star"></i>
                 <span>AI Insights</span>
               </div>
               <span className="updated-badge">Updated now</span>
@@ -426,7 +426,7 @@ export function ChartsSection() {
                 </>
               ) : (
                 <>
-                  <i className="fa-solid fa-wand-magic-sparkles"></i>
+                  <i className="fa-solid fa-wand-magic"></i>
                   <span>Get personalized recommendations</span>
                   <i className="fa-solid fa-arrow-right"></i>
                 </>
@@ -443,7 +443,7 @@ export function ChartsSection() {
             <div className="modal-header">
               <div className="modal-title-group">
                 <div className="modal-icon">
-                  <i className="fa-solid fa-wand-magic-sparkles"></i>
+                  <i className="fa-solid fa-wand-magic"></i>
                 </div>
                 <div>
                   <h2>Personalized AI Recommendations</h2>
@@ -499,10 +499,10 @@ export function ChartsSection() {
         }
 
         .chart-card-enhanced {
-          background: white;
+          background: var(--bg-elevated);
           border-radius: 20px;
           padding: 28px;
-          border: 1px solid rgba(226, 232, 240, 0.8);
+          border: 1px solid var(--border-color);
           opacity: 0;
           transform: translateY(20px);
           transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
@@ -526,19 +526,19 @@ export function ChartsSection() {
         .chart-title {
           font-size: 18px;
           font-weight: 700;
-          color: #1a202c;
+          color: var(--text-primary);
           margin-bottom: 4px;
         }
 
         .chart-subtitle {
           font-size: 13px;
-          color: #718096;
+          color: var(--text-muted);
         }
 
         .chart-controls {
           display: flex;
           gap: 4px;
-          background: #f7fafc;
+          background: var(--bg-hover);
           padding: 4px;
           border-radius: 10px;
         }
@@ -550,7 +550,7 @@ export function ChartsSection() {
           border-radius: 8px;
           font-size: 13px;
           font-weight: 600;
-          color: #718096;
+          color: var(--text-muted);
           cursor: pointer;
           transition: all 0.2s ease;
           min-width: 44px;
@@ -558,13 +558,13 @@ export function ChartsSection() {
         }
 
         .period-btn:hover {
-          color: #4a5568;
+          color: var(--text-secondary);
         }
 
         .period-btn.active {
-          background: white;
+          background: var(--bg-elevated);
           color: #667eea;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
 
         .chart-legend {
@@ -578,7 +578,7 @@ export function ChartsSection() {
           align-items: center;
           gap: 8px;
           font-size: 13px;
-          color: #718096;
+          color: var(--text-muted);
           font-weight: 500;
         }
 
@@ -975,7 +975,7 @@ export function ChartsSection() {
           gap: 10px;
           font-size: 15px;
           font-weight: 700;
-          color: #1a202c;
+          color: var(--text-primary);
         }
 
         .leaderboard-list {
@@ -989,9 +989,9 @@ export function ChartsSection() {
           align-items: center;
           gap: 12px;
           padding: 12px 14px;
-          background: white;
+          background: var(--bg-elevated);
           border-radius: 12px;
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--border-color);
           transition: all 0.2s;
           opacity: 0;
           animation: fadeInUp 0.4s ease forwards;
@@ -1000,7 +1000,7 @@ export function ChartsSection() {
         .leaderboard-item:hover {
           transform: translateX(4px);
           border-color: #667eea;
-          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
         }
 
         .rank-badge {
@@ -1012,8 +1012,8 @@ export function ChartsSection() {
           font-size: 14px;
           font-weight: 700;
           border-radius: 8px;
-          background: #f7fafc;
-          color: #718096;
+          background: var(--bg-hover);
+          color: var(--text-muted);
         }
 
         .rank-1 { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); }
@@ -1041,7 +1041,7 @@ export function ChartsSection() {
         .creator-name {
           font-size: 13px;
           font-weight: 600;
-          color: #1a202c;
+          color: var(--text-primary);
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -1165,9 +1165,9 @@ export function ChartsSection() {
           align-items: center;
           gap: 14px;
           padding: 16px;
-          background: white;
+          background: var(--bg-elevated);
           border-radius: 14px;
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--border-color);
           transition: all 0.2s;
           opacity: 0;
           animation: fadeInUp 0.4s ease forwards;
@@ -1175,7 +1175,7 @@ export function ChartsSection() {
 
         .insight-card:hover {
           transform: translateY(-2px);
-          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         }
 
         .insight-icon {
@@ -1198,7 +1198,7 @@ export function ChartsSection() {
 
         .insight-label {
           font-size: 11px;
-          color: #a0aec0;
+          color: var(--text-muted);
           font-weight: 500;
           text-transform: uppercase;
           letter-spacing: 0.5px;
@@ -1207,7 +1207,7 @@ export function ChartsSection() {
         .insight-value {
           font-size: 15px;
           font-weight: 700;
-          color: #1a202c;
+          color: var(--text-primary);
         }
 
         .insight-change {
@@ -1267,7 +1267,7 @@ export function ChartsSection() {
         }
 
         .recommendations-modal {
-          background: white;
+          background: var(--bg-elevated);
           border-radius: 24px;
           width: 100%;
           max-width: 700px;
@@ -1275,8 +1275,9 @@ export function ChartsSection() {
           overflow: hidden;
           display: flex;
           flex-direction: column;
-          box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
           animation: slideUp 0.3s ease;
+          border: 1px solid var(--border-color);
         }
 
         @keyframes slideUp {
@@ -1295,8 +1296,8 @@ export function ChartsSection() {
           align-items: center;
           justify-content: space-between;
           padding: 24px 28px;
-          border-bottom: 1px solid #e2e8f0;
-          background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+          border-bottom: 1px solid var(--border-color);
+          background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
         }
 
         .modal-title-group {
@@ -1320,13 +1321,13 @@ export function ChartsSection() {
         .modal-header h2 {
           font-size: 20px;
           font-weight: 700;
-          color: #1a202c;
+          color: var(--text-primary);
           margin: 0;
         }
 
         .modal-header p {
           font-size: 13px;
-          color: #718096;
+          color: var(--text-muted);
           margin: 4px 0 0 0;
         }
 
@@ -1453,8 +1454,8 @@ export function ChartsSection() {
           justify-content: flex-end;
           gap: 12px;
           padding: 20px 28px;
-          border-top: 1px solid #e2e8f0;
-          background: #f8fafc;
+          border-top: 1px solid var(--border-color);
+          background: var(--bg-hover);
         }
 
         .modal-footer .btn-secondary {
@@ -1462,15 +1463,15 @@ export function ChartsSection() {
           border-radius: 10px;
           font-size: 14px;
           font-weight: 600;
-          border: 1px solid #e2e8f0;
-          background: white;
-          color: #4a5568;
+          border: 1px solid var(--border-color);
+          background: var(--bg-elevated);
+          color: var(--text-secondary);
           cursor: pointer;
           transition: all 0.2s;
         }
 
         .modal-footer .btn-secondary:hover {
-          background: #f1f5f9;
+          background: var(--bg-hover);
         }
 
         .modal-footer .btn-primary {

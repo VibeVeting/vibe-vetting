@@ -135,7 +135,7 @@ export async function POST(request: NextRequest) {
             brandValues: data?.brandValues || "quality and authenticity",
             campaignName: data?.campaignName || "Our Campaign",
             deliverables: data?.deliverables || "• 1 Instagram Post\n• 2 Stories",
-            budgetRange: data?.budgetRange || "$500 - $2,000",
+            budgetRange: data?.budgetRange || "₹40,000 - ₹1,60,000",
             senderName: data?.senderName || "The Team",
             responseLink: data?.responseLink || "",
           },
@@ -310,7 +310,7 @@ export async function POST(request: NextRequest) {
           creatorId,
           data.initialOffer,
           data.deliverables,
-          data.currency || "USD"
+          data.currency || "INR"
         );
 
         // Send negotiation email
@@ -324,7 +324,7 @@ export async function POST(request: NextRequest) {
               brandName: data.brandName || "Our Brand",
               campaignName: data.campaignName || "Our Campaign",
               deliverables: data.deliverables.map((d: any) => `• ${d.quantity}x ${d.type}`).join("\n"),
-              offerAmount: `$${data.initialOffer.toLocaleString()}`,
+              offerAmount: `₹${data.initialOffer.toLocaleString('en-IN')}`,
               paymentTerms: data.paymentTerms || "50% upfront, 50% on completion",
               timeline: data.timeline || "2 weeks from contract signing",
               senderName: data.senderName || "The Team",

@@ -511,7 +511,7 @@ export function AddToPipelineModal({
         }
 
         .modal-content.pipeline-modal {
-          background: white;
+          background: var(--bg-elevated);
           border-radius: 16px;
           width: 100%;
           max-width: 540px;
@@ -519,7 +519,8 @@ export function AddToPipelineModal({
           overflow: hidden;
           display: flex;
           flex-direction: column;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+          border: 1px solid var(--border-color);
         }
 
         .modal-header {
@@ -527,14 +528,14 @@ export function AddToPipelineModal({
           align-items: center;
           justify-content: space-between;
           padding: 20px 24px;
-          border-bottom: 1px solid #e2e8f0;
+          border-bottom: 1px solid var(--border-color);
           flex-shrink: 0;
         }
 
         .modal-header h2 {
           font-size: 18px;
           font-weight: 600;
-          color: #1a202c;
+          color: var(--text-primary);
           display: flex;
           align-items: center;
           gap: 10px;
@@ -549,7 +550,7 @@ export function AddToPipelineModal({
           background: none;
           border: none;
           font-size: 18px;
-          color: #718096;
+          color: var(--text-muted);
           cursor: pointer;
           padding: 8px;
           border-radius: 8px;
@@ -557,8 +558,8 @@ export function AddToPipelineModal({
         }
 
         .modal-close:hover {
-          background: #f7fafc;
-          color: #1a202c;
+          background: var(--bg-hover);
+          color: var(--text-primary);
         }
 
         .modal-body {
@@ -573,8 +574,8 @@ export function AddToPipelineModal({
           justify-content: flex-end;
           gap: 12px;
           padding: 16px 24px;
-          border-top: 1px solid #e2e8f0;
-          background: #f7fafc;
+          border-top: 1px solid var(--border-color);
+          background: var(--bg-hover);
           flex-shrink: 0;
         }
 
@@ -587,7 +588,7 @@ export function AddToPipelineModal({
           display: block;
           font-size: 13px;
           font-weight: 600;
-          color: #4a5568;
+          color: var(--text-secondary);
           margin-bottom: 12px;
         }
 
@@ -604,13 +605,13 @@ export function AddToPipelineModal({
           align-items: center;
           gap: 8px;
           padding: 8px 12px;
-          background: #f7fafc;
-          border: 1px solid #e2e8f0;
+          background: var(--bg-input);
+          border: 1px solid var(--border-color);
           border-radius: 8px;
         }
 
         .creator-search i {
-          color: #a0aec0;
+          color: var(--text-muted);
           font-size: 14px;
         }
 
@@ -619,8 +620,12 @@ export function AddToPipelineModal({
           border: none;
           background: none;
           font-size: 14px;
-          color: #1a202c;
+          color: var(--text-primary);
           outline: none;
+        }
+
+        .creator-search input::placeholder {
+          color: var(--text-muted);
         }
 
         .creator-actions .btn-text {
@@ -640,14 +645,15 @@ export function AddToPipelineModal({
         .creator-discovery-list {
           max-height: 200px;
           overflow-y: auto;
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--border-color);
           border-radius: 12px;
+          background: var(--bg-card);
         }
 
         .loading-creators, .no-creators-found {
           padding: 32px;
           text-align: center;
-          color: #718096;
+          color: var(--text-muted);
         }
 
         .loading-creators i, .no-creators-found i {
@@ -661,7 +667,7 @@ export function AddToPipelineModal({
           align-items: center;
           gap: 12px;
           padding: 12px 16px;
-          border-bottom: 1px solid #e2e8f0;
+          border-bottom: 1px solid var(--border-color);
           cursor: pointer;
           transition: background 0.2s;
         }
@@ -671,16 +677,16 @@ export function AddToPipelineModal({
         }
 
         .creator-discovery-item:hover {
-          background: #f7fafc;
+          background: var(--bg-hover);
         }
 
         .creator-discovery-item.selected {
-          background: #ebf4ff;
+          background: rgba(102, 126, 234, 0.15);
         }
 
         .creator-checkbox {
           font-size: 18px;
-          color: #cbd5e0;
+          color: var(--text-muted);
         }
 
         .creator-discovery-item.selected .creator-checkbox {
@@ -710,7 +716,7 @@ export function AddToPipelineModal({
         .creator-name-mini {
           font-size: 13px;
           font-weight: 500;
-          color: #1a202c;
+          color: var(--text-primary);
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -718,7 +724,7 @@ export function AddToPipelineModal({
 
         .creator-handle-mini {
           font-size: 11px;
-          color: #718096;
+          color: var(--text-muted);
         }
 
         .creator-meta-mini {
@@ -730,7 +736,7 @@ export function AddToPipelineModal({
         .creator-followers-mini {
           font-size: 12px;
           font-weight: 500;
-          color: #4a5568;
+          color: var(--text-secondary);
         }
 
         .creator-platform-mini {
@@ -746,18 +752,18 @@ export function AddToPipelineModal({
         }
 
         .creator-score-mini .score.high {
-          background: #c6f6d5;
-          color: #22543d;
+          background: rgba(34, 197, 94, 0.2);
+          color: #22c55e;
         }
 
         .creator-score-mini .score.medium {
-          background: #feebc8;
-          color: #744210;
+          background: rgba(245, 158, 11, 0.2);
+          color: #f59e0b;
         }
 
         .creator-score-mini .score.low {
-          background: #fed7d7;
-          color: #c53030;
+          background: rgba(239, 68, 68, 0.2);
+          color: #ef4444;
         }
 
         .pipeline-creators-preview {
@@ -768,7 +774,7 @@ export function AddToPipelineModal({
           display: block;
           font-size: 13px;
           font-weight: 600;
-          color: #4a5568;
+          color: var(--text-secondary);
           margin-bottom: 12px;
         }
 
@@ -783,14 +789,14 @@ export function AddToPipelineModal({
           align-items: center;
           gap: 8px;
           padding: 8px 12px;
-          background: #f7fafc;
+          background: var(--bg-input);
           border-radius: 20px;
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--border-color);
         }
 
         .creator-chip.more {
-          background: #edf2f7;
-          color: #718096;
+          background: var(--bg-hover);
+          color: var(--text-muted);
           font-weight: 500;
         }
 
@@ -815,12 +821,12 @@ export function AddToPipelineModal({
         .chip-name {
           font-size: 13px;
           font-weight: 500;
-          color: #1a202c;
+          color: var(--text-primary);
         }
 
         .chip-handle {
           font-size: 11px;
-          color: #718096;
+          color: var(--text-muted);
         }
 
         .pipeline-campaign-select {
@@ -831,15 +837,15 @@ export function AddToPipelineModal({
           display: block;
           font-size: 13px;
           font-weight: 600;
-          color: #4a5568;
+          color: var(--text-secondary);
           margin-bottom: 12px;
         }
 
         .loading-campaigns, .no-campaigns {
           padding: 32px;
           text-align: center;
-          color: #718096;
-          background: #f7fafc;
+          color: var(--text-muted);
+          background: var(--bg-input);
           border-radius: 12px;
         }
 
@@ -862,7 +868,7 @@ export function AddToPipelineModal({
           align-items: center;
           gap: 12px;
           padding: 12px 16px;
-          background: #f7fafc;
+          background: var(--bg-input);
           border: 2px solid transparent;
           border-radius: 12px;
           cursor: pointer;
@@ -870,17 +876,17 @@ export function AddToPipelineModal({
         }
 
         .campaign-option:hover {
-          background: #edf2f7;
+          background: var(--bg-hover);
         }
 
         .campaign-option.selected {
-          background: #ebf4ff;
+          background: rgba(102, 126, 234, 0.15);
           border-color: #667eea;
         }
 
         .campaign-radio {
           font-size: 18px;
-          color: #cbd5e0;
+          color: var(--text-muted);
         }
 
         .campaign-option.selected .campaign-radio {
@@ -896,7 +902,7 @@ export function AddToPipelineModal({
 
         .campaign-name {
           font-weight: 500;
-          color: #1a202c;
+          color: var(--text-primary);
         }
 
         .campaign-status {
@@ -907,32 +913,33 @@ export function AddToPipelineModal({
         }
 
         .campaign-status.status-active {
-          background: #c6f6d5;
-          color: #22543d;
+          background: rgba(34, 197, 94, 0.2);
+          color: #22c55e;
         }
 
         .campaign-status.status-draft {
-          background: #feebc8;
-          color: #744210;
+          background: rgba(245, 158, 11, 0.2);
+          color: #f59e0b;
         }
 
         .campaign-budget {
           font-size: 13px;
-          color: #718096;
+          color: var(--text-muted);
           font-weight: 500;
         }
 
         .pipeline-info {
-          background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+          background: var(--bg-input);
           border-radius: 12px;
           padding: 16px;
           margin-bottom: 16px;
+          border: 1px solid var(--border-color);
         }
 
         .pipeline-info h4 {
           font-size: 13px;
           font-weight: 600;
-          color: #4a5568;
+          color: var(--text-secondary);
           margin-bottom: 12px;
           display: flex;
           align-items: center;
@@ -955,7 +962,7 @@ export function AddToPipelineModal({
           align-items: center;
           gap: 6px;
           font-size: 12px;
-          color: #4a5568;
+          color: var(--text-secondary);
         }
 
         .step-num {
@@ -972,7 +979,7 @@ export function AddToPipelineModal({
         }
 
         .step-arrow {
-          color: #cbd5e0;
+          color: var(--text-muted);
           font-size: 12px;
         }
 
@@ -986,13 +993,13 @@ export function AddToPipelineModal({
         }
 
         .alert-error {
-          background: #fed7d7;
-          color: #c53030;
+          background: rgba(239, 68, 68, 0.15);
+          color: #ef4444;
         }
 
         .alert-success {
-          background: #c6f6d5;
-          color: #22543d;
+          background: rgba(34, 197, 94, 0.15);
+          color: #22c55e;
         }
 
         .btn {
@@ -1009,13 +1016,13 @@ export function AddToPipelineModal({
         }
 
         .btn-secondary {
-          background: white;
-          border: 1px solid #e2e8f0;
-          color: #4a5568;
+          background: var(--bg-elevated);
+          border: 1px solid var(--border-color);
+          color: var(--text-secondary);
         }
 
         .btn-secondary:hover:not(:disabled) {
-          background: #f7fafc;
+          background: var(--bg-hover);
         }
 
         .btn-primary {

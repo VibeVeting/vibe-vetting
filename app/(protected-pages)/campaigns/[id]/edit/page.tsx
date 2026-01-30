@@ -1,14 +1,15 @@
 "use client";
 
 import { Sidebar } from '@/components/common/Sidebar';
-import { TopBar } from '@/components/common/TopBar';
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 export default function EditCampaignPage() {
   const params = useParams();
   const router = useRouter();
   const campaignId = params.id as string;
+  const pageRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,6 +47,7 @@ export default function EditCampaignPage() {
 
   // Fetch existing campaign data
   useEffect(() => {
+    setTimeout(() => setIsVisible(true), 50);
     const fetchCampaign = async () => {
       try {
         const token = localStorage.getItem('token');
@@ -233,12 +235,12 @@ export default function EditCampaignPage() {
       <div className="dashboard-wrapper">
         <Sidebar />
         <div className="main-content">
-          <div className="container">
-            <TopBar
-              title="Edit Campaign"
-              subtitle="Loading campaign data..."
-              showSearch={false}
-            />
+          <div className="yc-page">
+            <div className="yc-page-bg">
+              <div className="yc-page-orb yc-page-orb-1"></div>
+              <div className="yc-page-orb yc-page-orb-2"></div>
+              <div className="yc-page-grid"></div>
+            </div>
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '100px 0' }}>
               <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: '32px', color: '#667eea' }}></i>
             </div>
@@ -253,12 +255,12 @@ export default function EditCampaignPage() {
       <div className="dashboard-wrapper">
         <Sidebar />
         <div className="main-content">
-          <div className="container">
-            <TopBar
-              title="Edit Campaign"
-              subtitle="Error loading campaign"
-              showSearch={false}
-            />
+          <div className="yc-page">
+            <div className="yc-page-bg">
+              <div className="yc-page-orb yc-page-orb-1"></div>
+              <div className="yc-page-orb yc-page-orb-2"></div>
+              <div className="yc-page-grid"></div>
+            </div>
             <div style={{ 
               display: 'flex', 
               flexDirection: 'column', 
@@ -268,9 +270,9 @@ export default function EditCampaignPage() {
               gap: '16px'
             }}>
               <i className="fa-solid fa-exclamation-circle" style={{ fontSize: '48px', color: '#ef4444' }}></i>
-              <p style={{ fontSize: '18px', color: '#4a5568' }}>{error}</p>
+              <p style={{ fontSize: '18px', color: 'var(--text-secondary)' }}>{error}</p>
               <button 
-                className="btn btn-primary" 
+                className="yc-btn-primary" 
                 onClick={() => router.push('/campaigns')}
               >
                 <i className="fa-solid fa-arrow-left"></i> Back to Campaigns
@@ -286,12 +288,33 @@ export default function EditCampaignPage() {
     <div className="dashboard-wrapper">
       <Sidebar />
       <div className="main-content">
-        <div className="container">
-          <TopBar
-            title="Edit Campaign"
-            subtitle="Update your campaign details"
-            showSearch={false}
-          />
+        <div className="yc-page" ref={pageRef}>
+          {/* YC Background Effects */}
+          <div className="yc-page-bg">
+            <div className="yc-page-orb yc-page-orb-1"></div>
+            <div className="yc-page-orb yc-page-orb-2"></div>
+            <div className="yc-page-grid"></div>
+          </div>
+
+          {/* YC Page Header */}
+          <div className={`yc-page-header ${isVisible ? 'visible' : ''}`}>
+            <div className="yc-page-header-content">
+              <div className="yc-page-title-section">
+                <div className="yc-page-icon" style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' }}>
+                  <i className="fa-solid fa-pen-to-square"></i>
+                </div>
+                <div>
+                  <h1 className="yc-page-title">Edit Campaign</h1>
+                  <p className="yc-page-subtitle">Update your campaign details</p>
+                </div>
+              </div>
+              <div className="yc-page-actions">
+                <button className="yc-btn-secondary" onClick={() => router.push('/campaigns')}>
+                  <i className="fa-solid fa-arrow-left"></i> Back
+                </button>
+              </div>
+            </div>
+          </div>
 
           {/* Form Card */}
           <div className="form-card">
@@ -365,13 +388,13 @@ export default function EditCampaignPage() {
                       onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
                     >
                       <option value="">Select budget range...</option>
-                      <option value="500-1000">$500 - $1,000</option>
-                      <option value="1000-5000">$1,000 - $5,000</option>
-                      <option value="5000-10000">$5,000 - $10,000</option>
-                      <option value="10000-25000">$10,000 - $25,000</option>
-                      <option value="25000-50000">$25,000 - $50,000</option>
-                      <option value="50000-100000">$50,000 - $100,000</option>
-                      <option value="100000+">$100,000+</option>
+                      <option value="500-1000">₹40,000 - ₹80,000</option>
+                      <option value="1000-5000">₹80,000 - ₹4,00,000</option>
+                      <option value="5000-10000">₹4,00,000 - ₹8,00,000</option>
+                      <option value="10000-25000">₹8,00,000 - ₹20,00,000</option>
+                      <option value="25000-50000">₹20,00,000 - ₹40,00,000</option>
+                      <option value="50000-100000">₹40,00,000 - ₹80,00,000</option>
+                      <option value="100000+">₹80,00,000+</option>
                     </select>
                   </div>
                 </div>
@@ -746,6 +769,7 @@ export default function EditCampaignPage() {
                       type="date"
                       className="form-input"
                       value={formData.startDate}
+                      min={new Date().toISOString().split('T')[0]}
                       onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
                     />
                   </div>
@@ -755,6 +779,7 @@ export default function EditCampaignPage() {
                       type="date"
                       className="form-input"
                       value={formData.endDate}
+                      min={formData.startDate || new Date().toISOString().split('T')[0]}
                       onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
                     />
                   </div>

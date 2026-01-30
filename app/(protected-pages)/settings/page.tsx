@@ -1,10 +1,9 @@
 "use client";
 
 import { Sidebar } from '@/components/common/Sidebar';
-import { TopBar } from '@/components/common/TopBar';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { downloadInvoice } from '@/lib/export-utils';
 
@@ -27,7 +26,6 @@ interface Plan {
   id: string;
   name: string;
   price: number;
-  priceUSD?: number;
   period: string;
   features: string[];
   popular?: boolean;
@@ -98,6 +96,12 @@ export default function SettingsPage() {
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [isTwoFaSaving, setIsTwoFaSaving] = useState(false);
   const [twoFaMessage, setTwoFaMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const pageRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setTimeout(() => setIsVisible(true), 50);
+  }, []);
   
   // Profile form state
   const [profileForm, setProfileForm] = useState({
@@ -105,6 +109,25 @@ export default function SettingsPage() {
     email: '',
     company: '',
   });
+
+  // Company/Brand form state
+  const [companyForm, setCompanyForm] = useState({
+    companyName: '',
+    industry: '',
+    industryType: '',
+    description: '',
+    website: '',
+    linkedin_url: '',
+    twitter_url: '',
+    location: '',
+    employee_range: '',
+    revenue_range: '',
+    founded_year: '',
+  });
+  const [isCompanyLoading, setIsCompanyLoading] = useState(false);
+  const [isCompanySaving, setIsCompanySaving] = useState(false);
+  const [companyMessage, setCompanyMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [companyExists, setCompanyExists] = useState(false);
 
   // Initialize form with user data
   useEffect(() => {
@@ -117,6 +140,55 @@ export default function SettingsPage() {
     }
   }, [user]);
 
+  // Fetch company data when user's company name is available
+  useEffect(() => {
+    const fetchCompanyData = async () => {
+      if (!user?.company) {
+        setCompanyForm(prev => ({ ...prev, companyName: '' }));
+        setCompanyExists(false);
+        return;
+      }
+      
+      setIsCompanyLoading(true);
+      try {
+        const response = await fetch(`/api/company?name=${encodeURIComponent(user.company)}`);
+        const data = await response.json();
+        
+        if (data.success && data.company) {
+          const company = data.company;
+          setCompanyForm({
+            companyName: company.companyName || user.company || '',
+            industry: company.industry || '',
+            industryType: company.industryType || '',
+            description: company.description || '',
+            website: company.website || '',
+            linkedin_url: company.linkedin_url || '',
+            twitter_url: company.twitter_url || '',
+            location: company.location || '',
+            employee_range: company.employee_range || '',
+            revenue_range: company.revenue_range || '',
+            founded_year: company.founded_year?.toString() || '',
+          });
+          setCompanyExists(true);
+        } else {
+          // Company doesn't exist yet, initialize with user's company name
+          setCompanyForm(prev => ({ ...prev, companyName: user.company || '' }));
+          setCompanyExists(false);
+        }
+      } catch (error) {
+        console.error('Error fetching company data:', error);
+        setCompanyForm(prev => ({ ...prev, companyName: user?.company || '' }));
+        setCompanyExists(false);
+      } finally {
+        setIsCompanyLoading(false);
+      }
+    };
+
+    if (activeTab === 'company') {
+      fetchCompanyData();
+    }
+  }, [user?.company, activeTab]);
+
   useEffect(() => {
     setTwoFactorEnabled(!!user?.twoFactorEnabled);
   }, [user?.twoFactorEnabled]);
@@ -127,6 +199,72 @@ export default function SettingsPage() {
     sms: false,
     weekly: true,
   });
+  const [notificationsLoading, setNotificationsLoading] = useState(true);
+  const [notificationsSaving, setNotificationsSaving] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Fetch notification preferences from database
+  useEffect(() => {
+    const fetchNotificationPreferences = async () => {
+      if (!user?.email) return;
+      
+      try {
+        const response = await fetch('/api/user/settings', {
+          headers: { 'x-user-id': user.email },
+        });
+        const data = await response.json();
+        
+        if (data.success && data.user?.notificationPreferences) {
+          setNotifications(data.user.notificationPreferences);
+        }
+      } catch (error) {
+        console.error('Error fetching notification preferences:', error);
+      } finally {
+        setNotificationsLoading(false);
+      }
+    };
+
+    fetchNotificationPreferences();
+  }, [user?.email]);
+
+  // Save notification preferences to database
+  const handleNotificationToggle = async (key: keyof typeof notifications) => {
+    if (!user?.email) return;
+    
+    const newNotifications = { ...notifications, [key]: !notifications[key] };
+    setNotifications(newNotifications);
+    setNotificationsSaving(true);
+    
+    try {
+      const response = await fetch('/api/user/settings', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': user.email,
+        },
+        body: JSON.stringify({
+          notificationPreferences: newNotifications,
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setNotificationMessage({ type: 'success', text: 'Notification preference saved!' });
+      } else {
+        // Revert on failure
+        setNotifications(notifications);
+        setNotificationMessage({ type: 'error', text: data.error || 'Failed to save preference' });
+      }
+    } catch (error) {
+      console.error('Error saving notification preference:', error);
+      setNotifications(notifications);
+      setNotificationMessage({ type: 'error', text: 'Failed to save preference' });
+    } finally {
+      setNotificationsSaving(false);
+      setTimeout(() => setNotificationMessage(null), 2000);
+    }
+  };
   
   // Plans from database
   const [plans, setPlans] = useState<Plan[]>([]);
@@ -172,15 +310,18 @@ export default function SettingsPage() {
     name: '',
   });
 
-  // Fetch plans from database
+  // Fetch plans from database - only show the 3 main plans matching home page
   useEffect(() => {
     const fetchPlans = async () => {
       try {
         const response = await fetch('/api/plans');
         const data = await response.json();
         if (data.success && data.plans) {
+          // Filter to only show the 3 main plans: Starter, Growth, Enterprise (matching home page)
+          const mainPlanIds = ['starter', 'growth', 'enterprise'];
+          const filteredPlans = data.plans.filter((plan: Plan) => mainPlanIds.includes(plan.id));
           // Sort by order field to ensure correct display order
-          const sortedPlans = [...data.plans].sort((a: Plan, b: Plan) => (a.order || 0) - (b.order || 0));
+          const sortedPlans = [...filteredPlans].sort((a: Plan, b: Plan) => (a.order || 0) - (b.order || 0));
           setPlans(sortedPlans);
         }
       } catch (error) {
@@ -249,6 +390,55 @@ export default function SettingsPage() {
       setIsSaving(false);
       // Clear message after 3 seconds
       setTimeout(() => setSaveMessage(null), 3000);
+    }
+  };
+
+  // Save company/brand settings to MongoDB
+  const handleSaveCompany = async () => {
+    if (!companyForm.companyName) {
+      setCompanyMessage({ type: 'error', text: 'Company name is required. Please set it in Account settings first.' });
+      setTimeout(() => setCompanyMessage(null), 3000);
+      return;
+    }
+    
+    setIsCompanySaving(true);
+    setCompanyMessage(null);
+    
+    try {
+      const response = await fetch('/api/company', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          companyName: companyForm.companyName,
+          industry: companyForm.industry || undefined,
+          industryType: companyForm.industryType || undefined,
+          description: companyForm.description || undefined,
+          website: companyForm.website || undefined,
+          linkedin_url: companyForm.linkedin_url || undefined,
+          twitter_url: companyForm.twitter_url || undefined,
+          location: companyForm.location || undefined,
+          employee_range: companyForm.employee_range || undefined,
+          revenue_range: companyForm.revenue_range || undefined,
+          founded_year: companyForm.founded_year ? parseInt(companyForm.founded_year) : undefined,
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setCompanyMessage({ type: 'success', text: 'Company information saved successfully!' });
+        setCompanyExists(true);
+      } else {
+        setCompanyMessage({ type: 'error', text: data.error || 'Failed to save company information' });
+      }
+    } catch (error) {
+      console.error('Error saving company:', error);
+      setCompanyMessage({ type: 'error', text: 'Failed to save company information. Please try again.' });
+    } finally {
+      setIsCompanySaving(false);
+      setTimeout(() => setCompanyMessage(null), 3000);
     }
   };
 
@@ -421,7 +611,7 @@ export default function SettingsPage() {
   // Read tab from URL params
   useEffect(() => {
     const tab = searchParams.get('tab');
-    if (tab && ['account', 'notifications', 'security', 'billing'].includes(tab)) {
+    if (tab && ['account', 'company', 'notifications', 'security', 'billing'].includes(tab)) {
       setActiveTab(tab);
     }
   }, [searchParams]);
@@ -642,282 +832,492 @@ export default function SettingsPage() {
       <div className="dashboard-wrapper">
         <Sidebar />
         <div className="main-content">
-          <div className="container" style={{ maxWidth: '1000px' }}>
-            <TopBar
-              title="Settings"
-              subtitle="Manage your account and preferences"
-              showSearch={false}
-            />
+          <div className="yc-page" ref={pageRef}>
+            {/* YC Background Effects */}
+            <div className="yc-page-bg">
+              <div className="yc-page-orb yc-page-orb-1"></div>
+              <div className="yc-page-orb yc-page-orb-2"></div>
+              <div className="yc-page-grid"></div>
+            </div>
+
+            {/* YC Page Header */}
+            <div className={`yc-page-header ${isVisible ? 'visible' : ''}`}>
+              <div className="yc-page-header-content">
+                <div className="yc-page-title-section">
+                  <div className="yc-page-icon" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+                    <i className="fa-solid fa-gear"></i>
+                  </div>
+                  <div>
+                    <h1 className="yc-page-title">Settings</h1>
+                    <p className="yc-page-subtitle">Manage your account and preferences</p>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {/* Settings Layout */}
-            <div className="settings-wrapper">
-              {/* Navigation */}
-              <div className="settings-nav">
-                <div className="settings-nav-title">Settings</div>
-                <div 
-                  className={`settings-nav-item ${activeTab === 'account' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('account')}
-                >
-                  <i className="fa-solid fa-user"></i>
-                  Account
-                </div>
-                <div 
-                  className={`settings-nav-item ${activeTab === 'notifications' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('notifications')}
-                >
-                  <i className="fa-solid fa-bell"></i>
-                  Notifications
-                </div>
-                <div 
-                  className={`settings-nav-item ${activeTab === 'security' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('security')}
-                >
-                  <i className="fa-solid fa-shield"></i>
-                  Security
-                </div>
-                <div 
-                  className={`settings-nav-item ${activeTab === 'billing' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('billing')}
-                >
-                  <i className="fa-solid fa-credit-card"></i>
-                  Billing
-                </div>
+            <div className="settings-wrapper" style={{ position: 'relative', zIndex: 10, display: 'grid', gridTemplateColumns: '240px 1fr', gap: '24px' }}>
+              {/* Navigation - YC Style */}
+              <div style={{ background: 'var(--bg-elevated)', borderRadius: '20px', border: '1px solid var(--border-color)', padding: '20px', height: 'fit-content', position: 'sticky', top: '100px' }}>
+                <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', padding: '0 12px', marginBottom: '16px' }}>Settings</div>
+                {[
+                  { id: 'account', icon: 'fa-user', label: 'Account' },
+                  { id: 'company', icon: 'fa-building', label: 'Company' },
+                  { id: 'notifications', icon: 'fa-bell', label: 'Notifications' },
+                  { id: 'security', icon: 'fa-shield', label: 'Security' },
+                  { id: 'billing', icon: 'fa-credit-card', label: 'Billing' },
+                ].map((tab) => (
+                  <div 
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    style={{ 
+                      display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px',
+                      borderRadius: '12px', cursor: 'pointer', marginBottom: '4px',
+                      background: activeTab === tab.id ? 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)' : 'transparent',
+                      border: activeTab === tab.id ? '1px solid rgba(102, 126, 234, 0.2)' : '1px solid transparent',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <i className={`fa-solid ${tab.icon}`} style={{ fontSize: '14px', width: '20px', color: activeTab === tab.id ? '#667eea' : 'var(--text-muted)' }}></i>
+                    <span style={{ fontSize: '14px', fontWeight: activeTab === tab.id ? 600 : 500, color: activeTab === tab.id ? 'var(--text-primary)' : 'var(--text-secondary)' }}>{tab.label}</span>
+                    {activeTab === tab.id && <div style={{ marginLeft: 'auto', width: '6px', height: '6px', borderRadius: '50%', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}></div>}
+                  </div>
+                ))}
               </div>
 
               {/* Content */}
-              <div className="settings-content">
+              <div style={{ background: 'var(--bg-elevated)', borderRadius: '20px', border: '1px solid var(--border-color)', padding: '32px' }}>
                 {activeTab === 'account' && (
                   <>
-                    <div className="section-title">
-                      <i className="fa-solid fa-user"></i>
-                      Profile Information
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px', paddingBottom: '20px', borderBottom: '1px solid var(--border-color)' }}>
+                      <div style={{ width: '44px', height: '44px', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '18px' }}>
+                        <i className="fa-solid fa-user"></i>
+                      </div>
+                      <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>Profile Information</h3>
                     </div>
                     {saveMessage && (
-                      <div className={`save-message ${saveMessage.type}`}>
+                      <div style={{ padding: '12px 16px', borderRadius: '12px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px', background: saveMessage.type === 'success' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)', color: saveMessage.type === 'success' ? '#22c55e' : '#ef4444' }}>
                         <i className={`fa-solid ${saveMessage.type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}`}></i>
                         {saveMessage.text}
                       </div>
                     )}
-                    <div className="setting-item">
-                      <div className="setting-label">
-                        <div className="setting-title">Full Name</div>
-                        <div className="setting-description">Your display name</div>
-                      </div>
-                      <input 
-                        type="text" 
-                        className="form-input" 
-                        value={profileForm.name}
-                        onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
-                        style={{ width: '250px' }} 
-                      />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                      {[
+                        { label: 'Full Name', desc: 'Your display name', value: profileForm.name, field: 'name', disabled: false },
+                        { label: 'Email Address', desc: 'Your primary email', value: profileForm.email, field: 'email', disabled: true },
+                        { label: 'Company', desc: 'Your organization', value: profileForm.company, field: 'company', disabled: false },
+                      ].map((item, i) => (
+                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', background: 'rgba(102, 126, 234, 0.03)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                          <div>
+                            <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>{item.label}</div>
+                            <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{item.desc}</div>
+                          </div>
+                          <input 
+                            type={item.field === 'email' ? 'email' : 'text'}
+                            value={item.value}
+                            disabled={item.disabled}
+                            onChange={(e) => setProfileForm({ ...profileForm, [item.field]: e.target.value })}
+                            style={{ width: '260px', padding: '12px 16px', border: '1px solid var(--border-color)', borderRadius: '10px', fontSize: '14px', background: item.disabled ? 'rgba(102, 126, 234, 0.05)' : 'var(--bg-primary)', color: 'var(--text-primary)', opacity: item.disabled ? 0.7 : 1 }}
+                          />
+                        </div>
+                      ))}
                     </div>
-                    <div className="setting-item">
-                      <div className="setting-label">
-                        <div className="setting-title">Email Address</div>
-                        <div className="setting-description">Your primary email</div>
-                      </div>
-                      <input 
-                        type="email" 
-                        className="form-input" 
-                        value={profileForm.email}
-                        disabled
-                        style={{ width: '250px', opacity: 0.7, cursor: 'not-allowed' }} 
-                      />
-                    </div>
-                    <div className="setting-item">
-                      <div className="setting-label">
-                        <div className="setting-title">Company</div>
-                        <div className="setting-description">Your organization</div>
-                      </div>
-                      <input 
-                        type="text" 
-                        className="form-input" 
-                        value={profileForm.company}
-                        onChange={(e) => setProfileForm({ ...profileForm, company: e.target.value })}
-                        style={{ width: '250px' }} 
-                      />
-                    </div>
-                    <div className="setting-item" style={{ borderBottom: 'none', paddingTop: '20px' }}>
-                      <div className="setting-label"></div>
-                      <button 
-                        className="btn btn-primary"
-                        onClick={handleSaveProfile}
-                        disabled={isSaving}
-                        style={{ 
-                          display: 'flex', 
-                          alignItems: 'center', 
-                          gap: '8px',
-                          padding: '12px 24px',
-                        }}
-                      >
-                        {isSaving ? (
-                          <>
-                            <i className="fa-solid fa-spinner fa-spin"></i>
-                            Saving...
-                          </>
-                        ) : (
-                          <>
-                            <i className="fa-solid fa-save"></i>
-                            Save Changes
-                          </>
-                        )}
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '24px' }}>
+                      <button className="yc-btn-primary" onClick={handleSaveProfile} disabled={isSaving}>
+                        {isSaving ? <><i className="fa-solid fa-spinner fa-spin"></i> Saving...</> : <><i className="fa-solid fa-save"></i> Save Changes</>}
                       </button>
                     </div>
                   </>
                 )}
 
+              {activeTab === 'company' && (
+                <>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px', paddingBottom: '20px', borderBottom: '1px solid var(--border-color)' }}>
+                    <div style={{ width: '44px', height: '44px', background: 'linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '18px' }}>
+                      <i className="fa-solid fa-building"></i>
+                    </div>
+                    <div>
+                      <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>Company & Brand Information</h3>
+                      <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: '4px 0 0 0' }}>Update your company profile for better creator matching</p>
+                    </div>
+                  </div>
+                  
+                  {!user?.company && (
+                    <div style={{ padding: '20px', borderRadius: '12px', marginBottom: '24px', background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#f59e0b' }}>
+                        <i className="fa-solid fa-exclamation-triangle"></i>
+                        <span style={{ fontWeight: 600 }}>No company set</span>
+                      </div>
+                      <p style={{ margin: '8px 0 0 0', fontSize: '13px', color: 'var(--text-secondary)' }}>
+                        Please set your company name in the Account tab first, then return here to add detailed company information.
+                      </p>
+                    </div>
+                  )}
+                  
+                  {companyMessage && (
+                    <div style={{ padding: '12px 16px', borderRadius: '12px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px', background: companyMessage.type === 'success' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)', color: companyMessage.type === 'success' ? '#22c55e' : '#ef4444' }}>
+                      <i className={`fa-solid ${companyMessage.type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}`}></i>
+                      {companyMessage.text}
+                    </div>
+                  )}
+
+                  {isCompanyLoading ? (
+                    <div style={{ padding: '48px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                      <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: '24px', marginBottom: '12px' }}></i>
+                      <p>Loading company information...</p>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Basic Information Section */}
+                      <div style={{ marginBottom: '32px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                          <i className="fa-solid fa-info-circle" style={{ color: '#667eea' }}></i>
+                          <h4 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>Basic Information</h4>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', background: 'rgba(102, 126, 234, 0.03)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                            <div>
+                              <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>Company Name</div>
+                              <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Your official company name</div>
+                            </div>
+                            <input 
+                              type="text"
+                              value={companyForm.companyName}
+                              disabled={true}
+                              style={{ width: '280px', padding: '12px 16px', border: '1px solid var(--border-color)', borderRadius: '10px', fontSize: '14px', background: 'rgba(102, 126, 234, 0.05)', color: 'var(--text-primary)', opacity: 0.7 }}
+                            />
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '16px 20px', background: 'rgba(102, 126, 234, 0.03)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                            <div>
+                              <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>Description</div>
+                              <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Brief description of your company</div>
+                            </div>
+                            <textarea 
+                              value={companyForm.description}
+                              onChange={(e) => setCompanyForm({ ...companyForm, description: e.target.value })}
+                              placeholder="What does your company do?"
+                              disabled={!user?.company}
+                              rows={3}
+                              style={{ width: '280px', padding: '12px 16px', border: '1px solid var(--border-color)', borderRadius: '10px', fontSize: '14px', background: user?.company ? 'var(--bg-primary)' : 'rgba(102, 126, 234, 0.05)', color: 'var(--text-primary)', resize: 'vertical', fontFamily: 'inherit' }}
+                            />
+                          </div>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                            <div style={{ padding: '16px 20px', background: 'rgba(102, 126, 234, 0.03)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                              <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>Industry</div>
+                              <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '10px' }}>Your primary industry</div>
+                              <select 
+                                value={companyForm.industry}
+                                onChange={(e) => setCompanyForm({ ...companyForm, industry: e.target.value })}
+                                disabled={!user?.company}
+                                style={{ width: '100%', padding: '12px 16px', border: '1px solid var(--border-color)', borderRadius: '10px', fontSize: '14px', background: user?.company ? 'var(--bg-primary)' : 'rgba(102, 126, 234, 0.05)', color: 'var(--text-primary)', cursor: 'pointer' }}
+                              >
+                                <option value="">Select industry</option>
+                                <option value="Technology">Technology</option>
+                                <option value="E-commerce">E-commerce</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Healthcare">Healthcare</option>
+                                <option value="Education">Education</option>
+                                <option value="Media & Entertainment">Media & Entertainment</option>
+                                <option value="Fashion & Beauty">Fashion & Beauty</option>
+                                <option value="Food & Beverage">Food & Beverage</option>
+                                <option value="Travel & Hospitality">Travel & Hospitality</option>
+                                <option value="Real Estate">Real Estate</option>
+                                <option value="Automotive">Automotive</option>
+                                <option value="Sports & Fitness">Sports & Fitness</option>
+                                <option value="SaaS">SaaS</option>
+                                <option value="Consumer Goods">Consumer Goods</option>
+                                <option value="Other">Other</option>
+                              </select>
+                            </div>
+                            <div style={{ padding: '16px 20px', background: 'rgba(102, 126, 234, 0.03)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                              <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>Industry Type</div>
+                              <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '10px' }}>B2B, B2C, or D2C</div>
+                              <select 
+                                value={companyForm.industryType}
+                                onChange={(e) => setCompanyForm({ ...companyForm, industryType: e.target.value })}
+                                disabled={!user?.company}
+                                style={{ width: '100%', padding: '12px 16px', border: '1px solid var(--border-color)', borderRadius: '10px', fontSize: '14px', background: user?.company ? 'var(--bg-primary)' : 'rgba(102, 126, 234, 0.05)', color: 'var(--text-primary)', cursor: 'pointer' }}
+                              >
+                                <option value="">Select type</option>
+                                <option value="B2B">B2B (Business to Business)</option>
+                                <option value="B2C">B2C (Business to Consumer)</option>
+                                <option value="D2C">D2C (Direct to Consumer)</option>
+                                <option value="B2B2C">B2B2C (Hybrid)</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Company Details Section */}
+                      <div style={{ marginBottom: '32px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                          <i className="fa-solid fa-chart-line" style={{ color: '#22c55e' }}></i>
+                          <h4 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>Company Details</h4>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                          <div style={{ padding: '16px 20px', background: 'rgba(102, 126, 234, 0.03)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                            <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>Location</div>
+                            <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '10px' }}>Headquarters location</div>
+                            <input 
+                              type="text"
+                              value={companyForm.location}
+                              onChange={(e) => setCompanyForm({ ...companyForm, location: e.target.value })}
+                              placeholder="e.g., San Francisco, CA"
+                              disabled={!user?.company}
+                              style={{ width: '100%', padding: '12px 16px', border: '1px solid var(--border-color)', borderRadius: '10px', fontSize: '14px', background: user?.company ? 'var(--bg-primary)' : 'rgba(102, 126, 234, 0.05)', color: 'var(--text-primary)', boxSizing: 'border-box' }}
+                            />
+                          </div>
+                          <div style={{ padding: '16px 20px', background: 'rgba(102, 126, 234, 0.03)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                            <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>Founded Year</div>
+                            <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '10px' }}>Year company was founded</div>
+                            <input 
+                              type="number"
+                              value={companyForm.founded_year}
+                              onChange={(e) => setCompanyForm({ ...companyForm, founded_year: e.target.value })}
+                              placeholder="e.g., 2020"
+                              disabled={!user?.company}
+                              min="1900"
+                              max={new Date().getFullYear()}
+                              style={{ width: '100%', padding: '12px 16px', border: '1px solid var(--border-color)', borderRadius: '10px', fontSize: '14px', background: user?.company ? 'var(--bg-primary)' : 'rgba(102, 126, 234, 0.05)', color: 'var(--text-primary)', boxSizing: 'border-box' }}
+                            />
+                          </div>
+                          <div style={{ padding: '16px 20px', background: 'rgba(102, 126, 234, 0.03)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                            <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>Employee Range</div>
+                            <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '10px' }}>Company size</div>
+                            <select 
+                              value={companyForm.employee_range}
+                              onChange={(e) => setCompanyForm({ ...companyForm, employee_range: e.target.value })}
+                              disabled={!user?.company}
+                              style={{ width: '100%', padding: '12px 16px', border: '1px solid var(--border-color)', borderRadius: '10px', fontSize: '14px', background: user?.company ? 'var(--bg-primary)' : 'rgba(102, 126, 234, 0.05)', color: 'var(--text-primary)', cursor: 'pointer' }}
+                            >
+                              <option value="">Select range</option>
+                              <option value="1-10">1-10 employees</option>
+                              <option value="11-50">11-50 employees</option>
+                              <option value="51-200">51-200 employees</option>
+                              <option value="201-500">201-500 employees</option>
+                              <option value="501-1000">501-1000 employees</option>
+                              <option value="1001-5000">1001-5000 employees</option>
+                              <option value="5000+">5000+ employees</option>
+                            </select>
+                          </div>
+                          <div style={{ padding: '16px 20px', background: 'rgba(102, 126, 234, 0.03)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                            <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>Revenue Range</div>
+                            <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '10px' }}>Annual revenue</div>
+                            <select 
+                              value={companyForm.revenue_range}
+                              onChange={(e) => setCompanyForm({ ...companyForm, revenue_range: e.target.value })}
+                              disabled={!user?.company}
+                              style={{ width: '100%', padding: '12px 16px', border: '1px solid var(--border-color)', borderRadius: '10px', fontSize: '14px', background: user?.company ? 'var(--bg-primary)' : 'rgba(102, 126, 234, 0.05)', color: 'var(--text-primary)', cursor: 'pointer' }}
+                            >
+                              <option value="">Select range</option>
+                              <option value="Pre-revenue">Pre-revenue</option>
+                              <option value="₹0-₹80L">₹0 - ₹80 Lakhs</option>
+                              <option value="₹80L-₹8Cr">₹80 Lakhs - ₹8 Crore</option>
+                              <option value="₹8Cr-₹40Cr">₹8 Crore - ₹40 Crore</option>
+                              <option value="₹40Cr-₹80Cr">₹40 Crore - ₹80 Crore</option>
+                              <option value="₹80Cr-₹400Cr">₹80 Crore - ₹400 Crore</option>
+                              <option value="₹400Cr+">₹400 Crore+</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Online Presence Section */}
+                      <div style={{ marginBottom: '32px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                          <i className="fa-solid fa-globe" style={{ color: '#ec4899' }}></i>
+                          <h4 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>Online Presence</h4>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', background: 'rgba(102, 126, 234, 0.03)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              <div style={{ width: '36px', height: '36px', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+                                <i className="fa-solid fa-globe"></i>
+                              </div>
+                              <div>
+                                <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '2px' }}>Website</div>
+                                <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Your company website URL</div>
+                              </div>
+                            </div>
+                            <input 
+                              type="url"
+                              value={companyForm.website}
+                              onChange={(e) => setCompanyForm({ ...companyForm, website: e.target.value })}
+                              placeholder="https://example.com"
+                              disabled={!user?.company}
+                              style={{ width: '280px', padding: '12px 16px', border: '1px solid var(--border-color)', borderRadius: '10px', fontSize: '14px', background: user?.company ? 'var(--bg-primary)' : 'rgba(102, 126, 234, 0.05)', color: 'var(--text-primary)' }}
+                            />
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', background: 'rgba(102, 126, 234, 0.03)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              <div style={{ width: '36px', height: '36px', background: 'linear-gradient(135deg, #0077b5 0%, #00a0dc 100%)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+                                <i className="fa-brands fa-linkedin-in"></i>
+                              </div>
+                              <div>
+                                <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '2px' }}>LinkedIn</div>
+                                <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Company LinkedIn page</div>
+                              </div>
+                            </div>
+                            <input 
+                              type="url"
+                              value={companyForm.linkedin_url}
+                              onChange={(e) => setCompanyForm({ ...companyForm, linkedin_url: e.target.value })}
+                              placeholder="https://linkedin.com/company/..."
+                              disabled={!user?.company}
+                              style={{ width: '280px', padding: '12px 16px', border: '1px solid var(--border-color)', borderRadius: '10px', fontSize: '14px', background: user?.company ? 'var(--bg-primary)' : 'rgba(102, 126, 234, 0.05)', color: 'var(--text-primary)' }}
+                            />
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', background: 'rgba(102, 126, 234, 0.03)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              <div style={{ width: '36px', height: '36px', background: 'linear-gradient(135deg, #1da1f2 0%, #0d8ed9 100%)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+                                <i className="fa-brands fa-x-twitter"></i>
+                              </div>
+                              <div>
+                                <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '2px' }}>Twitter / X</div>
+                                <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Company Twitter profile</div>
+                              </div>
+                            </div>
+                            <input 
+                              type="url"
+                              value={companyForm.twitter_url}
+                              onChange={(e) => setCompanyForm({ ...companyForm, twitter_url: e.target.value })}
+                              placeholder="https://twitter.com/..."
+                              disabled={!user?.company}
+                              style={{ width: '280px', padding: '12px 16px', border: '1px solid var(--border-color)', borderRadius: '10px', fontSize: '14px', background: user?.company ? 'var(--bg-primary)' : 'rgba(102, 126, 234, 0.05)', color: 'var(--text-primary)' }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Save Button */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '20px', borderTop: '1px solid var(--border-color)' }}>
+                        <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+                          {companyExists ? (
+                            <span><i className="fa-solid fa-check-circle" style={{ color: '#22c55e', marginRight: '6px' }}></i>Company profile exists</span>
+                          ) : user?.company ? (
+                            <span><i className="fa-solid fa-info-circle" style={{ color: '#667eea', marginRight: '6px' }}></i>Save to create company profile</span>
+                          ) : null}
+                        </div>
+                        <button 
+                          className="yc-btn-primary" 
+                          onClick={handleSaveCompany} 
+                          disabled={isCompanySaving || !user?.company}
+                          style={{ opacity: !user?.company ? 0.5 : 1 }}
+                        >
+                          {isCompanySaving ? <><i className="fa-solid fa-spinner fa-spin"></i> Saving...</> : <><i className="fa-solid fa-save"></i> Save Company Info</>}
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </>
+              )}
+
               {activeTab === 'notifications' && (
                 <>
-                  <div className="section-title">
-                    <i className="fa-solid fa-bell"></i>
-                    Notification Preferences
-                  </div>
-                  <div className="setting-item">
-                    <div className="setting-label">
-                      <div className="setting-title">Email Notifications</div>
-                      <div className="setting-description">Receive updates via email</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px', paddingBottom: '20px', borderBottom: '1px solid var(--border-color)' }}>
+                    <div style={{ width: '44px', height: '44px', background: 'linear-gradient(135deg, #f59e0b 0%, #ec4899 100%)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '18px' }}>
+                      <i className="fa-solid fa-bell"></i>
                     </div>
-                    <div 
-                      className={`toggle ${notifications.email ? 'active' : ''}`}
-                      onClick={() => setNotifications({ ...notifications, email: !notifications.email })}
-                    ></div>
+                    <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>Notification Preferences</h3>
+                    {notificationsSaving && (
+                      <span style={{ fontSize: '12px', color: 'var(--text-muted)', marginLeft: 'auto' }}>
+                        <i className="fa-solid fa-spinner fa-spin" style={{ marginRight: '6px' }}></i>Saving...
+                      </span>
+                    )}
                   </div>
-                  <div className="setting-item">
-                    <div className="setting-label">
-                      <div className="setting-title">Push Notifications</div>
-                      <div className="setting-description">Browser push notifications</div>
+                  {notificationMessage && (
+                    <div style={{ padding: '12px 16px', borderRadius: '12px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px', background: notificationMessage.type === 'success' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)', color: notificationMessage.type === 'success' ? '#22c55e' : '#ef4444' }}>
+                      <i className={`fa-solid ${notificationMessage.type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}`}></i>
+                      {notificationMessage.text}
                     </div>
-                    <div 
-                      className={`toggle ${notifications.push ? 'active' : ''}`}
-                      onClick={() => setNotifications({ ...notifications, push: !notifications.push })}
-                    ></div>
-                  </div>
-                  <div className="setting-item">
-                    <div className="setting-label">
-                      <div className="setting-title">SMS Notifications</div>
-                      <div className="setting-description">Get text message alerts</div>
+                  )}
+                  {notificationsLoading ? (
+                    <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
+                      <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: '24px', color: 'var(--text-muted)' }}></i>
                     </div>
-                    <div 
-                      className={`toggle ${notifications.sms ? 'active' : ''}`}
-                      onClick={() => setNotifications({ ...notifications, sms: !notifications.sms })}
-                    ></div>
-                  </div>
-                  <div className="setting-item">
-                    <div className="setting-label">
-                      <div className="setting-title">Weekly Digest</div>
-                      <div className="setting-description">Summary of weekly activity</div>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      {[
+                        { key: 'email', label: 'Email Notifications', desc: 'Receive updates via email' },
+                        { key: 'push', label: 'Push Notifications', desc: 'Browser push notifications' },
+                        { key: 'sms', label: 'SMS Notifications', desc: 'Get text message alerts' },
+                        { key: 'weekly', label: 'Weekly Digest', desc: 'Summary of weekly activity' },
+                      ].map((item) => (
+                        <div key={item.key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', background: 'rgba(102, 126, 234, 0.03)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                          <div>
+                            <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>{item.label}</div>
+                            <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{item.desc}</div>
+                          </div>
+                          <div 
+                            onClick={() => !notificationsSaving && handleNotificationToggle(item.key as keyof typeof notifications)}
+                            style={{ width: '48px', height: '26px', background: notifications[item.key as keyof typeof notifications] ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'rgba(102, 126, 234, 0.2)', borderRadius: '26px', position: 'relative', cursor: notificationsSaving ? 'not-allowed' : 'pointer', transition: '0.3s', opacity: notificationsSaving ? 0.6 : 1 }}
+                          >
+                            <div style={{ position: 'absolute', width: '20px', height: '20px', backgroundColor: 'white', borderRadius: '50%', top: '3px', left: notifications[item.key as keyof typeof notifications] ? '25px' : '3px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.15)', transition: '0.3s' }}></div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    <div 
-                      className={`toggle ${notifications.weekly ? 'active' : ''}`}
-                      onClick={() => setNotifications({ ...notifications, weekly: !notifications.weekly })}
-                    ></div>
-                  </div>
+                  )}
                 </>
               )}
 
               {activeTab === 'security' && (
                 <>
-                  <div className="section-title">
-                    <i className="fa-solid fa-shield"></i>
-                    Security Settings
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px', paddingBottom: '20px', borderBottom: '1px solid var(--border-color)' }}>
+                    <div style={{ width: '44px', height: '44px', background: 'linear-gradient(135deg, #22c55e 0%, #00f5ff 100%)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '18px' }}>
+                      <i className="fa-solid fa-shield"></i>
+                    </div>
+                    <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>Security Settings</h3>
                   </div>
                   {passwordMessage && (
-                    <div className={`save-message ${passwordMessage.type}`}>
+                    <div style={{ padding: '12px 16px', borderRadius: '12px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px', background: passwordMessage.type === 'success' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)', color: passwordMessage.type === 'success' ? '#22c55e' : '#ef4444' }}>
                       <i className={`fa-solid ${passwordMessage.type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}`}></i>
                       {passwordMessage.text}
                     </div>
                   )}
 
-                  <div className="setting-item password-form">
-                    <div className="setting-label">
-                      <div className="setting-title">Current Password</div>
-                      <div className="setting-description">Enter your existing password</div>
-                    </div>
-                    <input
-                      type="password"
-                      className="form-input"
-                      value={passwordForm.currentPassword}
-                      onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                      placeholder="••••••••"
-                      style={{ width: '260px' }}
-                    />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
+                    {[
+                      { label: 'Current Password', desc: 'Enter your existing password', field: 'currentPassword' },
+                      { label: 'New Password', desc: 'Minimum 8 characters', field: 'newPassword' },
+                      { label: 'Confirm New Password', desc: 'Re-enter to confirm', field: 'confirmPassword' },
+                    ].map((item) => (
+                      <div key={item.field} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', background: 'rgba(102, 126, 234, 0.03)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                        <div>
+                          <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>{item.label}</div>
+                          <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{item.desc}</div>
+                        </div>
+                        <input
+                          type="password"
+                          value={passwordForm[item.field as keyof typeof passwordForm]}
+                          onChange={(e) => setPasswordForm({ ...passwordForm, [item.field]: e.target.value })}
+                          placeholder="••••••••"
+                          style={{ width: '260px', padding: '12px 16px', border: '1px solid var(--border-color)', borderRadius: '10px', fontSize: '14px', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
+                        />
+                      </div>
+                    ))}
                   </div>
-
-                  <div className="setting-item password-form">
-                    <div className="setting-label">
-                      <div className="setting-title">New Password</div>
-                      <div className="setting-description">Minimum 8 characters</div>
-                    </div>
-                    <input
-                      type="password"
-                      className="form-input"
-                      value={passwordForm.newPassword}
-                      onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                      placeholder="••••••••"
-                      style={{ width: '260px' }}
-                    />
-                  </div>
-
-                  <div className="setting-item password-form" style={{ borderBottom: 'none' }}>
-                    <div className="setting-label">
-                      <div className="setting-title">Confirm New Password</div>
-                      <div className="setting-description">Re-enter to confirm</div>
-                    </div>
-                    <input
-                      type="password"
-                      className="form-input"
-                      value={passwordForm.confirmPassword}
-                      onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                      placeholder="••••••••"
-                      style={{ width: '260px' }}
-                    />
-                  </div>
-
-                  <div className="setting-item" style={{ borderBottom: 'none', paddingTop: '8px' }}>
-                    <div className="setting-label"></div>
-                    <button
-                      className="btn btn-primary"
-                      onClick={handleChangePassword}
-                      disabled={isPasswordSaving}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        padding: '12px 24px',
-                      }}
-                    >
-                      {isPasswordSaving ? (
-                        <>
-                          <i className="fa-solid fa-spinner fa-spin"></i>
-                          Updating...
-                        </>
-                      ) : (
-                        <>
-                          <i className="fa-solid fa-lock"></i>
-                          Update Password
-                        </>
-                      )}
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '32px' }}>
+                    <button className="yc-btn-primary" onClick={handleChangePassword} disabled={isPasswordSaving}>
+                      {isPasswordSaving ? <><i className="fa-solid fa-spinner fa-spin"></i> Updating...</> : <><i className="fa-solid fa-lock"></i> Update Password</>}
                     </button>
                   </div>
 
-                  <div className="section-title" style={{ marginTop: '12px' }}>
-                    <i className="fa-solid fa-mobile"></i>
-                    Active Sessions
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px', paddingBottom: '16px', borderBottom: '1px solid var(--border-color)' }}>
+                    <i className="fa-solid fa-mobile" style={{ fontSize: '16px', color: '#667eea' }}></i>
+                    <h4 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>Active Sessions</h4>
                   </div>
 
-                  <div className="sessions-list">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
                     {sessionsLoading ? (
-                      <div className="session-card loading">
-                        <i className="fa-solid fa-spinner fa-spin"></i>
-                        Loading sessions...
+                      <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                        <i className="fa-solid fa-spinner fa-spin"></i> Loading sessions...
                       </div>
                     ) : sessions.length === 0 ? (
-                      <div className="session-card empty">
-                        <i className="fa-solid fa-laptop"></i>
-                        <div>
-                          <div className="session-name">No active sessions</div>
-                          <div className="session-meta">Sign in from another device to see it here.</div>
-                        </div>
+                      <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)', background: 'rgba(102, 126, 234, 0.03)', borderRadius: '12px' }}>
+                        <i className="fa-solid fa-laptop" style={{ fontSize: '24px', marginBottom: '12px', display: 'block' }}></i>
+                        <div>No active sessions</div>
                       </div>
                     ) : (
                       sessions.map((session) => {
@@ -926,26 +1326,22 @@ export default function SettingsPage() {
                         const isMobile = device === 'Mobile' || device === 'Tablet';
                         
                         return (
-                        <div key={session.id} className={`session-card ${session.isCurrent ? 'current' : ''}`}>
-                          <div className="session-left">
-                            <div className="session-icon">
+                        <div key={session.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', background: session.isCurrent ? 'rgba(34, 197, 94, 0.05)' : 'rgba(102, 126, 234, 0.03)', borderRadius: '12px', border: `1px solid ${session.isCurrent ? 'rgba(34, 197, 94, 0.2)' : 'var(--border-color)'}` }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                            <div style={{ width: '40px', height: '40px', background: session.isCurrent ? 'linear-gradient(135deg, #22c55e 0%, #00f5ff 100%)' : 'rgba(102, 126, 234, 0.1)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: session.isCurrent ? 'white' : '#667eea' }}>
                               <i className={isMobile ? 'fa-solid fa-mobile-screen' : 'fa-solid fa-laptop'}></i>
                             </div>
                             <div>
-                              <div className="session-name">{deviceName}</div>
-                              <div className="session-meta">
-                                {session.isCurrent ? 'This device' : ''} · Last active {new Date(session.lastActive).toLocaleString()}
-                              </div>
+                              <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>{deviceName}</div>
+                              <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{session.isCurrent ? 'This device · ' : ''}Last active {new Date(session.lastActive).toLocaleString()}</div>
                             </div>
                           </div>
-                          {!session.isCurrent && (
-                            <button className="btn btn-secondary btn-sm" onClick={() => handleRevokeSession(session.id)}>
-                              <i className="fa-solid fa-right-from-bracket"></i>
-                              Sign out
+                          {!session.isCurrent ? (
+                            <button className="yc-btn-secondary" style={{ padding: '8px 14px', fontSize: '12px' }} onClick={() => handleRevokeSession(session.id)}>
+                              <i className="fa-solid fa-right-from-bracket"></i> Sign out
                             </button>
-                          )}
-                          {session.isCurrent && (
-                            <span className="session-badge">Current</span>
+                          ) : (
+                            <span style={{ padding: '6px 14px', borderRadius: '20px', fontSize: '12px', fontWeight: 600, background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e' }}>Current</span>
                           )}
                         </div>
                         );
@@ -953,49 +1349,32 @@ export default function SettingsPage() {
                     )}
                   </div>
 
-                  <div className="session-actions">
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', background: 'rgba(102, 126, 234, 0.03)', borderRadius: '12px', border: '1px solid var(--border-color)', marginBottom: '24px' }}>
                     <div>
-                      <div className="session-name">Sign out of other sessions</div>
-                      <div className="session-meta">Keep this device signed in, log out everywhere else.</div>
+                      <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>Sign out of other sessions</div>
+                      <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Keep this device signed in, log out everywhere else.</div>
                     </div>
-                    <button className="btn btn-secondary" onClick={handleRevokeOthers} disabled={sessionsLoading || sessions.filter(s => !s.isCurrent).length === 0}>
-                      <i className="fa-solid fa-door-open"></i>
-                      Sign out others
+                    <button className="yc-btn-secondary" onClick={handleRevokeOthers} disabled={sessionsLoading || sessions.filter(s => !s.isCurrent).length === 0}>
+                      <i className="fa-solid fa-door-open"></i> Sign out others
                     </button>
                   </div>
 
                   {twoFaMessage && (
-                    <div className={`save-message ${twoFaMessage.type}`} style={{ marginTop: '8px' }}>
+                    <div style={{ padding: '12px 16px', borderRadius: '12px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px', background: twoFaMessage.type === 'success' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)', color: twoFaMessage.type === 'success' ? '#22c55e' : '#ef4444' }}>
                       <i className={`fa-solid ${twoFaMessage.type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}`}></i>
                       {twoFaMessage.text}
                     </div>
                   )}
 
-                  <div className="setting-item" style={{ marginTop: '8px', borderBottom: 'none' }}>
-                    <div className="setting-label">
-                      <div className="setting-title">Two-Factor Authentication</div>
-                      <div className="setting-description">
-                        {twoFactorEnabled
-                          ? 'Currently enabled. Verification codes will be emailed when you log in.'
-                          : 'Add extra security to your account'}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px', background: twoFactorEnabled ? 'rgba(34, 197, 94, 0.05)' : 'rgba(102, 126, 234, 0.03)', borderRadius: '12px', border: `1px solid ${twoFactorEnabled ? 'rgba(34, 197, 94, 0.2)' : 'var(--border-color)'}` }}>
+                    <div>
+                      <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>Two-Factor Authentication</div>
+                      <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+                        {twoFactorEnabled ? 'Currently enabled. Verification codes will be emailed when you log in.' : 'Add extra security to your account'}
                       </div>
                     </div>
-                    <button
-                      className={`btn ${twoFactorEnabled ? 'btn-secondary' : 'btn-primary'}`}
-                      onClick={handleToggleTwoFactor}
-                      disabled={isTwoFaSaving}
-                    >
-                      {isTwoFaSaving ? (
-                        <>
-                          <i className="fa-solid fa-spinner fa-spin"></i>
-                          Saving...
-                        </>
-                      ) : (
-                        <>
-                          <i className={`fa-solid ${twoFactorEnabled ? 'fa-toggle-off' : 'fa-shield-heart'}`}></i>
-                          {twoFactorEnabled ? 'Disable' : 'Enable'}
-                        </>
-                      )}
+                    <button className={twoFactorEnabled ? 'yc-btn-secondary' : 'yc-btn-primary'} onClick={handleToggleTwoFactor} disabled={isTwoFaSaving}>
+                      {isTwoFaSaving ? <><i className="fa-solid fa-spinner fa-spin"></i> Saving...</> : <><i className={`fa-solid ${twoFactorEnabled ? 'fa-toggle-off' : 'fa-shield-heart'}`}></i> {twoFactorEnabled ? 'Disable' : 'Enable'}</>}
                     </button>
                   </div>
                 </>
@@ -1003,81 +1382,128 @@ export default function SettingsPage() {
 
               {activeTab === 'billing' && (
                 <>
-                  <div className="section-title">
-                    <i className="fa-solid fa-credit-card"></i>
-                    Billing & Plans
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px', paddingBottom: '20px', borderBottom: '1px solid var(--border-color)' }}>
+                    <div style={{ width: '44px', height: '44px', background: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '18px' }}>
+                      <i className="fa-solid fa-credit-card"></i>
+                    </div>
+                    <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>Billing & Plans</h3>
                   </div>
                   
-                  {/* Current Plan */}
-                  <div className="billing-card current-plan-card">
-                    <div className="plan-header">
-                      <div className="plan-badge">{plans.find(p => p.id === currentPlan)?.name || 'Pro'}</div>
-                      <span className="plan-status active">Active</span>
-                    </div>
-                    <div className="plan-price">
-                      <span className="price-amount">₹{(plans.find(p => p.id === currentPlan)?.price || 4999).toLocaleString()}</span>
-                      <span className="price-period">/month</span>
-                    </div>
-                    <div className="plan-features">
-                      {plans.find(p => p.id === currentPlan)?.features.slice(0, 3).map((f, i) => (
-                        <div key={i} className="feature-item">
-                          <i className="fa-solid fa-check"></i>
-                          {f}
+                  {/* Current Plan Display */}
+                  <div style={{ marginBottom: '32px' }}>
+                    {plansLoading ? (
+                      <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)', background: 'rgba(102, 126, 234, 0.03)', borderRadius: '16px', border: '1px solid var(--border-color)' }}>
+                        <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: '24px', marginBottom: '12px' }}></i>
+                        <span style={{ display: 'block' }}>Loading plan...</span>
+                      </div>
+                    ) : (() => {
+                      const currentPlanData = plans.find(p => p.id === currentPlan);
+                      return currentPlanData ? (
+                        <div style={{ 
+                          padding: '28px', 
+                          borderRadius: '20px', 
+                          background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%)',
+                          border: '2px solid #22c55e',
+                        }}>
+                          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '20px' }}>
+                            <div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                                <h3 style={{ fontSize: '22px', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>{currentPlanData.name}</h3>
+                                <span style={{ padding: '4px 12px', borderRadius: '12px', fontSize: '11px', fontWeight: 700, background: 'rgba(34, 197, 94, 0.15)', color: '#22c55e' }}>Current Plan</span>
+                              </div>
+                              <p style={{ fontSize: '14px', color: 'var(--text-muted)', margin: 0 }}>
+                                {currentPlanData.id === 'starter' ? 'For D2C brands & small teams' : currentPlanData.id === 'growth' ? 'For agencies & mid-size brands' : 'For large brands & agencies'}
+                              </p>
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                              {currentPlanData.period === 'custom' ? (
+                                <span style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text-primary)' }}>Custom</span>
+                              ) : (
+                                <>
+                                  <span style={{ fontSize: '32px', fontWeight: 800, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>₹{currentPlanData.price.toLocaleString()}</span>
+                                  <span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>/mo</span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px', marginBottom: '24px' }}>
+                            {currentPlanData.features.slice(0, 6).map((feature, i) => (
+                              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: 'var(--text-secondary)' }}>
+                                <i className="fa-solid fa-check" style={{ color: '#22c55e', fontSize: '11px' }}></i>
+                                {feature}
+                              </div>
+                            ))}
+                          </div>
+
+                          <button 
+                            onClick={() => setShowPlanModal(true)}
+                            style={{ 
+                              padding: '12px 24px', borderRadius: '12px', border: 'none', 
+                              fontSize: '14px', fontWeight: 600, cursor: 'pointer',
+                              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                              color: 'white',
+                              display: 'flex', alignItems: 'center', gap: '8px'
+                            }}
+                          >
+                            <i className="fa-solid fa-arrows-rotate"></i> Change Plan
+                          </button>
                         </div>
-                      ))}
-                    </div>
-                    <button className="btn btn-primary" onClick={() => setShowPlanModal(true)}>
-                      <i className="fa-solid fa-arrow-up"></i>
-                      Change Plan
-                    </button>
+                      ) : (
+                        <div style={{ padding: '40px', textAlign: 'center', background: 'rgba(102, 126, 234, 0.03)', borderRadius: '16px', border: '1px solid var(--border-color)' }}>
+                          <p style={{ fontSize: '14px', color: 'var(--text-muted)', margin: '0 0 16px' }}>No active plan found</p>
+                          <button 
+                            onClick={() => setShowPlanModal(true)}
+                            style={{ 
+                              padding: '12px 24px', borderRadius: '12px', border: 'none', 
+                              fontSize: '14px', fontWeight: 600, cursor: 'pointer',
+                              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                              color: 'white',
+                              display: 'flex', alignItems: 'center', gap: '8px', margin: '0 auto'
+                            }}
+                          >
+                            <i className="fa-solid fa-plus"></i> Choose a Plan
+                          </button>
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   {/* Payment Methods */}
-                  <div className="section-title" style={{ marginTop: '32px' }}>
-                    <i className="fa-solid fa-wallet"></i>
-                    Payment Methods
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+                    <i className="fa-solid fa-wallet" style={{ color: '#667eea' }}></i>
+                    <h4 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>Payment Methods</h4>
                   </div>
 
-                  <div className="cards-list">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '32px' }}>
                     {savedCards.map((card) => (
-                      <div key={card.id} className={`payment-card-item ${card.isDefault ? 'default' : ''}`}>
-                        <div className="card-icon">
-                          <i className={`fa-brands ${getCardIcon(card.type)}`}></i>
-                        </div>
-                        <div className="card-details">
-                          <div className="card-number">•••• •••• •••• {card.last4}</div>
-                          <div className="card-meta">
-                            <span>{card.holderName}</span>
-                            <span>Expires {card.expiry}</span>
+                      <div key={card.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', background: card.isDefault ? 'rgba(34, 197, 94, 0.05)' : 'rgba(102, 126, 234, 0.03)', borderRadius: '12px', border: `1px solid ${card.isDefault ? 'rgba(34, 197, 94, 0.2)' : 'var(--border-color)'}` }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                          <div style={{ width: '48px', height: '32px', background: 'var(--bg-primary)', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border-color)' }}>
+                            <i className={`fa-brands ${getCardIcon(card.type)}`} style={{ fontSize: '20px', color: '#667eea' }}></i>
+                          </div>
+                          <div>
+                            <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>•••• •••• •••• {card.last4}</div>
+                            <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{card.holderName} · Expires {card.expiry}</div>
                           </div>
                         </div>
-                        {card.isDefault && <span className="default-badge">Default</span>}
-                        <div className="card-actions">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          {card.isDefault && <span style={{ padding: '4px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: 600, background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e' }}>Default</span>}
                           {!card.isDefault && (
-                            <button 
-                              className="card-action-btn"
-                              onClick={() => handleSetDefaultCard(card.id)}
-                              title="Set as default"
-                            >
+                            <button onClick={() => handleSetDefaultCard(card.id)} style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(102, 126, 234, 0.1)', border: '1px solid rgba(102, 126, 234, 0.2)', borderRadius: '8px', color: '#667eea', cursor: 'pointer' }} title="Set as default">
                               <i className="fa-solid fa-star"></i>
                             </button>
                           )}
-                          <button 
-                            className="card-action-btn delete"
-                            onClick={() => handleDeleteCard(card.id)}
-                            title="Remove card"
-                          >
+                          <button onClick={() => handleDeleteCard(card.id)} style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '8px', color: '#ef4444', cursor: 'pointer' }} title="Remove card">
                             <i className="fa-solid fa-trash"></i>
                           </button>
                         </div>
                       </div>
                     ))}
 
-                    {/* Add Card Button */}
                     {!showAddCard ? (
-                      <button className="add-card-btn" onClick={() => setShowAddCard(true)}>
-                        <i className="fa-solid fa-plus"></i>
-                        Add New Card
+                      <button onClick={() => setShowAddCard(true)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: '16px', background: 'transparent', border: '2px dashed var(--border-color)', borderRadius: '12px', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '14px', fontWeight: 500, transition: '0.2s' }}>
+                        <i className="fa-solid fa-plus"></i> Add New Card
                       </button>
                     ) : (
                       <div className="add-card-form">
@@ -1166,50 +1592,53 @@ export default function SettingsPage() {
                   </div>
 
                   {/* Billing History */}
-                  <div className="section-title" style={{ marginTop: '32px' }}>
-                    <i className="fa-solid fa-receipt"></i>
-                    Billing History
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+                    <i className="fa-solid fa-receipt" style={{ color: '#667eea' }}></i>
+                    <h4 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>Billing History</h4>
                   </div>
 
-                  <div className="billing-history">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     {invoicesLoading ? (
-                      <div className="invoices-loading">
-                        <i className="fa-solid fa-spinner fa-spin"></i>
+                      <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text-muted)', background: 'rgba(102, 126, 234, 0.03)', borderRadius: '12px' }}>
+                        <i className="fa-solid fa-spinner fa-spin" style={{ marginBottom: '8px', display: 'block' }}></i>
                         <span>Loading billing history...</span>
                       </div>
                     ) : invoices.length === 0 ? (
-                      <div className="no-invoices">
-                        <i className="fa-solid fa-receipt"></i>
-                        <p>No payment history yet</p>
-                        <span>Your invoices will appear here after your first payment</span>
+                      <div style={{ padding: '32px', textAlign: 'center', background: 'rgba(102, 126, 234, 0.03)', borderRadius: '12px' }}>
+                        <i className="fa-solid fa-receipt" style={{ fontSize: '32px', color: 'var(--text-muted)', opacity: 0.5, marginBottom: '12px', display: 'block' }}></i>
+                        <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', margin: '0 0 4px' }}>No payment history yet</p>
+                        <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Your invoices will appear here after your first payment</span>
                       </div>
                     ) : (
                       invoices.map((invoice) => (
-                        <div key={invoice.id} className="invoice-item">
-                          <div className="invoice-date">
-                            <i className="fa-solid fa-file-invoice"></i>
+                        <div key={invoice.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', background: 'rgba(102, 126, 234, 0.03)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                            <div style={{ width: '40px', height: '40px', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+                              <i className="fa-solid fa-file-invoice"></i>
+                            </div>
                             <div>
-                              <span className="invoice-title">{invoice.planName} Plan - {invoice.invoiceNumber}</span>
-                              <span className="invoice-date-text">{new Date(invoice.date).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                              <span style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>{invoice.planName} Plan - {invoice.invoiceNumber}</span>
+                              <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{new Date(invoice.date).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
                             </div>
                           </div>
-                          <div className="invoice-amount">₹{invoice.amount.toLocaleString('en-IN')}</div>
-                          <span className={`invoice-status ${invoice.status}`}>{invoice.status === 'paid' ? 'Paid' : invoice.status}</span>
-                          <button 
-                            className="btn btn-sm"
-                            onClick={() => downloadInvoice({
-                              invoiceNumber: invoice.invoiceNumber,
-                              date: new Date(invoice.date).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' }),
-                              planName: invoice.planName,
-                              amount: invoice.amount,
-                              paymentId: invoice.paymentId,
-                              customerName: user?.name || 'Customer',
-                              customerEmail: user?.email || '',
-                            })}
-                          >
-                            <i className="fa-solid fa-download"></i>
-                            Download
-                          </button>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                            <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)' }}>₹{invoice.amount.toLocaleString('en-IN')}</span>
+                            <span style={{ padding: '4px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: 600, background: invoice.status === 'paid' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(245, 158, 11, 0.1)', color: invoice.status === 'paid' ? '#22c55e' : '#f59e0b' }}>{invoice.status === 'paid' ? 'Paid' : invoice.status}</span>
+                            <button 
+                              className="yc-btn-secondary" style={{ padding: '8px 12px', fontSize: '12px' }}
+                              onClick={() => downloadInvoice({
+                                invoiceNumber: invoice.invoiceNumber,
+                                date: new Date(invoice.date).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' }),
+                                planName: invoice.planName,
+                                amount: invoice.amount,
+                                paymentId: invoice.paymentId,
+                                customerName: user?.name || 'Customer',
+                                customerEmail: user?.email || '',
+                              })}
+                            >
+                              <i className="fa-solid fa-download"></i> Download
+                            </button>
+                          </div>
                         </div>
                       ))
                     )}
@@ -1219,88 +1648,85 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          {/* Plan Selection Modal */}
+          {/* Plan Selection Modal - YC Style */}
           {showPlanModal && (
-            <div className="modal-overlay" onClick={() => setShowPlanModal(false)}>
-              <div className="plan-modal" onClick={(e) => e.stopPropagation()}>
-                <div className="modal-header">
-                  <h2>Choose Your Plan</h2>
-                  <button className="close-btn" onClick={() => setShowPlanModal(false)}>
+            <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }} onClick={() => setShowPlanModal(false)}>
+              <div style={{ background: 'var(--bg-elevated)', borderRadius: '24px', maxWidth: '900px', width: '100%', maxHeight: '90vh', overflow: 'auto', border: '1px solid var(--border-color)' }} onClick={(e) => e.stopPropagation()}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 32px', borderBottom: '1px solid var(--border-color)' }}>
+                  <h2 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>Choose Your Plan</h2>
+                  <button onClick={() => setShowPlanModal(false)} style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(102, 126, 234, 0.1)', border: 'none', borderRadius: '10px', color: 'var(--text-secondary)', cursor: 'pointer' }}>
                     <i className="fa-solid fa-times"></i>
                   </button>
                 </div>
 
-                <div className="plans-grid">
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', padding: '32px' }}>
                   {plansLoading ? (
-                    <div className="plans-loading">
-                      <i className="fa-solid fa-spinner fa-spin"></i>
-                      <span>Loading plans...</span>
+                    <div style={{ gridColumn: 'span 3', padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                      <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: '24px', marginBottom: '12px' }}></i>
+                      <span style={{ display: 'block' }}>Loading plans...</span>
                     </div>
                   ) : plans.length === 0 ? (
-                    <div className="plans-loading">
-                      <span>No plans available</span>
-                    </div>
+                    <div style={{ gridColumn: 'span 3', padding: '60px', textAlign: 'center' }}>No plans available</div>
                   ) : plans.map((plan) => (
                     <div 
                       key={plan.id} 
-                      className={`plan-card ${plan.popular ? 'popular' : ''} ${currentPlan === plan.id ? 'current' : ''}`}
+                      style={{ 
+                        position: 'relative', padding: '28px', borderRadius: '20px', 
+                        background: plan.popular ? 'linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%)' : 'rgba(102, 126, 234, 0.03)',
+                        border: `2px solid ${currentPlan === plan.id ? '#22c55e' : plan.popular ? 'rgba(102, 126, 234, 0.3)' : 'var(--border-color)'}`,
+                        transition: 'all 0.3s ease'
+                      }}
                     >
-                      {plan.popular && <div className="popular-badge">Most Popular</div>}
-                      {currentPlan === plan.id && <div className="current-badge">Current Plan</div>}
+                      {plan.popular && <div style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', padding: '4px 16px', borderRadius: '12px', fontSize: '11px', fontWeight: 700, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>Most Popular</div>}
+                      {currentPlan === plan.id && <div style={{ position: 'absolute', top: '-12px', right: '16px', padding: '4px 12px', borderRadius: '12px', fontSize: '11px', fontWeight: 700, background: 'rgba(34, 197, 94, 0.15)', color: '#22c55e' }}>Current</div>}
                       
-                      <h3 className="plan-name">{plan.name}</h3>
-                      <div className="plan-pricing">
+                      <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 12px' }}>{plan.name}</h3>
+                      <div style={{ marginBottom: '20px' }}>
                         {plan.period === 'custom' ? (
-                          <span className="plan-price-amount">Custom</span>
+                          <span style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text-primary)' }}>Custom</span>
                         ) : (
                           <>
-                            <span className="plan-price-amount">₹{plan.price.toLocaleString()}</span>
-                            <span className="plan-price-period">/mo</span>
+                            <span style={{ fontSize: '28px', fontWeight: 800, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>₹{plan.price.toLocaleString()}</span>
+                            <span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>/mo</span>
                           </>
                         )}
                       </div>
                       
-                      <ul className="plan-features-list">
+                      <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                         {plan.features.map((feature, i) => (
-                          <li key={i}>
-                            <i className="fa-solid fa-check"></i>
+                          <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '13px', color: 'var(--text-secondary)' }}>
+                            <i className="fa-solid fa-check" style={{ color: '#22c55e', marginTop: '3px', fontSize: '11px' }}></i>
                             {feature}
                           </li>
                         ))}
                       </ul>
 
                       <button 
-                        className={`plan-select-btn ${currentPlan === plan.id ? 'current' : ''}`}
                         onClick={() => handleUpgrade(plan)}
                         disabled={currentPlan === plan.id || isProcessing || (!razorpayLoaded && plan.price > 0 && plan.period !== 'custom')}
+                        style={{ 
+                          width: '100%', padding: '12px', borderRadius: '12px', border: 'none', 
+                          fontSize: '14px', fontWeight: 600, cursor: currentPlan === plan.id ? 'not-allowed' : 'pointer',
+                          background: currentPlan === plan.id ? 'rgba(34, 197, 94, 0.15)' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                          color: currentPlan === plan.id ? '#22c55e' : 'white',
+                          opacity: (isProcessing || (!razorpayLoaded && plan.price > 0 && plan.period !== 'custom')) && currentPlan !== plan.id ? 0.7 : 1,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
+                        }}
                       >
                         {isProcessing && selectedPlan?.id === plan.id ? (
-                          <>
-                            <i className="fa-solid fa-spinner fa-spin"></i>
-                            Processing...
-                          </>
+                          <><i className="fa-solid fa-spinner fa-spin"></i> Processing...</>
                         ) : !razorpayLoaded && plan.price > 0 && plan.period !== 'custom' ? (
-                          <>
-                            <i className="fa-solid fa-spinner fa-spin"></i>
-                            Loading...
-                          </>
+                          <><i className="fa-solid fa-spinner fa-spin"></i> Loading...</>
                         ) : currentPlan === plan.id ? (
                           'Current Plan'
                         ) : plan.period === 'custom' ? (
-                          <>
-                            <i className="fa-solid fa-envelope"></i>
-                            Contact Sales
-                          </>
+                          <><i className="fa-solid fa-envelope"></i> Contact Sales</>
                         ) : (() => {
-                          // Determine if this is an upgrade or downgrade
                           const currentPlanOrder = plans.find(p => p.id === currentPlan)?.order || 0;
                           const thisPlanOrder = plan.order || 0;
                           const isDowngrade = thisPlanOrder < currentPlanOrder;
                           return (
-                            <>
-                              <i className={`fa-solid fa-arrow-${isDowngrade ? 'down' : 'right'}`}></i>
-                              {isDowngrade ? 'Downgrade' : 'Upgrade Now'}
-                            </>
+                            <><i className={`fa-solid fa-arrow-${isDowngrade ? 'down' : 'right'}`}></i> {isDowngrade ? 'Downgrade' : 'Upgrade Now'}</>
                           );
                         })()}
                       </button>
@@ -1308,9 +1734,9 @@ export default function SettingsPage() {
                   ))}
                 </div>
 
-                <div className="payment-methods-info">
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', padding: '20px 32px', borderTop: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '13px' }}>
                   <span>Secure payments powered by</span>
-                  <img src="https://cdn.razorpay.com/logo.svg" alt="Razorpay" height="24" />
+                  <img src="https://cdn.razorpay.com/logo.svg" alt="Razorpay" height="20" />
                 </div>
               </div>
             </div>
