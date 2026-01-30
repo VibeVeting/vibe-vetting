@@ -2,7 +2,10 @@
 
 .bc-dashboard {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+  background: #0f172a;
+  background-image: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+  background-attachment: fixed;
+  background-size: cover;
   color: #f8fafc;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
 }
@@ -1203,7 +1206,7 @@
 }
 
 .bc-creator-card-select input:checked + .bc-checkbox-custom {
-  background: #22c55e;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
   border-color: transparent;
 }
 
@@ -1226,9 +1229,18 @@
   color: #64748b;
 }
 
+.bc-creator-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .bc-barter-ready-badge {
-  color: #4ade80;
-  font-size: 16px;
+  color: #22c55e;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .bc-creator-stats {
@@ -1257,11 +1269,10 @@
 }
 
 .bc-stat-label-small {
-  font-size: 10px;
-  color: #94a3b8;
+  font-size: 11px;
+  color: #64748b;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
-  font-weight: 500;
+  letter-spacing: 0.5px;
 }
 
 .bc-creator-tags {
@@ -1272,30 +1283,24 @@
 }
 
 .bc-niche-tag {
-  background: rgba(236, 72, 153, 0.15);
-  color: #f472b6;
-  padding: 6px 14px;
+  background: rgba(139, 92, 246, 0.2);
+  color: #a78bfa;
+  padding: 6px 12px;
   border-radius: 20px;
   font-size: 12px;
-  font-weight: 600;
-  border: 1px solid rgba(236, 72, 153, 0.3);
+  font-weight: 500;
 }
 
 .bc-location-tag {
-  background: rgba(236, 72, 153, 0.1);
-  color: #f472b6;
-  padding: 6px 14px;
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+  padding: 6px 12px;
   border-radius: 20px;
   font-size: 12px;
   font-weight: 500;
   display: flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid rgba(236, 72, 153, 0.25);
-}
-
-.bc-location-tag i {
-  color: #ec4899;
 }
 
 .bc-creator-socials {

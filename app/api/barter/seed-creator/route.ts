@@ -302,6 +302,8 @@ export async function POST() {
       const offer = allOffers[i];
       const { status } = applicationStatuses[i];
       
+      if (!offer._id) continue;
+      
       // Check if application already exists
       const existingApp = await BarterApplicationModel.findByOfferAndCreator(
         offer._id.toString(),

@@ -29,6 +29,7 @@ interface BarterOffer {
   productName: string;
   productDescription?: string;
   productImage?: string;
+  productLink?: string;
   productValue: number;
   productCategory: string;
   contentType: string;
@@ -161,6 +162,8 @@ export default function BarterCompanyDashboard() {
   const [offerForm, setOfferForm] = useState({
     productName: '',
     productDescription: '',
+    productImage: '',
+    productLink: '',
     productValue: '',
     productCategory: '',
     contentType: 'reel',
@@ -368,6 +371,8 @@ export default function BarterCompanyDashboard() {
         body: JSON.stringify({
           productName: offerForm.productName,
           productDescription: offerForm.productDescription,
+          productImage: offerForm.productImage || undefined,
+          productLink: offerForm.productLink || undefined,
           productValue: parseInt(offerForm.productValue),
           productCategory: offerForm.productCategory,
           contentType: offerForm.contentType,
@@ -391,6 +396,8 @@ export default function BarterCompanyDashboard() {
       setOfferForm({
         productName: '',
         productDescription: '',
+        productImage: '',
+        productLink: '',
         productValue: '',
         productCategory: '',
         contentType: 'reel',
@@ -1076,18 +1083,20 @@ export default function BarterCompanyDashboard() {
                           {getInitials(creator.name)}
                         </div>
                         <div className="bc-creator-info">
-                          <div className="bc-creator-name">{creator.name}</div>
+                          <div className="bc-creator-name">
+                            {creator.name}
+                            {creator.barterReady && (
+                              <span className="bc-barter-ready-badge">
+                                <i className="fa-solid fa-circle-check"></i>
+                              </span>
+                            )}
+                          </div>
                           <div className="bc-creator-handle">
                             {creator.socialHandles?.instagram && (
                               <span>@{creator.socialHandles.instagram.replace('@', '')}</span>
                             )}
                           </div>
                         </div>
-                        {creator.barterReady && (
-                          <span className="bc-barter-ready-badge">
-                            <i className="fa-solid fa-check-circle"></i>
-                          </span>
-                        )}
                       </div>
                       
                       <div className="bc-creator-stats">
@@ -1208,7 +1217,7 @@ export default function BarterCompanyDashboard() {
                 </div>
                 <h3 className="bc-empty-title">Advanced Analytics Coming Soon</h3>
                 <p className="bc-empty-text" style={{ maxWidth: '400px', margin: '0 auto 20px' }}>
-                  We&apos;re building detailed campaign performance analytics, ROI tracking, and creator engagement metrics.
+                  We&apos;re building detailed campaign performance analytics, engagement tracking, and creator engagement metrics.
                 </p>
                 <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
                   <div style={{ 
@@ -1234,8 +1243,8 @@ export default function BarterCompanyDashboard() {
                     alignItems: 'center',
                     gap: '8px'
                   }}>
-                    <i className="fa-solid fa-coins"></i>
-                    ROI Calculator
+                    <i className="fa-solid fa-heart"></i>
+                    Engagement Calculator
                   </div>
                   <div style={{ 
                     padding: '10px 16px', 
@@ -1423,6 +1432,35 @@ export default function BarterCompanyDashboard() {
                     value={offerForm.productDescription}
                     onChange={(e) => setOfferForm({ ...offerForm, productDescription: e.target.value })}
                   />
+                </div>
+
+                <div className="bc-form-row">
+                  <div className="bc-form-group">
+                    <label className="bc-form-label">
+                      <i className="fa-solid fa-image"></i>
+                      Product Photo URL
+                    </label>
+                    <input
+                      type="url"
+                      className="bc-form-input"
+                      placeholder="https://example.com/product-image.jpg"
+                      value={offerForm.productImage}
+                      onChange={(e) => setOfferForm({ ...offerForm, productImage: e.target.value })}
+                    />
+                  </div>
+                  <div className="bc-form-group">
+                    <label className="bc-form-label">
+                      <i className="fa-solid fa-link"></i>
+                      Product Link
+                    </label>
+                    <input
+                      type="url"
+                      className="bc-form-input"
+                      placeholder="https://yourstore.com/product"
+                      value={offerForm.productLink}
+                      onChange={(e) => setOfferForm({ ...offerForm, productLink: e.target.value })}
+                    />
+                  </div>
                 </div>
 
                 <div className="bc-form-row">

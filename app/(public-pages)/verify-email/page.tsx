@@ -406,9 +406,11 @@ function VerifyEmailContent() {
           filter: drop-shadow(0 0 4px ${getBrandColor()}80);
         }
 
-        .back-link {
-          color: #94a3b8;
-          text-decoration: none;
+        .back-link,
+        .back-link:visited,
+        .back-link:active {
+          color: ${getBrandColor()} !important;
+          text-decoration: none !important;
           font-size: 15px;
           display: inline-flex;
           align-items: center;
@@ -422,10 +424,11 @@ function VerifyEmailContent() {
         }
 
         .back-link:hover {
-          color: ${getBrandColor()};
+          color: ${getBrandColor()} !important;
           background: rgba(255, 255, 255, 0.06);
           border-color: ${getBrandColor()}40;
           transform: translateX(-4px);
+          text-decoration: none !important;
         }
       `}</style>
 

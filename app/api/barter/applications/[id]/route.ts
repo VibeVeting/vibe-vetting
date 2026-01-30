@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { BarterApplicationModel } from "@/lib/models/barter-application";
+import { BarterOfferModel } from "@/lib/models/barter-offer";
+import { NotificationModel } from "@/lib/models/notification";
 import { verifyToken } from "@/lib/auth";
 
 // GET - Get single application
@@ -91,6 +93,31 @@ export async function PUT(
       }
 
       updatedApplication = await BarterApplicationModel.submitContent(id, contentLink);
+
+      // Send notification to the company about the content submission
+      try {
+        const offer = await BarterOfferModel.findById(application.offerId.toString());
+        if (offer) {
+          await NotificationModel.create(offer.brandId.toString(), {
+            title: `Content Submitted by ${application.creatorName}`,
+            body: `${application.creatorName} has submitted content for "${offer.productName}". Review and approve to complete the collaboration.`,
+            type: 'content',
+            metadata: {
+              applicationId: application._id?.toString(),
+              offerId: offer._id?.toString(),
+              offerName: offer.productName,
+              creatorName: application.creatorName,
+              contentLink: contentLink,
+              avatar: application.creatorName.charAt(0).toUpperCase(),
+              actionUrl: '/barter-company-dashboard',
+              actionLabel: 'Review Content',
+            },
+          });
+        }
+      } catch (notifError) {
+        console.error("Error creating notification:", notifError);
+        // Don't fail the content submission if notification fails
+      }
     } else if (action === 'update_shipping') {
       if (!shippingAddress) {
         return NextResponse.json({ error: "Shipping address is required" }, { status: 400 });

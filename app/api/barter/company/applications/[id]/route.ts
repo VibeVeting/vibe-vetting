@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { BarterApplicationModel, ApplicationStatus } from "@/lib/models/barter-application";
 import { BarterOfferModel } from "@/lib/models/barter-offer";
+import { NotificationModel } from "@/lib/models/notification";
 import { verifyToken } from "@/lib/auth";
 
 // GET - Get specific application
@@ -146,6 +147,102 @@ export async function PUT(
           { error: "Invalid action" },
           { status: 400 }
         );
+    }
+
+    // Send notification to the creator based on the action
+    try {
+      let notificationData: { title: string; body: string; type: string; metadata: Record<string, unknown> } | null = null;
+
+      switch (action) {
+        case 'approve':
+          notificationData = {
+            title: `Application Approved! 🎉`,
+            body: `Great news! Your application for "${offer.productName}" has been approved. The product will be shipped to you soon.`,
+            type: 'application',
+            metadata: {
+              applicationId: id,
+              offerId: offer._id?.toString(),
+              offerName: offer.productName,
+              status: 'approved',
+              actionUrl: '/creator-dashboard',
+              actionLabel: 'View Details',
+            },
+          };
+          break;
+
+        case 'reject':
+          notificationData = {
+            title: `Application Update`,
+            body: `Unfortunately, your application for "${offer.productName}" was not selected this time. Keep applying to other offers!`,
+            type: 'application',
+            metadata: {
+              applicationId: id,
+              offerId: offer._id?.toString(),
+              offerName: offer.productName,
+              status: 'rejected',
+              actionUrl: '/creator-dashboard',
+              actionLabel: 'Browse Offers',
+            },
+          };
+          break;
+
+        case 'request_revision':
+          notificationData = {
+            title: `Content Revision Requested`,
+            body: `The brand has requested revisions for your "${offer.productName}" content. ${feedback ? `Feedback: ${feedback}` : 'Please check the details and resubmit.'}`,
+            type: 'content',
+            metadata: {
+              applicationId: id,
+              offerId: offer._id?.toString(),
+              offerName: offer.productName,
+              status: 'revision_requested',
+              feedback: feedback,
+              actionUrl: '/creator-dashboard',
+              actionLabel: 'Update Content',
+            },
+          };
+          break;
+
+        case 'approve_content':
+          notificationData = {
+            title: `Content Approved! 🎊`,
+            body: `Congratulations! Your content for "${offer.productName}" has been approved. The collaboration is now complete!`,
+            type: 'content',
+            metadata: {
+              applicationId: id,
+              offerId: offer._id?.toString(),
+              offerName: offer.productName,
+              status: 'completed',
+              actionUrl: '/creator-dashboard',
+              actionLabel: 'View Earnings',
+            },
+          };
+          break;
+
+        case 'ship':
+          notificationData = {
+            title: `Product Shipped! 📦`,
+            body: `Your product from "${offer.productName}" has been shipped! Tracking number: ${trackingNumber}`,
+            type: 'application',
+            metadata: {
+              applicationId: id,
+              offerId: offer._id?.toString(),
+              offerName: offer.productName,
+              trackingNumber: trackingNumber,
+              status: 'shipped',
+              actionUrl: '/creator-dashboard',
+              actionLabel: 'Track Shipment',
+            },
+          };
+          break;
+      }
+
+      if (notificationData) {
+        await NotificationModel.create(application.creatorId.toString(), notificationData);
+      }
+    } catch (notifError) {
+      console.error("Error creating notification:", notifError);
+      // Don't fail the action if notification fails
     }
 
     return NextResponse.json({

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { BarterApplicationModel } from "@/lib/models/barter-application";
 import { BarterOfferModel } from "@/lib/models/barter-offer";
 import { BarterUserModel } from "@/lib/models/barter-user";
+import { NotificationModel } from "@/lib/models/notification";
 import { verifyToken } from "@/lib/auth";
 
 // GET - Get all applications for the current user
@@ -124,6 +125,27 @@ export async function POST(request: NextRequest) {
       creatorSocialHandles: creator.creatorProfile.socialHandles,
       applicationMessage,
     });
+
+    // Send notification to the company about the new application
+    try {
+      await NotificationModel.create(offer.brandId.toString(), {
+        title: `New Application from ${creator.name}`,
+        body: `${creator.name} (${creator.creatorProfile.followerCount} followers) has applied to your "${offer.productName}" offer.`,
+        type: 'application',
+        metadata: {
+          applicationId: application._id?.toString(),
+          offerId: offer._id?.toString(),
+          offerName: offer.productName,
+          creatorName: creator.name,
+          avatar: creator.name.charAt(0).toUpperCase(),
+          actionUrl: '/barter-company-dashboard',
+          actionLabel: 'View Application',
+        },
+      });
+    } catch (notifError) {
+      console.error("Error creating notification:", notifError);
+      // Don't fail the application submission if notification fails
+    }
 
     return NextResponse.json({ 
       message: "Application submitted successfully",

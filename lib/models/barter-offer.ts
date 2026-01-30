@@ -18,6 +18,7 @@ export interface BarterOffer {
   productName: string;
   productDescription?: string;
   productImage?: string;
+  productLink?: string;
   productValue: number; // in INR
   productCategory: string;
   
