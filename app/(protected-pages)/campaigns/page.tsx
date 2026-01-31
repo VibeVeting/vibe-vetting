@@ -380,7 +380,7 @@ export default function CampaignsPage() {
                         <div className="yc-campaign-metric-label">Creators</div>
                       </div>
                       <div className="yc-campaign-metric">
-                        <div className="yc-campaign-metric-value">${(campaign.budget / 1000).toFixed(0)}K</div>
+                        <div className="yc-campaign-metric-value">₹{campaign.budget >= 100000 ? `${(campaign.budget / 100000).toFixed(1)}L` : `${(campaign.budget / 1000).toFixed(0)}K`}</div>
                         <div className="yc-campaign-metric-label">Budget</div>
                       </div>
                       <div className="yc-campaign-metric">

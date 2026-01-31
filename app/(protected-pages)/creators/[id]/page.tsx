@@ -334,49 +334,99 @@ export default function CreatorProfilePage() {
             </div>
           </div>
 
-          {/* Quick Stats Row */}
-          <div className="quick-stats-row">
-            <div className="quick-stat">
-              <div className="stat-icon-wrap purple"><i className="fa-solid fa-users"></i></div>
-              <div className="stat-info">
-                <span className="stat-number">{creatorData.followers}</span>
-                <span className="stat-name">Followers</span>
+          {/* Quick Stats Row - Premium Design */}
+          <div className="premium-stats-grid">
+            <div className="premium-stat-card purple-glow">
+              <div className="stat-card-bg"></div>
+              <div className="stat-card-shine"></div>
+              <div className="stat-icon-container">
+                <div className="stat-icon-ring"></div>
+                <div className="stat-icon-inner purple">
+                  <i className="fa-solid fa-users"></i>
+                </div>
               </div>
-              <span className="stat-trend positive">{creatorData.growthRate}</span>
-            </div>
-            <div className="quick-stat">
-              <div className="stat-icon-wrap blue"><i className="fa-solid fa-heart"></i></div>
-              <div className="stat-info">
-                <span className="stat-number">{creatorData.avgLikes}</span>
-                <span className="stat-name">Avg Likes</span>
+              <div className="stat-value-container">
+                <span className="stat-value-large">{creatorData.followers}</span>
+                <span className="stat-label-premium">Followers</span>
               </div>
-            </div>
-            <div className="quick-stat">
-              <div className="stat-icon-wrap green"><i className="fa-solid fa-comment"></i></div>
-              <div className="stat-info">
-                <span className="stat-number">{creatorData.avgComments}</span>
-                <span className="stat-name">Avg Comments</span>
+              <div className="stat-badge positive">
+                <i className="fa-solid fa-arrow-trend-up"></i>
+                {creatorData.growthRate}
               </div>
             </div>
-            <div className="quick-stat">
-              <div className="stat-icon-wrap orange"><i className="fa-solid fa-share"></i></div>
-              <div className="stat-info">
-                <span className="stat-number">{creatorData.avgShares}</span>
-                <span className="stat-name">Avg Shares</span>
+
+            <div className="premium-stat-card blue-glow">
+              <div className="stat-card-bg"></div>
+              <div className="stat-card-shine"></div>
+              <div className="stat-icon-container">
+                <div className="stat-icon-ring"></div>
+                <div className="stat-icon-inner blue">
+                  <i className="fa-solid fa-heart"></i>
+                </div>
+              </div>
+              <div className="stat-value-container">
+                <span className="stat-value-large">{creatorData.avgLikes}</span>
+                <span className="stat-label-premium">Avg Likes</span>
               </div>
             </div>
-            <div className="quick-stat">
-              <div className="stat-icon-wrap pink"><i className="fa-solid fa-eye"></i></div>
-              <div className="stat-info">
-                <span className="stat-number">{creatorData.avgViews}</span>
-                <span className="stat-name">Avg Views</span>
+
+            <div className="premium-stat-card green-glow">
+              <div className="stat-card-bg"></div>
+              <div className="stat-card-shine"></div>
+              <div className="stat-icon-container">
+                <div className="stat-icon-ring"></div>
+                <div className="stat-icon-inner green">
+                  <i className="fa-solid fa-comment"></i>
+                </div>
+              </div>
+              <div className="stat-value-container">
+                <span className="stat-value-large">{creatorData.avgComments}</span>
+                <span className="stat-label-premium">Avg Comments</span>
               </div>
             </div>
-            <div className="quick-stat">
-              <div className="stat-icon-wrap teal"><i className="fa-solid fa-bolt"></i></div>
-              <div className="stat-info">
-                <span className="stat-number">{creatorData.engagement}</span>
-                <span className="stat-name">Engagement</span>
+
+            <div className="premium-stat-card orange-glow">
+              <div className="stat-card-bg"></div>
+              <div className="stat-card-shine"></div>
+              <div className="stat-icon-container">
+                <div className="stat-icon-ring"></div>
+                <div className="stat-icon-inner orange">
+                  <i className="fa-solid fa-share"></i>
+                </div>
+              </div>
+              <div className="stat-value-container">
+                <span className="stat-value-large">{creatorData.avgShares}</span>
+                <span className="stat-label-premium">Avg Shares</span>
+              </div>
+            </div>
+
+            <div className="premium-stat-card pink-glow">
+              <div className="stat-card-bg"></div>
+              <div className="stat-card-shine"></div>
+              <div className="stat-icon-container">
+                <div className="stat-icon-ring"></div>
+                <div className="stat-icon-inner pink">
+                  <i className="fa-solid fa-eye"></i>
+                </div>
+              </div>
+              <div className="stat-value-container">
+                <span className="stat-value-large">{creatorData.avgViews}</span>
+                <span className="stat-label-premium">Avg Views</span>
+              </div>
+            </div>
+
+            <div className="premium-stat-card teal-glow">
+              <div className="stat-card-bg"></div>
+              <div className="stat-card-shine"></div>
+              <div className="stat-icon-container">
+                <div className="stat-icon-ring"></div>
+                <div className="stat-icon-inner teal">
+                  <i className="fa-solid fa-bolt"></i>
+                </div>
+              </div>
+              <div className="stat-value-container">
+                <span className="stat-value-large">{creatorData.engagement}</span>
+                <span className="stat-label-premium">Engagement</span>
               </div>
             </div>
           </div>
@@ -991,10 +1041,7 @@ export default function CreatorProfilePage() {
               <i className="fa-solid fa-download"></i>
               Export Report
             </button>
-            <button className="btn btn-secondary">
-              <i className="fa-solid fa-share-nodes"></i>
-              Share Report
-            </button>
+
             <button className="btn btn-primary" onClick={() => setShowPipelineModal(true)}>
               <i className="fa-solid fa-diagram-project"></i>
               Add to Pipeline

@@ -46,7 +46,7 @@ async function seedNotifications() {
       // Contract notifications
       { title: '📝 Contract Signed', body: 'Sarah Johnson signed the Summer Campaign contract. Ready to proceed!', type: 'contract', read: true },
       { title: '⏰ Contract Expiring', body: 'Contract with Mike Chen expires in 7 days. Consider renewal?', type: 'contract', read: false },
-      { title: '💰 Payment Due', body: 'Payment of $5,000 due for completed deliverables from James Rodriguez.', type: 'contract', read: false },
+      { title: '💰 Payment Due', body: 'Payment of ₹4,16,500 due for completed deliverables from James Rodriguez.', type: 'contract', read: false },
       { title: '📋 Contract Review', body: 'New contract template "Influencer Ambassador" requires your approval.', type: 'contract', read: false },
       { title: '✍️ Counter-offer Received', body: 'Lisa Park has submitted a counter-offer for the Q2 campaign contract.', type: 'contract', read: false },
       
@@ -86,7 +86,7 @@ async function seedNotifications() {
       { title: '💡 Campaign Insight', body: 'Top performing content type: Reels. Consider adjusting content strategy.', type: 'campaign', read: false },
       
       // More creator updates
-      { title: '🏆 Top Performer', body: 'Chris Taylor generated $45K in tracked sales last month!', type: 'creator', read: false },
+      { title: '🏆 Top Performer', body: 'Chris Taylor generated ₹37.5L in tracked sales last month!', type: 'creator', read: false },
       { title: '📸 Content Preview', body: 'Preview available: Jessica Lee submitted 5 photos for approval.', type: 'creator', read: false },
       { title: '🔄 Status Change', body: 'Ryan Park moved from "In Negotiation" to "Contracted" status.', type: 'creator', read: true },
       { title: '⚠️ Compliance Issue', body: 'Anna White missing FTC disclosure on recent sponsored post.', type: 'creator', read: false },
@@ -98,8 +98,8 @@ async function seedNotifications() {
       { title: '🏅 Achievement Unlocked', body: 'You verified 100 creators! Earning the "Talent Scout" badge.', type: 'achievement', read: true },
       { title: '📝 Survey Request', body: 'Help us improve! Complete our 2-minute feedback survey.', type: 'system', read: false },
       { title: '🚀 Beta Feature', body: 'You have early access to our new "Creator Comparison" tool!', type: 'system', read: false },
-      { title: '💰 Invoice Ready', body: 'January 2026 invoice for $12,500 is ready for download.', type: 'billing', read: false },
-      { title: '🎁 Referral Bonus', body: 'Your referral to Acme Corp was successful! $500 credit added.', type: 'billing', read: true },
+      { title: '💰 Invoice Ready', body: 'January 2026 invoice for ₹10,43,750 is ready for download.', type: 'billing', read: false },
+      { title: '🎁 Referral Bonus', body: 'Your referral to Acme Corp was successful! ₹41,750 credit added.', type: 'billing', read: true },
       { title: '📋 Compliance Update', body: 'New FTC guidelines for influencer marketing. Review required.', type: 'compliance', read: false },
       { title: '🌐 Platform Update', body: 'Instagram API integration enhanced for better analytics.', type: 'system', read: true },
       { title: '🔔 Reminder', body: 'Don\'t forget to review pending creator applications (12 waiting).', type: 'reminder', read: false },
