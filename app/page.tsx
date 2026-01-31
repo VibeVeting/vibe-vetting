@@ -30,41 +30,41 @@ const analysisMessages = [
 ];
 
 const stats = [
-  { value: "6", label: "Platforms", icon: "fa-globe", color: "#00f5ff" },
+  { value: "Multi", label: "Platform", icon: "fa-globe", color: "#00f5ff" },
   { value: "AI", label: "Powered", icon: "fa-robot", color: "#22c55e" },
-  { value: "7", label: "Pipeline Stages", icon: "fa-layer-group", color: "#a855f7" },
-  { value: "3", label: "AI Features", icon: "fa-brain", color: "#f59e0b" },
+  { value: "Full", label: "Pipeline", icon: "fa-layer-group", color: "#a855f7" },
+  { value: "Smart", label: "Automation", icon: "fa-brain", color: "#f59e0b" },
 ];
 
 // What makes us different
 const differentiators = [
   {
     icon: "fa-layer-group",
-    title: "7-Stage Pipeline",
+    title: "Full Pipeline",
     description: "Track creators from discovery to contract completion. Never lose track of negotiations or deadlines again.",
-    stat: "7",
-    statLabel: "Stages",
+    stat: "End",
+    statLabel: "to End",
   },
   {
     icon: "fa-bolt",
     title: "Instant Results",
     description: "What takes agencies weeks, we do in seconds. Full analysis before your coffee gets cold.",
-    stat: "10s",
-    statLabel: "Average",
+    stat: "Fast",
+    statLabel: "Analysis",
   },
   {
     icon: "fa-globe",
-    title: "6 Platforms",
+    title: "All Platforms",
     description: "Instagram, YouTube, Twitter, LinkedIn, Facebook, Twitch - all in one place.",
-    stat: "6",
-    statLabel: "Networks",
+    stat: "Multi",
+    statLabel: "Network",
   },
   {
     icon: "fa-file-contract",
     title: "Built-in Contracts",
     description: "Generate professional contracts instantly. No more back-and-forth with legal teams.",
-    stat: "1-Click",
-    statLabel: "Contracts",
+    stat: "One",
+    statLabel: "Click",
   },
 ];
 
@@ -72,14 +72,14 @@ const differentiators = [
 
 // How it works for customers - Complete Journey
 const howItWorks = [
-  { step: "1", title: "Discover", desc: "Find creators across 6 platforms matching your brand", icon: "fa-magnifying-glass" },
+  { step: "1", title: "Discover", desc: "Find creators across all platforms matching your brand", icon: "fa-magnifying-glass" },
   { step: "2", title: "AI Vetting", desc: "Deep scan of content history, audience & risks", icon: "fa-brain" },
   { step: "3", title: "VibeScore", desc: "Get AI-powered brand alignment score", icon: "fa-chart-line" },
   { step: "4", title: "Add to Pipeline", desc: "Move vetted creators into your workflow", icon: "fa-layer-group" },
   { step: "5", title: "Outreach", desc: "AI writes personalized collaboration emails", icon: "fa-envelope" },
   { step: "6", title: "Negotiate", desc: "AI auto-negotiates the best rates for you", icon: "fa-handshake" },
   { step: "7", title: "Contract", desc: "Generate professional contracts instantly", icon: "fa-file-signature" },
-  { step: "8", title: "Track Engagement", desc: "Monitor likes, comments, shares & audience growth", icon: "fa-chart-pie" },
+  { step: "8", title: "Track", desc: "Monitor engagement & audience growth in real-time", icon: "fa-chart-pie" },
 ];
 
 const supportedPlatforms = [
@@ -98,8 +98,8 @@ const superpowerFeatures = [
     title: "Controversy Alerts",
     headline: "Know When Creators Get Into Trouble",
     description: "Get notified when any creator in your pipeline gets into controversy, posts problematic content, or faces backlash. Take action before it hurts your brand.",
-    stat: "Alerts",
-    statSub: "Protection",
+    stat: "Real",
+    statSub: "Time",
     gradient: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
     badge: "PROTECTION",
   },
@@ -108,8 +108,8 @@ const superpowerFeatures = [
     title: "Auto-Negotiation Bot",
     headline: "AI Negotiates Deals For You",
     description: "Set your budget. Our AI handles the entire negotiation. It knows market rates, uses smart strategies, and gets you the best price without awkward back-and-forth.",
-    stat: "3",
-    statSub: "Strategies",
+    stat: "Smart",
+    statSub: "Deals",
     gradient: "linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)",
     badge: "GAME CHANGER",
   },
@@ -118,8 +118,8 @@ const superpowerFeatures = [
     title: "Fake Follower Detector",
     headline: "Know The Real Audience Size",
     description: "AI analyzes engagement patterns, follower growth, and interaction quality to calculate what percentage of followers are real humans vs bots. Stop paying for fake reach.",
-    stat: "AI",
-    statSub: "Detection",
+    stat: "Deep",
+    statSub: "Analysis",
     gradient: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
     badge: "SAVE MONEY",
   },
@@ -128,8 +128,8 @@ const superpowerFeatures = [
     title: "AI Outreach Writer",
     headline: "Personalized Emails That Get Replies",
     description: "AI generates custom collaboration emails based on creator's content and style. No more generic templates. Every email feels personal because AI writes it specifically for them.",
-    stat: "Smart",
-    statSub: "Templates",
+    stat: "Custom",
+    statSub: "Messages",
     gradient: "linear-gradient(135deg, #00f5ff 0%, #0099ff 100%)",
     badge: "EXCLUSIVE",
   },
@@ -153,7 +153,7 @@ const barterBenefits = [
   {
     icon: "fa-gem",
     title: "Nano & Micro Focus",
-    description: "1K-50K followers with 8-15% engagement rates. Their audiences trust them more than mega influencers.",
+    description: "Micro creators with high engagement rates. Their audiences trust them more than mega influencers.",
     gradient: "linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%)",
   },
   {
@@ -232,8 +232,8 @@ const advancedFeatures = [
     icon: "fa-magnifying-glass",
     title: "Similar Creator Finder",
     description: "Found a creator you love? AI finds more like them across all platforms instantly.",
-    stat: "7",
-    statLabel: "Platforms",
+    stat: "Cross",
+    statLabel: "Platform",
     gradient: "linear-gradient(135deg, #a855f7 0%, #ec4899 100%)",
   },
   {
@@ -248,8 +248,8 @@ const advancedFeatures = [
     icon: "fa-language",
     title: "Multi-Language Detection",
     description: "Automatically detect what languages a creator speaks. Perfect for regional and multilingual campaigns.",
-    stat: "50+",
-    statLabel: "Languages",
+    stat: "Global",
+    statLabel: "Reach",
     gradient: "linear-gradient(135deg, #22c55e 0%, #10b981 100%)",
   },
   {
@@ -529,10 +529,10 @@ export default function LandingPage() {
                 <div className="demo-avatar">👩‍🎨</div>
                 <div className="demo-info">
                   <span className="demo-name">Creator Profile</span>
-                  <span className="demo-platform">Instagram • 847K followers</span>
+                  <span className="demo-platform">Instagram • High Reach</span>
                 </div>
                 <div className="demo-score">
-                  <span className="score-value">94</span>
+                  <span className="score-value">A+</span>
                   <span className="score-label">Trust Score</span>
                 </div>
               </div>
@@ -540,7 +540,7 @@ export default function LandingPage() {
                 <div className="demo-metric safe">
                   <i className="fa-solid fa-check-circle"></i>
                   <span>Authentic Audience</span>
-                  <span className="metric-value">91%</span>
+                  <span className="metric-value">High</span>
                 </div>
                 <div className="demo-metric safe">
                   <i className="fa-solid fa-check-circle"></i>
@@ -550,17 +550,17 @@ export default function LandingPage() {
                 <div className="demo-metric warning">
                   <i className="fa-solid fa-exclamation-triangle"></i>
                   <span>Price vs Market</span>
-                  <span className="metric-value">+15%</span>
+                  <span className="metric-value">Above</span>
                 </div>
                 <div className="demo-metric safe">
                   <i className="fa-solid fa-check-circle"></i>
                   <span>Engagement Rate</span>
-                  <span className="metric-value">4.2%</span>
+                  <span className="metric-value">Strong</span>
                 </div>
               </div>
               <div className="demo-recommendation">
                 <span className="rec-badge">✓ RECOMMENDED</span>
-                <span className="rec-text">High-quality creator. Negotiate rate down 10-15%.</span>
+                <span className="rec-text">High-quality creator. AI can negotiate better rates.</span>
               </div>
             </div>
           </div>
@@ -603,8 +603,8 @@ export default function LandingPage() {
                 <i className="fa-solid fa-users-slash" />
               </div>
               <h3>Fake Followers</h3>
-              <p>40-70% of influencer audiences are bots. You pay for reach that doesn&apos;t exist.</p>
-              <div className="problem-stat">Billions wasted on fake engagement</div>
+              <p>Most influencer audiences are filled with bots. You pay for reach that doesn&apos;t exist.</p>
+              <div className="problem-stat">Massive budgets wasted on fake engagement</div>
             </div>
 
             <div className="problem-card glass">
@@ -622,7 +622,7 @@ export default function LandingPage() {
               </div>
               <h3>Overpriced Rates</h3>
               <p>No standard rates. Creators charge whatever they want. You have no leverage.</p>
-              <div className="problem-stat">Brands overpay by 30-50%</div>
+              <div className="problem-stat">Brands consistently overpay</div>
             </div>
 
             <div className="problem-card glass">
@@ -631,7 +631,7 @@ export default function LandingPage() {
               </div>
               <h3>Time Wasted</h3>
               <p>Manual research takes hours per creator. Your team is exhausted.</p>
-              <div className="problem-stat">20+ hours/week on research</div>
+              <div className="problem-stat">Endless hours lost on research</div>
             </div>
           </div>
         </div>
@@ -851,7 +851,7 @@ export default function LandingPage() {
                 <div className="creator-avatar">👩‍🎨</div>
                 <div className="creator-info">
                   <span className="creator-niche">Beauty & Skincare</span>
-                  <span className="creator-followers">12.4K followers</span>
+                  <span className="creator-followers">Growing Fast</span>
                 </div>
                 <span className="barter-tag">🎁 Barter Ready</span>
               </div>
@@ -859,7 +859,7 @@ export default function LandingPage() {
                 <div className="creator-avatar">🧑‍💻</div>
                 <div className="creator-info">
                   <span className="creator-niche">Tech Reviews</span>
-                  <span className="creator-followers">8.2K followers</span>
+                  <span className="creator-followers">Rising Star</span>
                 </div>
                 <span className="barter-tag">🎁 Barter Ready</span>
               </div>
@@ -867,7 +867,7 @@ export default function LandingPage() {
                 <div className="creator-avatar">🏃‍♀️</div>
                 <div className="creator-info">
                   <span className="creator-niche">Fitness & Health</span>
-                  <span className="creator-followers">23.1K followers</span>
+                  <span className="creator-followers">High Engagement</span>
                 </div>
                 <span className="barter-tag">🎁 Barter Ready</span>
               </div>
@@ -875,7 +875,7 @@ export default function LandingPage() {
                 <div className="creator-avatar">👨‍🍳</div>
                 <div className="creator-info">
                   <span className="creator-niche">Food & Cooking</span>
-                  <span className="creator-followers">15.7K followers</span>
+                  <span className="creator-followers">Loyal Audience</span>
                 </div>
                 <span className="barter-tag">🎁 Barter Ready</span>
               </div>
@@ -883,7 +883,7 @@ export default function LandingPage() {
                 <div className="creator-avatar">🎮</div>
                 <div className="creator-info">
                   <span className="creator-niche">Gaming</span>
-                  <span className="creator-followers">31.5K followers</span>
+                  <span className="creator-followers">Trending Now</span>
                 </div>
                 <span className="barter-tag">🎁 Barter Ready</span>
               </div>
@@ -891,7 +891,7 @@ export default function LandingPage() {
                 <div className="creator-avatar">✈️</div>
                 <div className="creator-info">
                   <span className="creator-niche">Travel & Lifestyle</span>
-                  <span className="creator-followers">18.9K followers</span>
+                  <span className="creator-followers">Active Community</span>
                 </div>
                 <span className="barter-tag">🎁 Barter Ready</span>
               </div>
@@ -1123,6 +1123,188 @@ export default function LandingPage() {
                 <p className="diff-desc">{item.description}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 🌌 THE PLATFORM JOURNEY - Premium Flow Section */}
+      <section className="platform-journey-section" id="journey">
+        <div className="journey-bg-elements">
+          <div className="journey-gradient-orb orb-left"></div>
+          <div className="journey-gradient-orb orb-right"></div>
+          <div className="journey-grid-overlay"></div>
+        </div>
+
+        <div className="section-container">
+          {/* Section Header */}
+          <div className="section-header">
+            <div className="section-badge glass" style={{ background: 'rgba(168, 85, 247, 0.1)', border: '1px solid rgba(168, 85, 247, 0.3)' }}>
+              <span className="badge-pulse" style={{ background: '#a855f7' }} />
+              <span>✦</span>
+              <span style={{ color: '#a855f7' }}>The Platform</span>
+            </div>
+            <h2 className="section-title">
+              <span className="title-gradient">One Platform. Complete Control.</span>
+              <span className="title-sub">From Discovery to Delivery</span>
+            </h2>
+            <p className="section-desc">
+              The end-to-end creator intelligence platform that transforms how brands build partnerships
+            </p>
+          </div>
+
+          {/* Main Journey Flow */}
+          <div className="journey-flow-wrapper">
+            {/* Connecting Line */}
+            <div className="journey-connector-line">
+              <div className="connector-progress"></div>
+            </div>
+
+            <div className="journey-stages">
+              {/* Stage 1 */}
+              <div className="journey-stage">
+                <div className="stage-number">01</div>
+                <div className="stage-icon-wrap" style={{ background: 'linear-gradient(135deg, #00f5ff, #0099ff)' }}>
+                  <i className="fa-solid fa-magnifying-glass"></i>
+                </div>
+                <div className="stage-content">
+                  <h3>Discover</h3>
+                  <p>AI scans every platform to find creators perfectly aligned with your brand DNA</p>
+                </div>
+              </div>
+
+              {/* Stage 2 */}
+              <div className="journey-stage">
+                <div className="stage-number">02</div>
+                <div className="stage-icon-wrap" style={{ background: 'linear-gradient(135deg, #a855f7, #7c3aed)' }}>
+                  <i className="fa-solid fa-shield-halved"></i>
+                </div>
+                <div className="stage-content">
+                  <h3>Vet & Verify</h3>
+                  <p>Deep analysis of history, authenticity, brand safety, and hidden risks</p>
+                </div>
+              </div>
+
+              {/* Stage 3 */}
+              <div className="journey-stage">
+                <div className="stage-number">03</div>
+                <div className="stage-icon-wrap" style={{ background: 'linear-gradient(135deg, #ec4899, #db2777)' }}>
+                  <i className="fa-solid fa-envelope-open-text"></i>
+                </div>
+                <div className="stage-content">
+                  <h3>Outreach</h3>
+                  <p>AI crafts personalized messages that resonate with each creator&apos;s style</p>
+                </div>
+              </div>
+
+              {/* Stage 4 */}
+              <div className="journey-stage">
+                <div className="stage-number">04</div>
+                <div className="stage-icon-wrap" style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)' }}>
+                  <i className="fa-solid fa-handshake"></i>
+                </div>
+                <div className="stage-content">
+                  <h3>Negotiate</h3>
+                  <p>Smart AI negotiation ensures you always get the best market rates</p>
+                </div>
+              </div>
+
+              {/* Stage 5 */}
+              <div className="journey-stage">
+                <div className="stage-number">05</div>
+                <div className="stage-icon-wrap" style={{ background: 'linear-gradient(135deg, #22c55e, #16a34a)' }}>
+                  <i className="fa-solid fa-rocket"></i>
+                </div>
+                <div className="stage-content">
+                  <h3>Execute & Track</h3>
+                  <p>Contracts, delivery, and real-time performance monitoring in one place</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Value Propositions */}
+          <div className="journey-value-grid">
+            <div className="value-card glass">
+              <div className="value-icon">
+                <i className="fa-solid fa-bolt"></i>
+              </div>
+              <div className="value-content">
+                <h4>Speed</h4>
+                <p>What takes weeks manually happens in seconds with vibeAI™</p>
+              </div>
+            </div>
+
+            <div className="value-card glass">
+              <div className="value-icon">
+                <i className="fa-solid fa-brain"></i>
+              </div>
+              <div className="value-content">
+                <h4>Intelligence</h4>
+                <p>AI sees patterns and risks invisible to human analysis</p>
+              </div>
+            </div>
+
+            <div className="value-card glass">
+              <div className="value-icon">
+                <i className="fa-solid fa-shield-halved"></i>
+              </div>
+              <div className="value-content">
+                <h4>Protection</h4>
+                <p>Continuous monitoring keeps your brand safe around the clock</p>
+              </div>
+            </div>
+
+            <div className="value-card glass">
+              <div className="value-icon">
+                <i className="fa-solid fa-chart-line"></i>
+              </div>
+              <div className="value-content">
+                <h4>Results</h4>
+                <p>Data-driven decisions that maximize campaign ROI</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Before/After Comparison */}
+          <div className="journey-comparison">
+            <div className="comparison-card before glass">
+              <div className="comparison-header">
+                <span className="comparison-label">Without VibeVetting</span>
+              </div>
+              <ul className="comparison-list">
+                <li><i className="fa-solid fa-xmark"></i>Hours of manual research per creator</li>
+                <li><i className="fa-solid fa-xmark"></i>Guessing game with authenticity</li>
+                <li><i className="fa-solid fa-xmark"></i>No leverage in negotiations</li>
+                <li><i className="fa-solid fa-xmark"></i>PR risks discovered too late</li>
+              </ul>
+            </div>
+
+            <div className="comparison-divider">
+              <div className="divider-arrow">
+                <i className="fa-solid fa-arrow-right"></i>
+              </div>
+            </div>
+
+            <div className="comparison-card after glass">
+              <div className="comparison-header">
+                <span className="comparison-label success">With VibeVetting</span>
+              </div>
+              <ul className="comparison-list">
+                <li><i className="fa-solid fa-check"></i>Instant AI-powered insights</li>
+                <li><i className="fa-solid fa-check"></i>Data-backed creator selection</li>
+                <li><i className="fa-solid fa-check"></i>AI negotiates optimal rates</li>
+                <li><i className="fa-solid fa-check"></i>Real-time brand protection</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="journey-cta-section">
+            <Link href="/register" className="journey-cta-btn">
+              <span>Start Your Journey</span>
+              <i className="fa-solid fa-arrow-right"></i>
+            </Link>
+            <p className="journey-cta-note">Join brands already transforming their creator partnerships</p>
           </div>
         </div>
       </section>
