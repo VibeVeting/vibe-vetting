@@ -31286,65 +31286,182 @@ i.fa-brands.fa-x-twitter {
    NOTIFICATION STYLES
    ======================================== */
 
+/* Creative Notification Styles */
+@keyframes notificationSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes notificationPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(102, 126, 234, 0); }
+}
+
+@keyframes iconFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
 .yc-notification-item {
   display: flex;
   align-items: flex-start;
   gap: 16px;
   padding: 20px 24px;
   background: var(--bg-elevated);
-  border-radius: 16px;
+  border-radius: 20px;
   border: 1px solid var(--border-color);
   position: relative;
-  transition: all 0.3s ease;
-  animation: ycCardFadeIn 0.6s ease forwards;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: notificationSlideIn 0.5s ease forwards;
+  opacity: 1;
+  overflow: hidden;
+}
+
+.yc-notification-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.03) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
   opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.yc-notification-item:hover::before {
+  opacity: 1;
+  animation: shimmer 2s infinite;
 }
 
 .yc-notification-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.15),
+    0 0 60px rgba(102, 126, 234, 0.1);
+  border-color: rgba(102, 126, 234, 0.3);
 }
 
 .yc-notification-item.unread {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
-  border-color: rgba(102, 126, 234, 0.25);
+  background: linear-gradient(135deg, 
+    rgba(102, 126, 234, 0.08) 0%, 
+    rgba(236, 72, 153, 0.05) 50%,
+    rgba(118, 75, 162, 0.08) 100%);
+  border-color: rgba(102, 126, 234, 0.35);
+  animation: notificationSlideIn 0.5s ease forwards, notificationPulse 3s ease-in-out infinite;
+}
+
+[data-theme="dark"] .yc-notification-item {
+  background: rgba(30, 30, 40, 0.8);
+  backdrop-filter: blur(12px);
 }
 
 [data-theme="dark"] .yc-notification-item.unread {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
-  border-color: rgba(102, 126, 234, 0.3);
+  background: linear-gradient(135deg, 
+    rgba(102, 126, 234, 0.15) 0%, 
+    rgba(236, 72, 153, 0.08) 50%,
+    rgba(118, 75, 162, 0.15) 100%);
+  border-color: rgba(102, 126, 234, 0.4);
 }
 
 .yc-notification-unread-indicator {
   position: absolute;
   left: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 0;
+  bottom: 0;
   width: 4px;
-  height: 40px;
-  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
-  border-radius: 0 4px 4px 0;
+  background: linear-gradient(180deg, #667eea 0%, #ec4899 50%, #764ba2 100%);
+  border-radius: 20px 0 0 20px;
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+.yc-notification-unread-indicator::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: inherit;
+  filter: blur(8px);
+  opacity: 0.6;
 }
 
 .yc-notification-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 20px;
   color: white;
   flex-shrink: 0;
+  position: relative;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
-.yc-notification-icon.match { background: #ec4899; }
-.yc-notification-icon.alert { background: #f59e0b; }
-.yc-notification-icon.campaign { background: #667eea; }
-.yc-notification-icon.system { background: #6b7280; }
-.yc-notification-icon.success { background: #22c55e; }
-.yc-notification-icon.insight { background: #8b5cf6; }
-.yc-notification-icon.default { background: #667eea; }
+.yc-notification-item:hover .yc-notification-icon {
+  animation: iconFloat 1.5s ease-in-out infinite;
+  transform: scale(1.05);
+}
+
+.yc-notification-icon::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 18px;
+  background: inherit;
+  opacity: 0.3;
+  filter: blur(8px);
+  z-index: -1;
+}
+
+.yc-notification-icon.match { 
+  background: linear-gradient(135deg, #ec4899 0%, #f472b6 100%); 
+}
+.yc-notification-icon.alert { 
+  background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); 
+}
+.yc-notification-icon.campaign { 
+  background: linear-gradient(135deg, #667eea 0%, #818cf8 100%); 
+}
+.yc-notification-icon.system { 
+  background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%); 
+}
+.yc-notification-icon.success { 
+  background: linear-gradient(135deg, #22c55e 0%, #4ade80 100%); 
+}
+.yc-notification-icon.insight { 
+  background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%); 
+}
+.yc-notification-icon.default { 
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+}
 
 .yc-notification-content {
   flex: 1;
@@ -31356,26 +31473,39 @@ i.fa-brands.fa-x-twitter {
   justify-content: space-between;
   align-items: flex-start;
   gap: 12px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .yc-notification-title {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--text-primary);
   margin: 0;
+  letter-spacing: -0.3px;
+  line-height: 1.3;
+}
+
+.yc-notification-item.unread .yc-notification-title {
+  background: linear-gradient(135deg, var(--text-primary) 0%, #667eea 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .yc-notification-time {
   font-size: 12px;
   color: var(--text-muted);
   white-space: nowrap;
+  padding: 4px 10px;
+  background: var(--bg-hover);
+  border-radius: 20px;
+  font-weight: 500;
 }
 
 .yc-notification-body {
   font-size: 14px;
   color: var(--text-secondary);
-  line-height: 1.5;
+  line-height: 1.6;
   margin: 0;
 }
 
@@ -31383,74 +31513,131 @@ i.fa-brands.fa-x-twitter {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-top: 12px;
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: var(--bg-hover);
+  border-radius: 12px;
+  width: fit-content;
 }
 
 .yc-notification-score-bar {
-  flex: 1;
-  max-width: 150px;
-  height: 6px;
+  width: 120px;
+  height: 8px;
   background: var(--bg-active);
-  border-radius: 3px;
+  border-radius: 4px;
   overflow: hidden;
+  position: relative;
 }
 
 .yc-notification-score-fill {
   height: 100%;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-  border-radius: 3px;
+  background: linear-gradient(90deg, #667eea 0%, #ec4899 50%, #764ba2 100%);
+  background-size: 200% 100%;
+  border-radius: 4px;
+  animation: shimmer 3s linear infinite;
+  position: relative;
+}
+
+.yc-notification-score-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 6px;
+  height: 100%;
+  background: white;
+  opacity: 0.5;
+  border-radius: 0 4px 4px 0;
 }
 
 .yc-notification-score-text {
   font-size: 13px;
-  font-weight: 700;
-  color: #667eea;
+  font-weight: 800;
+  background: linear-gradient(135deg, #667eea 0%, #ec4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .yc-notification-actions {
   display: flex;
   gap: 8px;
+  opacity: 0;
+  transform: translateX(10px);
+  transition: all 0.3s ease;
+}
+
+.yc-notification-item:hover .yc-notification-actions {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .yc-notification-action-btn {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid;
+  backdrop-filter: blur(8px);
 }
 
 .yc-notification-action-btn.read {
-  background: rgba(34, 197, 94, 0.1);
-  border-color: rgba(34, 197, 94, 0.2);
+  background: rgba(34, 197, 94, 0.15);
+  border-color: rgba(34, 197, 94, 0.3);
   color: #22c55e;
 }
 
 .yc-notification-action-btn.read:hover {
-  background: rgba(34, 197, 94, 0.2);
+  background: rgba(34, 197, 94, 0.25);
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
 }
 
 .yc-notification-action-btn.delete {
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.2);
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
   color: #ef4444;
 }
 
 .yc-notification-action-btn.delete:hover {
-  background: rgba(239, 68, 68, 0.2);
+  background: rgba(239, 68, 68, 0.25);
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
 .yc-notification-settings-card {
   position: relative;
   z-index: 10;
   background: var(--bg-elevated);
-  border-radius: 20px;
+  border-radius: 24px;
   border: 1px solid var(--border-color);
-  padding: 24px;
+  padding: 28px;
+  overflow: hidden;
+}
+
+.yc-notification-settings-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea 0%, #ec4899 50%, #764ba2 100%);
+}
+
+.yc-notification-settings-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(102, 126, 234, 0.08) 0%, transparent 70%);
+  pointer-events: none;
 }
 
 .yc-notification-settings-header {
@@ -31463,22 +31650,36 @@ i.fa-brands.fa-x-twitter {
 }
 
 .yc-notification-settings-icon {
-  width: 48px;
-  height: 48px;
-  background: var(--gradient-primary);
-  border-radius: 14px;
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 20px;
+  font-size: 22px;
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+  position: relative;
+}
+
+.yc-notification-settings-icon::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  opacity: 0.3;
+  filter: blur(8px);
+  z-index: -1;
 }
 
 .yc-notification-settings-title {
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 800;
   color: var(--text-primary);
   margin: 0 0 4px;
+  letter-spacing: -0.3px;
 }
 
 .yc-notification-settings-subtitle {
@@ -31490,26 +31691,29 @@ i.fa-brands.fa-x-twitter {
 .yc-notification-settings-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .yc-notification-setting-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
+  padding: 18px 22px;
   background: var(--bg-hover);
-  border-radius: 12px;
-  transition: all 0.2s ease;
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
 }
 
 .yc-notification-setting-item:hover {
   background: var(--bg-active);
+  border-color: rgba(102, 126, 234, 0.2);
+  transform: translateX(4px);
 }
 
 .yc-notification-setting-label {
   display: block;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 4px;
@@ -31519,19 +31723,22 @@ i.fa-brands.fa-x-twitter {
   display: block;
   font-size: 13px;
   color: var(--text-secondary);
+  line-height: 1.4;
 }
 
 .yc-notification-toggle {
-  width: 48px;
-  height: 26px;
-  border-radius: 26px;
+  width: 52px;
+  height: 28px;
+  border-radius: 28px;
   position: relative;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
 }
 
 .yc-notification-toggle.active {
-  background: var(--gradient-primary);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 .yc-notification-toggle.inactive {
@@ -31540,37 +31747,68 @@ i.fa-brands.fa-x-twitter {
 
 .yc-notification-toggle-knob {
   position: absolute;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   background-color: white;
   border-radius: 50%;
   top: 3px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-  transition: left 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .yc-notification-toggle.active .yc-notification-toggle-knob {
-  left: 25px;
+  left: 27px;
+  transform: scale(1.05);
 }
 
 .yc-notification-toggle.inactive .yc-notification-toggle-knob {
   left: 3px;
 }
 
+/* Mobile Responsive Notification Styles */
 @media (max-width: 768px) {
   .yc-notification-item {
-    flex-direction: column;
-    gap: 12px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding: 18px;
+  }
+  
+  .yc-notification-icon {
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+  }
+  
+  .yc-notification-content {
+    flex: 1 1 calc(100% - 60px);
   }
   
   .yc-notification-header {
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
   }
   
   .yc-notification-actions {
     position: absolute;
-    top: 16px;
-    right: 16px;
+    top: 14px;
+    right: 14px;
+    opacity: 1;
+    transform: none;
+  }
+  
+  .yc-notification-settings-card {
+    padding: 20px;
+  }
+  
+  .yc-notification-setting-item {
+    padding: 14px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .yc-notification-toggle {
+    align-self: flex-end;
   }
 }
