@@ -13,6 +13,9 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: 'VibeVetting - AI-Powered Influencer Vetting',
   description: 'Find perfect creator matches for your brand with AI-powered vetting',
+  icons: {
+    icon: '/icon.svg',
+  },
 };
 
 export default function RootLayout({
