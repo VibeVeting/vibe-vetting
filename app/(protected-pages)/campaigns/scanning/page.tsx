@@ -3,7 +3,14 @@
 import { Sidebar } from '@/components/common/Sidebar';
 import { TopBar } from '@/components/common/TopBar';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
+import dynamic from 'next/dynamic';
+
+// Dynamically import Three.js component to avoid SSR issues
+const ThreeScene = dynamic(() => import('./ThreeScene').then(mod => ({ default: mod.ThreeScene })), {
+  ssr: false,
+  loading: () => <div className="three-loading">Loading 3D...</div>
+});
 
 export default function ScanningPage() {
   const router = useRouter();
@@ -49,79 +56,156 @@ export default function ScanningPage() {
             subtitle="Finding the best creator matches for your campaign"
             showSearch={false}
           />
-          {/* Scan Header */}
-          <div className="scan-header">
-            <div className="scan-icon-wrapper">
-              <i className="fa-solid fa-robot"></i>
+
+          {/* 3D Scanning Hero Section */}
+          <div className="scanning-hero-3d">
+            {/* Three.js 3D Scene */}
+            <ThreeScene progress={progress} />
+            
+            {/* Glass Overlay with Progress */}
+            <div className="scanning-overlay">
+              <div className="scanning-glass-card">
+                <div className="hologram-effect"></div>
+                <div className="progress-ring-3d">
+                  <svg viewBox="0 0 120 120">
+                    <defs>
+                      <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#667eea" />
+                        <stop offset="50%" stopColor="#764ba2" />
+                        <stop offset="100%" stopColor="#a855f7" />
+                      </linearGradient>
+                      <filter id="glow">
+                        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                        <feMerge>
+                          <feMergeNode in="coloredBlur"/>
+                          <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                      </filter>
+                    </defs>
+                    <circle className="progress-track-3d" cx="60" cy="60" r="54" />
+                    <circle 
+                      className="progress-fill-3d" 
+                      cx="60" cy="60" r="54"
+                      strokeDasharray="339.3"
+                      strokeDashoffset={339.3 - (339.3 * progress) / 100}
+                      filter="url(#glow)"
+                    />
+                  </svg>
+                  <div className="progress-content-3d">
+                    <span className="progress-value-3d">{progress}</span>
+                    <span className="progress-symbol">%</span>
+                  </div>
+                </div>
+                <h2 className="scanning-status">
+                  {progress < 100 ? 'Neural Analysis Active' : '✓ Analysis Complete'}
+                </h2>
+                <p className="scanning-step-text">{steps[currentStep]?.text}</p>
+                <div className="scanning-indicators">
+                  {steps.map((_, i) => (
+                    <div 
+                      key={i} 
+                      className={`indicator ${i < currentStep ? 'complete' : ''} ${i === currentStep ? 'active' : ''}`}
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
-            <h1>AI Scanning in Progress</h1>
-            <p>Finding the best creator matches for your campaign</p>
+
+            {/* Floating Stats */}
+            <div className="floating-stats-3d">
+              <div className="float-stat stat-left">
+                <div className="float-stat-icon">
+                  <i className="fa-solid fa-users"></i>
+                </div>
+                <div className="float-stat-content">
+                  <span className="float-stat-value">{creatorsFound}</span>
+                  <span className="float-stat-label">Creators</span>
+                </div>
+              </div>
+              <div className="float-stat stat-right">
+                <div className="float-stat-icon green">
+                  <i className="fa-solid fa-bolt"></i>
+                </div>
+                <div className="float-stat-content">
+                  <span className="float-stat-value">{Math.max(0, Math.ceil((100 - progress) * 0.08))}s</span>
+                  <span className="float-stat-label">Remaining</span>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Progress Card */}
-          <div className="progress-card">
-            <div className="progress-header">
-              <span className="progress-label">Overall Progress</span>
-              <span className="progress-percentage">{progress}%</span>
-            </div>
-            <div className="progress-bar">
-              <div className="progress-fill" style={{ width: `${progress}%` }}></div>
-            </div>
-          </div>
-
-          {/* Scan Steps */}
-          <div className="scan-steps">
+          {/* Horizontal Timeline */}
+          <div className="timeline-horizontal">
             {steps.map((step, index) => (
               <div
                 key={index}
-                className={`scan-step ${index === currentStep ? 'active' : ''} ${index < currentStep ? 'completed' : ''}`}
+                className={`h-step ${index === currentStep ? 'active' : ''} ${index < currentStep ? 'completed' : ''}`}
               >
-                <div className="step-icon">
+                <div className="h-step-connector">
+                  <div className="h-connector-line"></div>
+                </div>
+                <div className="h-step-node">
                   {index < currentStep ? (
                     <i className="fa-solid fa-check"></i>
                   ) : (
                     <i className={`fa-solid ${step.icon}`}></i>
                   )}
                 </div>
-                <div className="step-content">
-                  <div className="step-text">{step.text}</div>
-                  <div className="step-progress">{step.subtext}</div>
-                </div>
-                <div className="step-status">
-                  {index < currentStep ? 'Complete' : index === currentStep ? 'In Progress' : 'Pending'}
-                </div>
+                <div className="h-step-label">{step.text.split(' ').slice(0, 2).join(' ')}</div>
               </div>
             ))}
           </div>
 
-          {/* Info Section */}
-          <div className="info-section">
-            <div className="info-item">
-              <div className="info-icon">
-                <i className="fa-solid fa-users"></i>
+          {/* Info Cards Row */}
+          <div className="scanning-info-row">
+            <div className="info-card-3d purple">
+              <div className="card-glow"></div>
+              <div className="info-card-icon">
+                <i className="fa-solid fa-brain"></i>
               </div>
-              <div className="info-text">
-                <div className="info-label">Creators Found</div>
-                <div className="info-value">{creatorsFound}</div>
+              <div className="info-card-data">
+                <span className="info-card-value">AI</span>
+                <span className="info-card-label">Neural Engine</span>
               </div>
-            </div>
-            <div className="info-item">
-              <div className="info-icon">
-                <i className="fa-solid fa-bullhorn"></i>
-              </div>
-              <div className="info-text">
-                <div className="info-label">Campaign</div>
-                <div className="info-value">Summer Launch</div>
+              <div className="info-card-status active">
+                <span className="pulse-dot"></span>
+                Active
               </div>
             </div>
-            <div className="info-item">
-              <div className="info-icon">
-                <i className="fa-solid fa-clock"></i>
+            <div className="info-card-3d amber">
+              <div className="card-glow"></div>
+              <div className="info-card-icon">
+                <i className="fa-solid fa-database"></i>
               </div>
-              <div className="info-text">
-                <div className="info-label">Est. Time</div>
-                <div className="info-value">{Math.max(0, Math.ceil((100 - progress) * 0.08))}s</div>
+              <div className="info-card-data">
+                <span className="info-card-value">2.4M</span>
+                <span className="info-card-label">Profiles Indexed</span>
               </div>
+              <div className="info-card-badge">LIVE</div>
+            </div>
+            <div className="info-card-3d green">
+              <div className="card-glow"></div>
+              <div className="info-card-icon">
+                <i className="fa-solid fa-shield-halved"></i>
+              </div>
+              <div className="info-card-data">
+                <span className="info-card-value">99.9%</span>
+                <span className="info-card-label">Accuracy Rate</span>
+              </div>
+              <div className="info-card-check">
+                <i className="fa-solid fa-check"></i>
+              </div>
+            </div>
+            <div className="info-card-3d cyan">
+              <div className="card-glow"></div>
+              <div className="info-card-icon">
+                <i className="fa-solid fa-rocket"></i>
+              </div>
+              <div className="info-card-data">
+                <span className="info-card-value">0.3s</span>
+                <span className="info-card-label">Avg Response</span>
+              </div>
+              <div className="info-card-spark">⚡</div>
             </div>
           </div>
         </div>

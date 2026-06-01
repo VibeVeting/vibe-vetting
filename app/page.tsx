@@ -1,880 +1,1726 @@
 "use client";
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+
+// Typewriter catchy lines for hero - Based on Superpower Features
+const catchyLines = [
+  "Influencers Who Hurt Your Brand",
+  "Followers That Don't Exist",
+  "Engagement That's All Bots",
+  "Creators Who Ghost You",
+  "Rates Above Market",
+  "Scandals You Didn't See Coming",
+  "Campaigns That Flop Hard",
+  "Reach That Never Converts",
+  "Promises That Never Deliver",
+  "Content That Damages Trust",
+];
 
 const analysisMessages = [
-  "AI scanning creator digital footprint - 55 creators",
-  "AI computing brand impact potential - 26 creators",
-  "Verifying creator credibility score - 68 creators",
-  "Processing audience demographics - 28 creators",
-  "Predicting future content performance - 47 creators",
-  "AI analyzing values alignment - 28 creators",
-  "Verifying audience authenticity - 42 creators",
-  "Evaluating content quality patterns - 28 creators",
-  "Analyzing creator growth trajectory - 72 creators",
+  "Scanning 847 creators in real-time...",
+  "AI computing brand impact potential...",
+  "Verifying creator credibility scores...",
+  "Processing audience demographics...",
+  "Predicting future content performance...",
+  "Analyzing values alignment matrix...",
+  "Verifying audience authenticity...",
+  "Evaluating content quality patterns...",
+  "Mapping creator growth trajectory...",
 ];
 
 const stats = [
-  { value: "10M+", label: "Creators Analyzed", icon: "🧠" },
-  { value: "500+", label: "Brands Protected", icon: "🛡️" },
-  { value: "99.9%", label: "AI Accuracy", icon: "🎯" },
-  { value: "0", label: "Brand Incidents", icon: "✨" },
+  { value: "Multi", label: "Platform", icon: "fa-globe", color: "#00f5ff" },
+  { value: "AI", label: "Powered", icon: "fa-robot", color: "#22c55e" },
+  { value: "Full", label: "Pipeline", icon: "fa-layer-group", color: "#a855f7" },
+  { value: "Smart", label: "Automation", icon: "fa-brain", color: "#f59e0b" },
 ];
 
-const trustedBrands = [
-  "Nike", "Apple", "Google", "Amazon", "Meta", "Netflix", "Spotify", "Adobe"
+// What makes us different
+const differentiators = [
+  {
+    icon: "fa-layer-group",
+    title: "Full Pipeline",
+    description: "Track creators from discovery to contract completion. Never lose track of negotiations or deadlines again.",
+    stat: "End",
+    statLabel: "to End",
+  },
+  {
+    icon: "fa-bolt",
+    title: "Instant Results",
+    description: "What takes agencies weeks, we do in seconds. Full analysis before your coffee gets cold.",
+    stat: "Fast",
+    statLabel: "Analysis",
+  },
+  {
+    icon: "fa-globe",
+    title: "All Platforms",
+    description: "Instagram, YouTube, Twitter, LinkedIn, Facebook, Twitch - all in one place.",
+    stat: "Multi",
+    statLabel: "Network",
+  },
+  {
+    icon: "fa-file-contract",
+    title: "Built-in Contracts",
+    description: "Generate professional contracts instantly. No more back-and-forth with legal teams.",
+    stat: "One",
+    statLabel: "Click",
+  },
 ];
+
+
+
+// How it works for customers - Complete Journey
+const howItWorks = [
+  { step: "1", title: "Discover", desc: "Find creators across all platforms matching your brand", icon: "fa-magnifying-glass" },
+  { step: "2", title: "AI Vetting", desc: "Deep scan of content history, audience & risks", icon: "fa-brain" },
+  { step: "3", title: "VibeScore", desc: "Get AI-powered brand alignment score", icon: "fa-chart-line" },
+  { step: "4", title: "Add to Pipeline", desc: "Move vetted creators into your workflow", icon: "fa-layer-group" },
+  { step: "5", title: "Outreach", desc: "AI writes personalized collaboration emails", icon: "fa-envelope" },
+  { step: "6", title: "Negotiate", desc: "AI auto-negotiates the best rates for you", icon: "fa-handshake" },
+  { step: "7", title: "Contract", desc: "Generate professional contracts instantly", icon: "fa-file-signature" },
+  { step: "8", title: "Track", desc: "Monitor engagement & audience growth in real-time", icon: "fa-chart-pie" },
+];
+
+const supportedPlatforms = [
+  { name: "Instagram", icon: "fa-instagram", color: "#E4405F" },
+  { name: "YouTube", icon: "fa-youtube", color: "#FF0000" },
+  { name: "Twitter", icon: "fa-twitter", color: "#1DA1F2" },
+  { name: "LinkedIn", icon: "fa-linkedin-in", color: "#0A66C2" },
+  { name: "Facebook", icon: "fa-facebook-f", color: "#1877F2" },
+  { name: "Twitch", icon: "fa-twitch", color: "#9146FF" },
+];
+
+// 🔥 SUPERPOWER FEATURES - Real features that exist in the codebase
+const superpowerFeatures = [
+  {
+    icon: "fa-bell",
+    title: "Controversy Alerts",
+    headline: "Know When Creators Get Into Trouble",
+    description: "Get notified when any creator in your pipeline gets into controversy, posts problematic content, or faces backlash. Take action before it hurts your brand.",
+    stat: "Real",
+    statSub: "Time",
+    gradient: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
+    badge: "PROTECTION",
+  },
+  {
+    icon: "fa-robot",
+    title: "Auto-Negotiation Bot",
+    headline: "AI Negotiates Deals For You",
+    description: "Set your budget. Our AI handles the entire negotiation. It knows market rates, uses smart strategies, and gets you the best price without awkward back-and-forth.",
+    stat: "Smart",
+    statSub: "Deals",
+    gradient: "linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)",
+    badge: "GAME CHANGER",
+  },
+  {
+    icon: "fa-users-slash",
+    title: "Fake Follower Detector",
+    headline: "Know The Real Audience Size",
+    description: "AI analyzes engagement patterns, follower growth, and interaction quality to calculate what percentage of followers are real humans vs bots. Stop paying for fake reach.",
+    stat: "Deep",
+    statSub: "Analysis",
+    gradient: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
+    badge: "SAVE MONEY",
+  },
+  {
+    icon: "fa-envelope-open-text",
+    title: "AI Outreach Writer",
+    headline: "Personalized Emails That Get Replies",
+    description: "AI generates custom collaboration emails based on creator's content and style. No more generic templates. Every email feels personal because AI writes it specifically for them.",
+    stat: "Custom",
+    statSub: "Messages",
+    gradient: "linear-gradient(135deg, #00f5ff 0%, #0099ff 100%)",
+    badge: "EXCLUSIVE",
+  },
+];
+
+// 💎 BARTER DEAL CREATORS - Mini & Micro Influencers Ready for Product Exchange
+const barterCreatorStats = [
+  { value: "Zero", label: "Upfront Cash Needed", icon: "fa-wallet" },
+  { value: "Micro", label: "& Nano Creators", icon: "fa-users" },
+  { value: "Real", label: "Authentic Content", icon: "fa-heart" },
+  { value: "Win", label: "Win Partnerships", icon: "fa-handshake-simple" },
+];
+
+const barterBenefits = [
+  {
+    icon: "fa-gift",
+    title: "Product = Payment",
+    description: "Send your product, get authentic content. No cash exchange needed. Perfect for startups & D2C brands.",
+    gradient: "linear-gradient(135deg, #f472b6 0%, #ec4899 100%)",
+  },
+  {
+    icon: "fa-gem",
+    title: "Nano & Micro Focus",
+    description: "Micro creators with high engagement rates. Their audiences trust them more than mega influencers.",
+    gradient: "linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%)",
+  },
+  {
+    icon: "fa-fire-flame-curved",
+    title: "Hungry Creators",
+    description: "Rising stars eager to prove themselves. They'll create better content because they want to grow with you.",
+    gradient: "linear-gradient(135deg, #fb923c 0%, #f97316 100%)",
+  },
+  {
+    icon: "fa-filter",
+    title: "Barter-Ready Filter",
+    description: "Our AI flags creators who've done barter deals before and are actively seeking product collaborations.",
+    gradient: "linear-gradient(135deg, #4ade80 0%, #22c55e 100%)",
+  },
+];
+
+const features = [
+  {
+    icon: "fa-crosshairs",
+    title: "Brand DNA Matching",
+    description: "AI analyzes your brand identity and finds creators who naturally speak your language.",
+    gradient: "linear-gradient(135deg, #00f5ff 0%, #0099ff 100%)",
+  },
+  {
+    icon: "fa-brain",
+    title: "Complete History Scan",
+    description: "From first post to present - AI examines years of content, comments, and interactions.",
+    gradient: "linear-gradient(135deg, #a855f7 0%, #ec4899 100%)",
+    featured: true
+  },
+  {
+    icon: "fa-chart-line",
+    title: "Growth Trajectory",
+    description: "Predict which creators will blow up next. Partner before they get expensive.",
+    gradient: "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)",
+  },
+  {
+    icon: "fa-hashtag",
+    title: "Niche Expertise",
+    description: "Find creators with deep expertise in your specific niche and category.",
+    gradient: "linear-gradient(135deg, #22c55e 0%, #10b981 100%)",
+  },
+  {
+    icon: "fa-calendar-check",
+    title: "Posting Consistency",
+    description: "Analyze posting frequency and reliability. Partner with consistent creators.",
+    gradient: "linear-gradient(135deg, #f43f5e 0%, #ec4899 100%)",
+  },
+  {
+    icon: "fa-comments",
+    title: "Engagement Quality",
+    description: "Go beyond numbers - analyze comment quality and real audience interaction.",
+    gradient: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+  },
+];
+
+// Advanced Intelligence Features (unique capabilities not in superpowers)
+const advancedFeatures = [
+  {
+    icon: "fa-magnifying-glass-chart",
+    title: "Competitor Intelligence",
+    description: "See which creators your competitors work with. Find untapped talent they haven't discovered yet.",
+    stat: "Intel",
+    statLabel: "Advantage",
+    gradient: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+  },
+  {
+    icon: "fa-users-between-lines",
+    title: "Audience Overlap Analysis",
+    description: "Avoid paying for the same audience twice. See overlap between creators before booking both.",
+    stat: "Smart",
+    statLabel: "Budgeting",
+    gradient: "linear-gradient(135deg, #00f5ff 0%, #0099ff 100%)",
+  },
+  {
+    icon: "fa-magnifying-glass",
+    title: "Similar Creator Finder",
+    description: "Found a creator you love? AI finds more like them across all platforms instantly.",
+    stat: "Cross",
+    statLabel: "Platform",
+    gradient: "linear-gradient(135deg, #a855f7 0%, #ec4899 100%)",
+  },
+  {
+    icon: "fa-scale-balanced",
+    title: "Creator Comparison",
+    description: "Compare multiple creators side-by-side. Engagement, authenticity, brand safety - all in one view.",
+    stat: "Side",
+    statLabel: "By Side",
+    gradient: "linear-gradient(135deg, #f59e0b 0%, #eab308 100%)",
+  },
+  {
+    icon: "fa-language",
+    title: "Multi-Language Detection",
+    description: "Automatically detect what languages a creator speaks. Perfect for regional and multilingual campaigns.",
+    stat: "Global",
+    statLabel: "Reach",
+    gradient: "linear-gradient(135deg, #22c55e 0%, #10b981 100%)",
+  },
+  {
+    icon: "fa-clock-rotate-left",
+    title: "Best Time to Post",
+    description: "Know when a creator's audience is most active. Schedule campaigns for maximum visibility.",
+    stat: "Peak",
+    statLabel: "Timing",
+    gradient: "linear-gradient(135deg, #ef4444 0%, #f97316 100%)",
+  },
+];
+
+
+
+const pricingPlans = [
+  {
+    name: "Starter",
+    price: "₹4,999",
+    originalPrice: "₹9,999",
+    period: "/mo",
+    description: "For D2C brands & small teams",
+    features: [
+      "50 vibeAI™ Analyses/month",
+      "AI Fake Follower Detection",
+      "3 Year History Analysis",
+      "Email & Chat Support",
+      "Up to 3 team members",
+    ],
+  },
+  {
+    name: "Growth",
+    price: "₹14,999",
+    originalPrice: "₹29,999",
+    period: "/mo",
+    description: "For agencies & mid-size brands",
+    featured: true,
+    features: [
+      "250 vibeAI™ Analyses/month",
+      "Advanced Brand Safety AI",
+      "Complete History Analysis",
+      "Priority Support + CSM",
+      "Custom Brand DNA Profile",
+      "Auto-negotiation AI",
+      "Up to 10 team members",
+    ],
+  },
+  {
+    name: "Enterprise",
+    price: "Custom",
+    period: "",
+    description: "For large brands & agencies",
+    features: [
+      "Unlimited vibeAI™ Analyses",
+      "White-label Solution",
+      "Dedicated AI Engineer",
+      "Custom AI Model Training",
+      "SLA Guarantee (99.9%)",
+      "API Access & Integrations",
+      "Unlimited team members",
+    ],
+  },
+];
+
+const faqs = [
+  { q: "How does vibeAI™ analyze creators?", a: "vibeAI™ analyzes every piece of content a creator has posted - examining patterns, values alignment, and predicting future behavior with advanced AI." },
+  { q: "What makes vibeAI™ different?", a: "Unlike traditional tools, vibeAI™ analyzes past digital footprint to predict future performance, ensuring you partner with creators who will deliver results." },
+  { q: "What platforms does vibeAI™ analyze?", a: "vibeAI™ processes data from all major platforms including Instagram, YouTube, Twitter, LinkedIn, Facebook, Twitch and emerging platforms." },
+  { q: "How far back does analysis go?", a: "vibeAI™ analyzes a creator's complete digital history - from their very first post to their most recent activity, no time limit." },
+  { q: "What is the beta program?", a: "Beta users get exclusive early access to vibeAI™ at 50% discounted rates, plus direct input into feature development and priority support." },
+  { q: "Can I customize the AI model?", a: "Growth and Enterprise plans allow you to customize AI analysis based on your specific brand requirements and target criteria." },
+];
+
+const testimonials: { quote: string; name: string; role: string; company: string; avatar: string }[] = [];
 
 export default function LandingPage() {
   const [currentMessage, setCurrentMessage] = useState(0);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+  const [particles, setParticles] = useState<Array<{ left: number; top: number; delay: number; duration: number }>>([]);
+  const heroRef = useRef<HTMLDivElement>(null);
+  
+  // Typewriter effect state
+  const [currentLineIndex, setCurrentLineIndex] = useState(0);
+  const [displayText, setDisplayText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [typingSpeed, setTypingSpeed] = useState(100);
+
+  // Typewriter effect
+  useEffect(() => {
+    const currentLine = catchyLines[currentLineIndex];
+    
+    const handleTyping = () => {
+      if (!isDeleting) {
+        // Typing
+        if (displayText.length < currentLine.length) {
+          setDisplayText(currentLine.substring(0, displayText.length + 1));
+          setTypingSpeed(80 + Math.random() * 50); // Natural typing speed variation
+        } else {
+          // Pause at end before deleting
+          setTimeout(() => setIsDeleting(true), 2000);
+        }
+      } else {
+        // Deleting
+        if (displayText.length > 0) {
+          setDisplayText(currentLine.substring(0, displayText.length - 1));
+          setTypingSpeed(40); // Faster delete
+        } else {
+          setIsDeleting(false);
+          setCurrentLineIndex((prev) => (prev + 1) % catchyLines.length);
+        }
+      }
+    };
+
+    const timer = setTimeout(handleTyping, typingSpeed);
+    return () => clearTimeout(timer);
+  }, [displayText, isDeleting, currentLineIndex, typingSpeed]);
 
   useEffect(() => {
+    setIsVisible(true);
+    // Generate particle positions on client-side only to avoid hydration mismatch
+    setParticles(
+      Array.from({ length: 15 }).map(() => ({
+        left: Math.random() * 100,
+        top: Math.random() * 100,
+        delay: Math.random() * 20,
+        duration: 15 + Math.random() * 20,
+      }))
+    );
     const interval = setInterval(() => {
       setCurrentMessage((prev) => (prev + 1) % analysisMessages.length);
     }, 3000);
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (heroRef.current) {
+        const rect = heroRef.current.getBoundingClientRect();
+        setMousePosition({
+          x: (e.clientX - rect.left) / rect.width,
+          y: (e.clientY - rect.top) / rect.height,
+        });
+      }
+    };
+
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      setScrollProgress((scrollTop / docHeight) * 100);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   return (
     <div className="landing-page">
-      {/* Floating Background Elements */}
+      {/* Scroll Progress Indicator */}
+      <div className="scroll-progress" style={{ width: `${scrollProgress}%` }} />
+
+      {/* Background Elements */}
+      <div className="bg-grid" />
       <div className="floating-elements">
-        <div className="floating-orb orb-1"></div>
-        <div className="floating-orb orb-2"></div>
-        <div className="floating-orb orb-3"></div>
+        <div className="floating-orb orb-1" />
+        <div className="floating-orb orb-2" />
+      </div>
+      
+      {/* Particle Effect */}
+      <div className="particles">
+        {particles.map((particle, i) => (
+          <div key={i} className="particle" style={{
+            left: `${particle.left}%`,
+            top: `${particle.top}%`,
+            animationDelay: `${particle.delay}s`,
+            animationDuration: `${particle.duration}s`,
+          }} />
+        ))}
       </div>
 
       {/* Navigation */}
-      <nav className="landing-nav">
+      <nav className="landing-nav glass">
         <div className="nav-container">
           <Link href="/" className="nav-logo">
-            <span className="logo-vibe">VIBE</span>
-            <span className="logo-vetting">VETTING</span>
+            <div className="logo-icon-new">
+              <div className="logo-hexagon">
+                <div className="hex-inner">
+                  <span className="hex-v">V</span>
+                  <span className="hex-pulse"></span>
+                </div>
+              </div>
+            </div>
+            <span className="logo-text">
+              <span className="logo-vibe">VIBE</span>
+              <span className="logo-vetting">VETTING</span>
+            </span>
             <span className="beta-badge">BETA</span>
           </Link>
           <div className="nav-links">
-            <Link href="#matching">AI Matching</Link>
-            <Link href="#protection">Brand Shield</Link>
-            <Link href="#analysis">Deep Analysis</Link>
-            <Link href="#find">vibeAI Engine</Link>
+            <a href="#problem" className="nav-link">Problem</a>
+            <a href="#superpowers" className="nav-link" style={{ color: '#ef4444' }}>🔥 Superpowers</a>
+            <a href="#barter-deals" className="nav-link" style={{ color: '#f472b6' }}>🎁 Barter Deals</a>
+            <a href="#get-started" className="nav-link" style={{ color: '#8b5cf6' }}>🚀 Get Started</a>
+            <a href="#pricing" className="nav-link">Pricing</a>
           </div>
-          <Link href="/login" className="nav-cta">
-            <span className="cta-icon">�</span> Find Creator
-          </Link>
+          <div className="nav-actions">
+            <Link href="/login" className="nav-link signin">Sign In</Link>
+            <Link href="/register" className="nav-cta glow-btn">
+              <span>Get Started</span>
+              <i className="fa-solid fa-arrow-right" />
+            </Link>
+          </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="hero-section">
-        <div className="hero-container">
-          <div className="hero-badges">
-            <div className="hero-badge ai-badge">
-              <span className="ai-pulse"></span>
-              <span className="badge-icon">🤖</span>
-              vibeAI™ Powered Platform
-            </div>
-            <div className="hero-badge secondary">
-              <span className="status-dot"></span>
-              {analysisMessages[currentMessage]}
+      <section className="hero-section" ref={heroRef}>
+        <div 
+          className="hero-spotlight"
+          style={{
+            background: `radial-gradient(600px circle at ${mousePosition.x * 100}% ${mousePosition.y * 100}%, rgba(0, 245, 255, 0.06), transparent 40%)`,
+          }}
+        />
+        <div className={`hero-container ${isVisible ? 'visible' : ''}`}>
+          {/* Status Badge */}
+          <div className="hero-status">
+            <div className="status-badge glass">
+              <span className="status-pulse" />
+              <span className="status-text">vibeAI™ Beta Now Live</span>
+              <span className="status-sparkle">✨</span>
             </div>
           </div>
-          
+
+          {/* Main Title */}
           <h1 className="hero-title">
-            <span className="neon-text">NEXT-GEN</span>
-            <span className="cyber-text">AI CREATOR</span>
-            <span className="gradient-text">INTELLIGENCE</span>
-            <span className="light-text">PLATFORM</span>
+            <span className="title-line">Stop Paying For</span>
+            <span className="title-line typewriter-container">
+              <span className="typewriter-text">{displayText}</span>
+              <span className="typewriter-cursor">|</span>
+            </span>
           </h1>
 
           <p className="hero-subtitle">
-            Powered by <span className="highlight-vibe">vibeAI™</span> intelligence. Our AI analyzes past digital footprint 
-            to predict future performance and find creators who perfectly align with your brand.
+            AI vets creators before you pay. Detect fake followers, hidden controversies 
+            and overpriced rates instantly. <strong>Save time. Save money.</strong>
           </p>
 
+          {/* CTA Buttons */}
           <div className="hero-buttons">
-            <Link href="/campaigns/create" className="btn-hero-primary neon-btn">
-              <span className="btn-icon">🚀</span> LAUNCH vibeAI
+            <Link href="/register" className="btn-primary-glow">
+              <span>Get Started</span>
+              <i className="fa-solid fa-arrow-right" />
             </Link>
-            <Link href="#demo" className="btn-hero-secondary cyber-btn">
-              <span className="btn-icon">⚡</span> WATCH DEMO
+            <Link href="/book-demo" className="btn-secondary-glass">
+              <i className="fa-solid fa-calendar-check" />
+              <span>Book Demo</span>
             </Link>
           </div>
 
-          {/* Stats Bar */}
-          <div className="stats-bar futuristic">
+          {/* Live Demo Preview */}
+          <div className="hero-demo-preview glass">
+            <div className="demo-header">
+              <div className="demo-dots">
+                <span></span><span></span><span></span>
+              </div>
+              <span className="demo-title">vibeAI™ Creator Analysis</span>
+              <span className="demo-live-badge">
+                <span className="live-dot"></span> LIVE
+              </span>
+            </div>
+            <div className="demo-content">
+              <div className="demo-creator">
+                <div className="demo-avatar">👩‍🎨</div>
+                <div className="demo-info">
+                  <span className="demo-name">Creator Profile</span>
+                  <span className="demo-platform">Instagram • High Reach</span>
+                </div>
+                <div className="demo-score">
+                  <span className="score-value">A+</span>
+                  <span className="score-label">Trust Score</span>
+                </div>
+              </div>
+              <div className="demo-metrics">
+                <div className="demo-metric safe">
+                  <i className="fa-solid fa-check-circle"></i>
+                  <span>Authentic Audience</span>
+                  <span className="metric-value">High</span>
+                </div>
+                <div className="demo-metric safe">
+                  <i className="fa-solid fa-check-circle"></i>
+                  <span>Brand Safety</span>
+                  <span className="metric-value">Clean</span>
+                </div>
+                <div className="demo-metric warning">
+                  <i className="fa-solid fa-exclamation-triangle"></i>
+                  <span>Price vs Market</span>
+                  <span className="metric-value">Above</span>
+                </div>
+                <div className="demo-metric safe">
+                  <i className="fa-solid fa-check-circle"></i>
+                  <span>Engagement Rate</span>
+                  <span className="metric-value">Strong</span>
+                </div>
+              </div>
+              <div className="demo-recommendation">
+                <span className="rec-badge">✓ RECOMMENDED</span>
+                <span className="rec-text">High-quality creator. AI can negotiate better rates.</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Stats */}
+          <div className="hero-stats glass">
             {stats.map((stat, index) => (
               <div key={index} className="stat-item">
-                <div className="stat-icon">{stat.icon}</div>
-                <div className="stat-value-hero">{stat.value}</div>
-                <div className="stat-label-hero">{stat.label}</div>
+                <div className="stat-icon" style={{ background: `${stat.color}20`, color: stat.color }}>
+                  <i className={`fa-solid ${stat.icon}`} />
+                </div>
+                <div className="stat-content">
+                  <div className="stat-value">{stat.value}</div>
+                  <div className="stat-label">{stat.label}</div>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Trusted By Section */}
-      <section className="trusted-section">
+      {/* Problem Section */}
+      <section className="problem-section" id="problem">
         <div className="section-container">
-          <p className="trusted-label">TRUSTED BY LEADING BRANDS WORLDWIDE</p>
-          <div className="trusted-logos">
-            {trustedBrands.map((brand, index) => (
-              <div key={index} className="brand-logo">{brand}</div>
+          <div className="section-header">
+            <div className="section-badge glass" style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
+              <span className="badge-pulse" style={{ background: '#ef4444' }} />
+              <span>🔥</span>
+              <span style={{ color: '#ef4444' }}>The Problem</span>
+            </div>
+            <h2 className="section-title">
+              <span className="title-sub">Brands Lose Money Every Day On</span>
+              <span className="title-gradient" style={{ background: 'linear-gradient(135deg, #ef4444 0%, #f97316 100%)', WebkitBackgroundClip: 'text', backgroundClip: 'text' }}>Bad Influencer Deals</span>
+            </h2>
+          </div>
+
+          <div className="problem-grid">
+            <div className="problem-card glass">
+              <div className="problem-icon" style={{ background: 'linear-gradient(135deg, #ef4444 0%, #f97316 100%)' }}>
+                <i className="fa-solid fa-users-slash" />
+              </div>
+              <h3>Fake Followers</h3>
+              <p>Most influencer audiences are filled with bots. You pay for reach that doesn&apos;t exist.</p>
+              <div className="problem-stat">Massive budgets wasted on fake engagement</div>
+            </div>
+
+            <div className="problem-card glass">
+              <div className="problem-icon" style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #eab308 100%)' }}>
+                <i className="fa-solid fa-bomb" />
+              </div>
+              <h3>Hidden Controversies</h3>
+              <p>Creators with controversial pasts surface after you&apos;ve paid. PR disasters follow.</p>
+              <div className="problem-stat">One bad creator can destroy your brand</div>
+            </div>
+
+            <div className="problem-card glass">
+              <div className="problem-icon" style={{ background: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)' }}>
+                <i className="fa-solid fa-money-bill-wave" />
+              </div>
+              <h3>Overpriced Rates</h3>
+              <p>No standard rates. Creators charge whatever they want. You have no leverage.</p>
+              <div className="problem-stat">Brands consistently overpay</div>
+            </div>
+
+            <div className="problem-card glass">
+              <div className="problem-icon" style={{ background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)' }}>
+                <i className="fa-solid fa-clock" />
+              </div>
+              <h3>Time Wasted</h3>
+              <p>Manual research takes hours per creator. Your team is exhausted.</p>
+              <div className="problem-stat">Endless hours lost on research</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 🔥 SUPERPOWER FEATURES - The Game Changers */}
+      <section className="superpower-section" id="superpowers">
+        <div className="section-container">
+          <div className="section-header">
+            <div className="section-badge glass superpower-badge">
+              <span className="badge-pulse" style={{ background: '#ef4444' }} />
+              <span>🔥</span>
+              <span style={{ color: '#ef4444' }}>Only We Have This</span>
+            </div>
+            <h2 className="section-title">
+              <span className="title-gradient superpower-title">Features So Powerful,</span>
+              <span className="title-sub">You&apos;ll Wonder How You Survived Without Them</span>
+            </h2>
+            <p className="section-desc superpower-desc">
+              These aren&apos;t just features. These are superpowers your competitors don&apos;t have.
+            </p>
+          </div>
+
+          <div className="superpower-grid">
+            {superpowerFeatures.map((feature, index) => (
+              <div key={index} className="superpower-card glass">
+                <div className="superpower-badge-label">{feature.badge}</div>
+                <div className="superpower-icon" style={{ background: feature.gradient }}>
+                  <i className={`fa-solid ${feature.icon}`}></i>
+                </div>
+                <div className="superpower-content">
+                  <h3 className="superpower-card-title">{feature.title}</h3>
+                  <p className="superpower-headline">{feature.headline}</p>
+                  <p className="superpower-description">{feature.description}</p>
+                </div>
+                <div className="superpower-stat" style={{ background: feature.gradient }}>
+                  <span className="stat-main">{feature.stat}</span>
+                  <span className="stat-sub">{feature.statSub}</span>
+                </div>
+              </div>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* Brand Protection Section */}
-      <section className="section-dark" id="protection">
-        <div className="section-container">
-          <div className="ai-indicator">
-            <span className="ai-dot"></span>
-            vibeAI™ BRAND PROTECTION ACTIVE
-          </div>
-          <h2 className="section-heading-light">AI-POWERED BRAND PROTECTION</h2>
-          <p className="section-desc-light">
-            Our <span className="highlight-vibe">vibeAI™</span> analyzes every post, comment, and action from a creator&apos;s entire history. 
-            We scan their complete digital footprint to predict future behavior and find only those who genuinely 
-            align with your brand values and will elevate your reputation.
-          </p>
-        </div>
-      </section>
-
-      {/* Analysis Section */}
-      <section className="section-dark" id="analysis">
-        <div className="section-container">
-          <div className="section-badges">
-            <div className="hero-badge ai-badge">
-              <span className="ai-pulse"></span>
-              <span className="badge-icon">🧠</span>
-              Deep AI Analysis Engine
-            </div>
-            <div className="hero-badge secondary">
-              <span className="status-dot"></span>
-              {analysisMessages[(currentMessage + 2) % analysisMessages.length]}
-            </div>
-          </div>
-
-          <h2 className="section-title-gradient">
-            <span className="neon-text">Every Post, Every Action</span>
-            <span className="cyber-text">Analyzed by vibeAI™</span>
-          </h2>
-
-          <p className="section-desc-light">
-            Our AI digs deep into creators&apos; complete digital footprint - analyzing years of content 
-            to predict future performance and ensure perfect brand alignment
-          </p>
-
-          {/* Feature Cards Grid */}
-          <div className="feature-cards-grid">
-            <div className="feature-card cyber-card">
-              <div className="card-glow"></div>
-              <div className="feature-icon">🎯</div>
-              <h3 className="feature-title">Values Alignment</h3>
-              <p className="feature-desc">
-                vibeAI™ analyzes every piece of content to ensure creators&apos; personal values, 
-                messaging, and behavior align with your brand&apos;s identity.
-              </p>
-              <button className="feature-btn neon">AI MATCH</button>
-            </div>
-
-            <div className="feature-card cyber-card highlighted">
-              <div className="card-glow gold"></div>
-              <div className="feature-icon">🧠</div>
-              <h3 className="feature-title">Digital Footprint Analysis</h3>
-              <p className="feature-desc">
-                From first post to present - our AI examines years of content, comments, interactions 
-                to predict future behavior and identify any red flags.
-              </p>
-              <button className="feature-btn neon">DEEP SCAN</button>
-            </div>
-
-            <div className="feature-card cyber-card">
-              <div className="card-glow"></div>
-              <div className="feature-icon">👥</div>
-              <h3 className="feature-title">Audience Intelligence</h3>
-              <p className="feature-desc">
-                AI verification ensures creators&apos; audiences match your target demographic with 
-                genuinely engaged, real followers who trust the creator.
-              </p>
-              <button className="feature-btn neon">VERIFY</button>
-            </div>
-
-            <div className="feature-card cyber-card pink-border">
-              <div className="card-glow pink"></div>
-              <div className="feature-icon">🛡️</div>
-              <h3 className="feature-title">Zero-Risk Shield</h3>
-              <p className="feature-desc">
-                Comprehensive AI screening eliminates any creators with potential brand risks, ensuring 
-                your partnerships are always safe and secure.
-              </p>
-            </div>
-
-            <div className="feature-card cyber-card gold-border">
-              <div className="card-glow gold"></div>
-              <div className="feature-icon">📈</div>
-              <h3 className="feature-title">Future Performance Prediction</h3>
-              <p className="feature-desc">
-                vibeAI™ predicts creator growth trajectory and recommends only those who will actively 
-                elevate your brand through authentic content.
-              </p>
-            </div>
-
-            <div className="feature-card cyber-card cyan-border">
-              <div className="card-glow cyan"></div>
-              <div className="feature-icon">💎</div>
-              <h3 className="feature-title">Perfect Brand Match</h3>
-              <p className="feature-desc">
-                Through AI analysis of communication patterns, content quality, and brand affinity, 
-                we find creators who are your brand&apos;s perfect match.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Matching Process Section */}
-      <section className="section-dark" id="matching">
-        <div className="section-container">
-          <div className="matching-engine-card">
-            <div className="hero-badge secondary floating-badge">
-              <span className="status-dot"></span>
-              {analysisMessages[(currentMessage + 4) % analysisMessages.length]}
-            </div>
-            
-            <div className="matching-header">
-              <span className="matching-icon">🧠</span>
-              <h2 className="matching-title">vibeAI™ Smart Matching Engine</h2>
-              <p className="matching-subtitle">6-step AI process to find your perfect creator match</p>
-            </div>
-
-            <div className="matching-grid">
-              <div className="matching-step">
-                <div className="step-badge">01</div>
-                <h4 className="step-name">Deep Content Scan</h4>
-                <p className="step-info">AI analyzes every post, story, comment for brand alignment patterns</p>
-              </div>
-              <div className="matching-step">
-                <div className="step-badge">02</div>
-                <h4 className="step-name">Voice Style Matching</h4>
-                <p className="step-info">AI identifies creators whose communication style matches your brand voice</p>
-              </div>
-              <div className="matching-step">
-                <div className="step-badge">03</div>
-                <h4 className="step-name">Risk Assessment</h4>
-                <p className="step-info">AI screening eliminates any potential brand damage with 99.9% accuracy</p>
-              </div>
-              <div className="matching-step">
-                <div className="step-badge">04</div>
-                <h4 className="step-name">Audience Verification</h4>
-                <p className="step-info">AI verifies authentic, engaged audiences matching your target demographics</p>
-              </div>
-              <div className="matching-step">
-                <div className="step-badge">05</div>
-                <h4 className="step-name">Growth Prediction</h4>
-                <p className="step-info">AI predicts creator growth trajectory and future brand impact potential</p>
-              </div>
-              <div className="matching-step">
-                <div className="step-badge">06</div>
-                <h4 className="step-name">24/7 Monitoring</h4>
-                <p className="step-info">Continuous AI tracking ensures creators maintain brand alignment over time</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How We Find Section */}
-      <section className="section-dark" id="find">
-        <div className="section-container">
-          <div className="section-badges">
-            <div className="hero-badge ai-badge">
-              <span className="ai-pulse"></span>
-              <span className="badge-icon">⚡</span>
-              vibeAI™ Smart Engine
-            </div>
-            <div className="hero-badge secondary">
-              <span className="status-dot"></span>
-              {analysisMessages[(currentMessage + 6) % analysisMessages.length]}
-            </div>
-          </div>
-
-          <h2 className="section-title-gradient">
-            <span className="neon-text">How vibeAI™ Discovers Your</span>
-            <span className="cyber-text">Perfect Creator Match</span>
-          </h2>
-
-          <p className="section-desc-light">
-            Our AI analyzes complete digital history to predict future performance and ensures every 
-            recommended creator will enhance your brand with <span className="highlight-vibe">99.9% accuracy</span>
-          </p>
-
-          {/* Pipeline Section */}
-          <div className="pipeline-card cyber-pipeline">
-            <h3 className="pipeline-title">
-              <span className="emoji">🔬</span> vibeAI™ Analysis Pipeline
-            </h3>
-
-            <div className="pipeline-steps">
-              <div className="pipeline-step cyber-step">
-                <div className="step-number">PHASE 01</div>
-                <div className="step-icon">📊</div>
-                <h4 className="step-title">Complete History Analysis</h4>
-                <p className="step-desc">
-                  vibeAI™ processes every piece of content creators have published across all platforms - from their 
-                  first post to latest activity. AI examines language patterns, messaging consistency, 
-                  and value alignment to predict future behavior and ensure brand fit.
-                </p>
-              </div>
-
-              <div className="step-arrow cyber-arrow">
-                <span className="arrow-line"></span>
-                <span className="arrow-icon">⚡</span>
-                <span className="arrow-line"></span>
-              </div>
-
-              <div className="pipeline-step cyber-step">
-                <div className="step-number">PHASE 02</div>
-                <div className="step-icon">🎯</div>
-                <h4 className="step-title">Values Compatibility Check</h4>
-                <p className="step-desc">
-                  Our AI compares creator values, messaging tone, and content themes against your brand guidelines 
-                  to identify creators who naturally speak your brand language and share your values.
-                </p>
-              </div>
-
-              <div className="step-arrow cyber-arrow">
-                <span className="arrow-line"></span>
-                <span className="arrow-icon">⚡</span>
-                <span className="arrow-line"></span>
-              </div>
-
-              <div className="pipeline-step cyber-step">
-                <div className="step-number">PHASE 03</div>
-                <div className="step-icon">✨</div>
-                <h4 className="step-title">Perfect Match Verification</h4>
-                <p className="step-desc">
-                  Only creators who pass our comprehensive AI screening and demonstrate consistent brand value 
-                  enhancement potential are recommended. We guarantee 99.9% accuracy on every match.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* UGC Rising Stars Section */}
-      <section className="section-dark ugc-section">
-        <div className="section-container">
-          <div className="ai-indicator centered">
-            <span className="ai-dot"></span>
-            HIDDEN GEMS DISCOVERED BY vibeAI™
-          </div>
-
-          <h2 className="section-title-gradient">
-            <span className="neon-text">Rising Stars:</span>
-            <span className="cyber-text">UGC Creators (1K-50K)</span>
-          </h2>
-
-          <p className="section-desc-light">
-            The most valuable creators aren&apos;t always the biggest. Our AI identifies <span className="highlight-vibe">micro-creators</span> with 
-            extreme engagement, authentic trust, and explosive growth potential.
-          </p>
-
-          <div className="ugc-highlight-card">
-            <div className="ugc-header">
-              <div className="ugc-icon">💎</div>
-              <div className="ugc-badge">HIGH ROI OPPORTUNITY</div>
-            </div>
-            
-            <h3 className="ugc-title">Why Micro-Creators (1K-50K) Deliver Maximum Impact</h3>
-            
-            <div className="ugc-grid">
-              <div className="ugc-benefit-card">
-                <div className="ugc-benefit-icon">🔥</div>
-                <h4>Extreme Engagement</h4>
-                <p>5-10x higher engagement rates than mega-influencers. Their audience actually listens and acts.</p>
-                <div className="ugc-stat">
-                  <span className="ugc-stat-value">8.7%</span>
-                  <span className="ugc-stat-label">Avg. Engagement Rate</span>
-                </div>
-              </div>
-              
-              <div className="ugc-benefit-card">
-                <div className="ugc-benefit-icon">🤝</div>
-                <h4>Authentic Trust</h4>
-                <p>Deep personal connection with followers. When they recommend, their audience believes and buys.</p>
-                <div className="ugc-stat">
-                  <span className="ugc-stat-value">92%</span>
-                  <span className="ugc-stat-label">Trust Score</span>
-                </div>
-              </div>
-              
-              <div className="ugc-benefit-card">
-                <div className="ugc-benefit-icon">💪</div>
-                <h4>Maximum Effort</h4>
-                <p>Hungry to prove themselves. They put 10x more effort into every piece of content for your brand.</p>
-                <div className="ugc-stat">
-                  <span className="ugc-stat-value">3x</span>
-                  <span className="ugc-stat-label">Content Output</span>
-                </div>
-              </div>
-              
-              <div className="ugc-benefit-card">
-                <div className="ugc-benefit-icon">🚀</div>
-                <h4>Explosive Growth Potential</h4>
-                <p>Partner early. When their content blasts viral, your brand goes with them. 100x ROI potential.</p>
-                <div className="ugc-stat">
-                  <span className="ugc-stat-value">47%</span>
-                  <span className="ugc-stat-label">Avg. Monthly Growth</span>
-                </div>
-              </div>
-              
-              <div className="ugc-benefit-card">
-                <div className="ugc-benefit-icon">💰</div>
-                <h4>Budget-Friendly</h4>
-                <p>10-50x lower cost than mega-influencers with better conversion rates. Maximum ROI per dollar.</p>
-                <div className="ugc-stat">
-                  <span className="ugc-stat-value">$50-500</span>
-                  <span className="ugc-stat-label">Per Post</span>
-                </div>
-              </div>
-              
-              <div className="ugc-benefit-card">
-                <div className="ugc-benefit-icon">🎯</div>
-                <h4>Niche Authority</h4>
-                <p>Laser-focused on specific niches. Perfect for targeted campaigns that convert like crazy.</p>
-                <div className="ugc-stat">
-                  <span className="ugc-stat-value">4.2x</span>
-                  <span className="ugc-stat-label">Conversion Rate</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="ugc-cta">
-              <p className="ugc-cta-text">
-                <span className="highlight-vibe">vibeAI™</span> scans millions of micro-creators to find the hidden gems 
-                with the highest growth trajectory and brand alignment score.
-              </p>
-              <Link href="/campaigns/create" className="neon-btn">
-                <span className="btn-icon">🔍</span> DISCOVER RISING STARS
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Tech Stack Section */}
-      <section className="section-dark">
-        <div className="section-container">
-          <div className="ai-indicator centered">
-            <span className="ai-dot"></span>
-            POWERED BY vibeAI™ INTELLIGENCE
-          </div>
-          
-          <h2 className="section-title-gradient">
-            <span className="cyan-text">Built on Next-Gen</span>
-            <span className="neon-text">AI Technology</span>
-          </h2>
-
-          <div className="tech-grid">
-            <div className="tech-card">
-              <div className="tech-icon">🧠</div>
-              <h3>Smart AI</h3>
-              <p>Advanced AI trained on billions of creator data points</p>
-            </div>
-            <div className="tech-card">
-              <div className="tech-icon">⚡</div>
-              <h3>Real-time Processing</h3>
-              <p>Lightning-fast analysis with sub-second response times</p>
-            </div>
-            <div className="tech-card">
-              <div className="tech-icon">🔮</div>
-              <h3>Predictive AI</h3>
-              <p>Forecast creator growth and brand impact</p>
-            </div>
-            <div className="tech-card">
-              <div className="tech-icon">🛡️</div>
-              <h3>Enterprise Security</h3>
-              <p>Bank-grade protection for your brand data</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Code Section */}
-      <section className="section-dark">
-        <div className="section-container">
-          <div className="code-cards-grid">
-            <div className="code-card">
-              <div className="code-card-icon">📝</div>
-              <h3 className="code-card-title cyan">Content History Analysis System</h3>
-              <div className="code-block">
-                <div className="code-label">Creator Analysis System</div>
-                <pre className="code-content">
-{`function analyzeCreatorHistory(creator) {
-  const analysisResults = {
-    contentConsistency: 0,
-    valueAlignment: 0,
-    brandSafety: 0,
-    audienceQuality: 0
-  };
-  
-  // Analyze all historical posts
-  creator.posts.forEach(post => {
-    analysisResults.contentConsistency += 
-      checkContentQuality(post.text);
-    analysisResults.valueAlignment += 
-      compareWithBrandValues(post.message);
-    analysisResults.brandSafety += 
-      scanForRiskFactors(post.content);
-  });
-  
-  return analysisResults;
-}`}
-                </pre>
-              </div>
-              <p className="code-card-desc">
-                Comprehensive content analysis examining <span className="highlight-cyan">years of creator history</span> to ensure perfect brand alignment
-              </p>
-            </div>
-
-            <div className="code-card">
-              <div className="code-card-icon">🎯</div>
-              <h3 className="code-card-title cyan">Brand Voice & Values Matching</h3>
-              <div className="code-block">
-                <div className="code-label">Creator Analysis System</div>
-                <pre className="code-content">
-{`function findPerfectBrandMatch(brand, creators) {
-  const brandCharacteristics = {
-    communicationStyle: brand.voiceTone,
-    coreValues: brand.values,
-    targetAudience: brand.demographics,
-    contentThemes: brand.preferredTopics
-  };
-  
-  const perfectMatches = [];
-  creators.forEach(creator => {
-    const matchScore = {
-      voiceAlignment: calculateVoiceMatch(
-        creator.style, brandCharacteristics),
-      valuesSynergy: compareValues(
-        creator.values, brand.values)
-    };
-    if (matchScore.overall > 90) {
-      perfectMatches.push(creator);
-    }
-  });
-  
-  return perfectMatches;
-}`}
-                </pre>
-              </div>
-              <p className="code-card-desc">
-                Advanced matching algorithms ensuring <span className="highlight-cyan">perfect brand voice alignment</span> and value compatibility
-              </p>
-            </div>
-
-            <div className="code-card">
-              <div className="code-card-icon">🛡️</div>
-              <h3 className="code-card-title cyan">Brand Protection & Risk Assessment</h3>
-              <div className="code-block">
-                <div className="code-label">Creator Analysis System</div>
-                <pre className="code-content">
-{`function comprehensiveRiskAssessment(creator) {
-  const riskFactors = {
-    contentRisks: 0,
-    behaviouralRisks: 0,
-    associationRisks: 0,
-    reputationRisks: 0
-  };
-  
-  // Analyze all creator content
-  creator.completeHistory.forEach(content => {
-    riskFactors.contentRisks += 
-      scanForControversialContent(content);
-    riskFactors.behaviouralRisks += 
-      assessBehaviouralPatterns(content);
-  });
-  
-  return {
-    overallRiskScore: calculateRisk(riskFactors),
-    protectionGuarantee: 
-      riskFactors.total < 5 ? 'FULL' : 'REVIEW'
-  };
-}`}
-                </pre>
-              </div>
-              <p className="code-card-desc">
-                Comprehensive risk screening with <span className="highlight-pink">zero-tolerance policy</span> for brand-damaging content
-              </p>
-            </div>
-
-            <div className="code-card">
-              <div className="code-card-icon">📈</div>
-              <h3 className="code-card-title cyan">Brand Value Enhancement Prediction</h3>
-              <div className="code-block">
-                <div className="code-label">Creator Analysis System</div>
-                <pre className="code-content">
-{`function predictBrandEnhancement(creator, brand) {
-  const enhancementFactors = {
-    audienceOverlap: calculateOverlap(
-      creator.audience, brand.target),
-    engagementQuality: analyzeEngagement(
-      creator.metrics),
-    contentResonance: predictResonance(
-      creator.style, brand.voice)
-  };
-  
-  const projectedImpact = {
-    brandAwareness: estimateAwarenessGain(),
-    brandSentiment: predictSentimentShift(),
-    valueEnhancement: calculateValueIncrease()
-  };
-  
-  return {
-    score: calculateEnhancementScore(),
-    recommendation: 'HIGHLY_RECOMMENDED'
-  };
-}`}
-                </pre>
-              </div>
-              <p className="code-card-desc">
-                Predictive analytics showing <span className="highlight-gold">expected brand value enhancement</span> from each creator partnership
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="cta-section cyber-cta">
-        <div className="section-container">
-          <div className="ai-indicator centered">
-            <span className="ai-dot"></span>
-            vibeAI™ READY TO LAUNCH
-          </div>
-          <h2 className="cta-title neon-glow">Experience the Future of Creator Intelligence</h2>
-          <p className="cta-desc">
-            Join the beta program and be among the first to experience vibeAI™ powered creator matching
-          </p>
-          <div className="cta-buttons">
-            <Link href="/register" className="btn-hero-primary neon-btn">
-              <span className="btn-icon">🚀</span> JOIN BETA
+          <div className="superpower-cta">
+            <p className="cta-text">Stop letting competitors steal your best influencers.</p>
+            <Link href="/register" className="btn-superpower">
+              <span>Get These Superpowers Now</span>
+              <i className="fa-solid fa-bolt"></i>
             </Link>
-            <Link href="/login" className="btn-hero-secondary cyber-btn">
-              <span className="btn-icon">⚡</span> SIGN IN
+          </div>
+        </div>
+      </section>
+
+      {/* 💎 BARTER DEAL CREATORS - Unique USP Section */}
+      <section className="barter-section" id="barter-deals">
+        <div className="section-container">
+          {/* Floating Elements */}
+          <div className="barter-floating-icons">
+            <div className="floating-icon fi-1">🎁</div>
+            <div className="floating-icon fi-2">💎</div>
+            <div className="floating-icon fi-3">🤝</div>
+            <div className="floating-icon fi-4">✨</div>
+          </div>
+
+          <div className="barter-hero-content">
+            <div className="barter-badge-container">
+              <div className="barter-exclusive-badge">
+                <span className="sparkle">✦</span>
+                <span>SMART BRAND BUILDING</span>
+                <span className="sparkle">✦</span>
+              </div>
+            </div>
+            
+            <h2 className="barter-main-title">
+              <span className="barter-title-small">No Budget? No Problem</span>
+              <span className="barter-title-gradient">Find Creators Who Accept</span>
+              <span className="barter-title-highlight">
+                <span className="highlight-icon">🎁</span>
+                Barter Deals
+                <span className="highlight-icon">🎁</span>
+              </span>
+            </h2>
+
+            <p className="barter-subtitle">
+              Find <strong>mini &amp; micro influencers</strong> who are excited to collaborate 
+              for <strong>free products</strong> instead of cash. 
+              Perfect for startups, D2C brands, and lean marketing teams.
+            </p>
+
+            {/* Barter Stats */}
+            <div className="barter-stats-grid">
+              {barterCreatorStats.map((stat, index) => (
+                <div key={index} className="barter-stat-card glass">
+                  <div className="barter-stat-icon">
+                    <i className={`fa-solid ${stat.icon}`}></i>
+                  </div>
+                  <div className="barter-stat-value">{stat.value}</div>
+                  <div className="barter-stat-label">{stat.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* How Barter Works Visual - Creative Timeline */}
+          <div className="barter-flow-section">
+            <h3 className="barter-flow-title">The Barter Deal Journey</h3>
+            
+            {/* Creative Flow Visualization */}
+            <div className="barter-journey">
+              <div className="journey-steps">
+                <div className="journey-step">
+                  <div className="step-beacon">
+                    <div className="beacon-ring"></div>
+                    <div className="beacon-core">🎯</div>
+                  </div>
+                  <div className="step-content">
+                    <h4>Find Match</h4>
+                    <p>AI finds creators who love your product</p>
+                  </div>
+                </div>
+                
+                <div className="journey-step">
+                  <div className="step-beacon">
+                    <div className="beacon-ring"></div>
+                    <div className="beacon-core">📦</div>
+                  </div>
+                  <div className="step-content">
+                    <h4>Send Product</h4>
+                    <p>Ship your product to the creator</p>
+                  </div>
+                </div>
+                
+                <div className="journey-step">
+                  <div className="step-beacon">
+                    <div className="beacon-ring"></div>
+                    <div className="beacon-core">✨</div>
+                  </div>
+                  <div className="step-content">
+                    <h4>Create Magic</h4>
+                    <p>They create authentic content</p>
+                  </div>
+                </div>
+                
+                <div className="journey-step">
+                  <div className="step-beacon">
+                    <div className="beacon-ring"></div>
+                    <div className="beacon-core">🚀</div>
+                  </div>
+                  <div className="step-content">
+                    <h4>You Grow</h4>
+                    <p>Content goes live, audience grows</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Value Exchange Visual */}
+            <div className="value-exchange-visual">
+              <div className="exchange-party brand">
+                <div className="party-icon">🏢</div>
+                <span className="party-name">Your Brand</span>
+                <div className="gives-badge">
+                  <i className="fa-solid fa-gift"></i> Product
+                </div>
+              </div>
+              
+              <div className="exchange-flow">
+                <div className="flow-arrow top">
+                  <span>Give</span>
+                  <i className="fa-solid fa-arrow-right"></i>
+                </div>
+                <div className="exchange-heart">🤝</div>
+                <div className="flow-arrow bottom">
+                  <i className="fa-solid fa-arrow-left"></i>
+                  <span>Get</span>
+                </div>
+              </div>
+              
+              <div className="exchange-party creator">
+                <div className="party-icon">🎨</div>
+                <span className="party-name">Creator</span>
+                <div className="gives-badge">
+                  <i className="fa-solid fa-camera"></i> Content
+                </div>
+              </div>
+            </div>
+            
+            <p className="barter-flow-note">
+              <i className="fa-solid fa-circle-check"></i>
+              Zero cash exchanged. 100% authentic content. Both parties win.
+            </p>
+          </div>
+
+          {/* Barter Benefits Grid */}
+          <div className="barter-benefits-grid">
+            {barterBenefits.map((benefit, index) => (
+              <div key={index} className="barter-benefit-card glass">
+                <div className="benefit-icon-wrap" style={{ background: benefit.gradient }}>
+                  <i className={`fa-solid ${benefit.icon}`}></i>
+                </div>
+                <h4 className="benefit-title">{benefit.title}</h4>
+                <p className="benefit-desc">{benefit.description}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Creator Showcase */}
+          <div className="barter-creator-showcase glass">
+            <div className="showcase-header">
+              <div className="showcase-badge">
+                <span className="live-pulse"></span>
+                LIVE BARTER-READY CREATORS
+              </div>
+            </div>
+            <div className="showcase-creators">
+              <div className="showcase-creator">
+                <div className="creator-avatar">👩‍🎨</div>
+                <div className="creator-info">
+                  <span className="creator-niche">Beauty & Skincare</span>
+                  <span className="creator-followers">Growing Fast</span>
+                </div>
+                <span className="barter-tag">🎁 Barter Ready</span>
+              </div>
+              <div className="showcase-creator">
+                <div className="creator-avatar">🧑‍💻</div>
+                <div className="creator-info">
+                  <span className="creator-niche">Tech Reviews</span>
+                  <span className="creator-followers">Rising Star</span>
+                </div>
+                <span className="barter-tag">🎁 Barter Ready</span>
+              </div>
+              <div className="showcase-creator">
+                <div className="creator-avatar">🏃‍♀️</div>
+                <div className="creator-info">
+                  <span className="creator-niche">Fitness & Health</span>
+                  <span className="creator-followers">High Engagement</span>
+                </div>
+                <span className="barter-tag">🎁 Barter Ready</span>
+              </div>
+              <div className="showcase-creator">
+                <div className="creator-avatar">👨‍🍳</div>
+                <div className="creator-info">
+                  <span className="creator-niche">Food & Cooking</span>
+                  <span className="creator-followers">Loyal Audience</span>
+                </div>
+                <span className="barter-tag">🎁 Barter Ready</span>
+              </div>
+              <div className="showcase-creator">
+                <div className="creator-avatar">🎮</div>
+                <div className="creator-info">
+                  <span className="creator-niche">Gaming</span>
+                  <span className="creator-followers">Trending Now</span>
+                </div>
+                <span className="barter-tag">🎁 Barter Ready</span>
+              </div>
+              <div className="showcase-creator">
+                <div className="creator-avatar">✈️</div>
+                <div className="creator-info">
+                  <span className="creator-niche">Travel & Lifestyle</span>
+                  <span className="creator-followers">Active Community</span>
+                </div>
+                <span className="barter-tag">🎁 Barter Ready</span>
+              </div>
+              <div className="showcase-more">
+                <div className="more-content">
+                  <span className="more-icon-wrap">🚀</span>
+                  <span className="more-label">Growing Fast</span>
+                  <span className="more-sublabel">Join the Network</span>
+                </div>
+                <div className="more-arrow">
+                  <i className="fa-solid fa-arrow-right"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="barter-cta-section">
+            <div className="barter-cta-content">
+              <h3>Are You a Creator? Join Our Barter Network</h3>
+              <p>Get free products from brands in exchange for authentic content you love creating.</p>
+            </div>
+            <Link href="/register-barter" className="barter-cta-button">
+              <span className="cta-icon">🎁</span>
+              <span>Join as Barter Creator</span>
+              <i className="fa-solid fa-arrow-right"></i>
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* 🎯 GET STARTED - Choose Your Path Section */}
+      <section className="choose-path-section" id="get-started">
+        <div className="section-container">
+          <div className="section-header">
+            <div className="section-badge glass" style={{ background: 'rgba(139, 92, 246, 0.1)', border: '1px solid rgba(139, 92, 246, 0.3)' }}>
+              <span className="badge-pulse" style={{ background: '#8b5cf6' }} />
+              <span>🚀</span>
+              <span style={{ color: '#8b5cf6' }}>Get Started</span>
+            </div>
+            <h2 className="section-title">
+              <span className="title-gradient">Choose Your Path</span>
+              <span className="title-sub">Two Ways to Join the Barter Revolution</span>
+            </h2>
+            <p className="section-desc">
+              Whether you're a brand looking for creators or a creator seeking collaborations — we've got you covered
+            </p>
+          </div>
+
+          <div className="path-cards-container">
+            {/* Barter Company Path */}
+            <div className="path-card company-path glass">
+              <div className="path-ribbon">FOR BRANDS</div>
+              <div className="path-icon-wrapper company">
+                <div className="path-icon-bg"></div>
+                <div className="path-icon">
+                  <i className="fa-solid fa-building"></i>
+                </div>
+                <div className="path-icon-ring"></div>
+              </div>
+              
+              <h3 className="path-title">Barter Company</h3>
+              <p className="path-subtitle">Post barter deals & find creators</p>
+              
+              <div className="path-how-it-works">
+                <div className="path-step">
+                  <div className="step-num">1</div>
+                  <div className="step-content">
+                    <span className="step-icon">📝</span>
+                    <span className="step-text">Create Account</span>
+                  </div>
+                </div>
+                <div className="path-arrow"><i className="fa-solid fa-chevron-down"></i></div>
+                <div className="path-step">
+                  <div className="step-num">2</div>
+                  <div className="step-content">
+                    <span className="step-icon">🎁</span>
+                    <span className="step-text">Post Barter Offers</span>
+                  </div>
+                </div>
+                <div className="path-arrow"><i className="fa-solid fa-chevron-down"></i></div>
+                <div className="path-step">
+                  <div className="step-num">3</div>
+                  <div className="step-content">
+                    <span className="step-icon">👀</span>
+                    <span className="step-text">Review Applications</span>
+                  </div>
+                </div>
+                <div className="path-arrow"><i className="fa-solid fa-chevron-down"></i></div>
+                <div className="path-step">
+                  <div className="step-num">4</div>
+                  <div className="step-content">
+                    <span className="step-icon">🤝</span>
+                    <span className="step-text">Collaborate & Grow</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="path-benefits">
+                <div className="benefit-item"><i className="fa-solid fa-check"></i> Zero cash investment</div>
+                <div className="benefit-item"><i className="fa-solid fa-check"></i> AI-vetted creators</div>
+                <div className="benefit-item"><i className="fa-solid fa-check"></i> Authentic content</div>
+              </div>
+
+              <div className="path-buttons">
+                <Link href="/login-barter-company" className="path-btn login">
+                  <i className="fa-solid fa-sign-in-alt"></i>
+                  <span>Login</span>
+                </Link>
+                <Link href="/register-barter-company" className="path-btn register">
+                  <span>Register</span>
+                  <i className="fa-solid fa-arrow-right"></i>
+                </Link>
+              </div>
+            </div>
+
+            {/* Center VS Divider */}
+            <div className="path-divider">
+              <div className="divider-line"></div>
+              <div className="divider-circle">
+                <span>OR</span>
+              </div>
+              <div className="divider-line"></div>
+            </div>
+
+            {/* Creator Path */}
+            <div className="path-card creator-path glass">
+              <div className="path-ribbon creator">FOR CREATORS</div>
+              <div className="path-icon-wrapper creator">
+                <div className="path-icon-bg"></div>
+                <div className="path-icon">
+                  <i className="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <div className="path-icon-ring"></div>
+              </div>
+              
+              <h3 className="path-title">Barter Creator</h3>
+              <p className="path-subtitle">Get free products & create content</p>
+              
+              <div className="path-how-it-works">
+                <div className="path-step">
+                  <div className="step-num">1</div>
+                  <div className="step-content">
+                    <span className="step-icon">✨</span>
+                    <span className="step-text">Join Network</span>
+                  </div>
+                </div>
+                <div className="path-arrow"><i className="fa-solid fa-chevron-down"></i></div>
+                <div className="path-step">
+                  <div className="step-num">2</div>
+                  <div className="step-content">
+                    <span className="step-icon">🔍</span>
+                    <span className="step-text">Browse Offers</span>
+                  </div>
+                </div>
+                <div className="path-arrow"><i className="fa-solid fa-chevron-down"></i></div>
+                <div className="path-step">
+                  <div className="step-num">3</div>
+                  <div className="step-content">
+                    <span className="step-icon">📦</span>
+                    <span className="step-text">Receive Products</span>
+                  </div>
+                </div>
+                <div className="path-arrow"><i className="fa-solid fa-chevron-down"></i></div>
+                <div className="path-step">
+                  <div className="step-num">4</div>
+                  <div className="step-content">
+                    <span className="step-icon">📸</span>
+                    <span className="step-text">Create & Shine</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="path-benefits">
+                <div className="benefit-item"><i className="fa-solid fa-check"></i> Free products</div>
+                <div className="benefit-item"><i className="fa-solid fa-check"></i> Build portfolio</div>
+                <div className="benefit-item"><i className="fa-solid fa-check"></i> Grow your reach</div>
+              </div>
+
+              <div className="path-buttons">
+                <Link href="/login-barter" className="path-btn login creator">
+                  <i className="fa-solid fa-sign-in-alt"></i>
+                  <span>Login</span>
+                </Link>
+                <Link href="/register-barter" className="path-btn register creator">
+                  <span>Register</span>
+                  <i className="fa-solid fa-arrow-right"></i>
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Info */}
+          <div className="path-info-banner glass">
+            <div className="info-icon">💡</div>
+            <div className="info-content">
+              <p><strong>How does barter work?</strong> Brands send free products to creators, who create authentic content in return. No money changes hands — just great products and genuine content!</p>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Why Choose Us Section */}
-      <section className="section-dark">
+      <section className="differentiators-section" id="why-us">
         <div className="section-container">
-          <h2 className="section-title-gradient">
-            <span className="cyan-text">Why Brands Choose</span>
-            <span className="neon-text">VibeVetting</span>
-          </h2>
+          <div className="section-header">
+            <div className="section-badge glass" style={{ background: 'rgba(0, 245, 255, 0.1)', border: '1px solid rgba(0, 245, 255, 0.3)' }}>
+              <span className="badge-pulse" />
+              <span>✨</span>
+              <span>Why Choose Us</span>
+            </div>
+            <h2 className="section-title">
+              <span className="title-gradient">Other Tools Find Creators.</span>
+              <span className="title-sub">We Protect Your Brand.</span>
+            </h2>
+          </div>
 
-          <div className="benefits-grid">
-            <div className="benefit-card cyber-benefit">
-              <div className="benefit-icon">🧠</div>
-              <h3 className="benefit-title">vibeAI™ Powered</h3>
-              <p className="benefit-desc">Next-gen AI for unmatched accuracy in creator matching.</p>
-            </div>
-            <div className="benefit-card cyber-benefit">
-              <div className="benefit-icon">⚡</div>
-              <h3 className="benefit-title">Lightning Speed</h3>
-              <p className="benefit-desc">Get perfect creator matches in milliseconds, not weeks of manual research.</p>
-            </div>
-            <div className="benefit-card cyber-benefit">
-              <div className="benefit-icon">🎯</div>
-              <h3 className="benefit-title">99.9% Accuracy</h3>
-              <p className="benefit-desc">AI-powered matching ensures creators align with your brand values.</p>
-            </div>
-            <div className="benefit-card cyber-benefit">
-              <div className="benefit-icon">📊</div>
-              <h3 className="benefit-title">Digital Footprint Analysis</h3>
-              <p className="benefit-desc">Years of content history processed to predict future behavior.</p>
-            </div>
-            <div className="benefit-card cyber-benefit">
-              <div className="benefit-icon">🛡️</div>
-              <h3 className="benefit-title">Zero-Risk Shield</h3>
-              <p className="benefit-desc">Continuous AI monitoring alerts you to any potential brand risks.</p>
-            </div>
-            <div className="benefit-card cyber-benefit">
-              <div className="benefit-icon">💎</div>
-              <h3 className="benefit-title">Growth Prediction</h3>
-              <p className="benefit-desc">Find creators with high growth potential before they blow up.</p>
-            </div>
+          <div className="differentiators-grid">
+            {differentiators.map((item, index) => (
+              <div key={index} className="differentiator-card glass">
+                <div className="diff-icon">
+                  <i className={`fa-solid ${item.icon}`}></i>
+                </div>
+                <div className="diff-stat">
+                  <span className="diff-stat-value">{item.stat}</span>
+                  <span className="diff-stat-label">{item.statLabel}</span>
+                </div>
+                <h3 className="diff-title">{item.title}</h3>
+                <p className="diff-desc">{item.description}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Beta Pricing Section */}
-      <section className="pricing-section cyber-pricing" id="pricing">
+      {/* 🌌 THE PLATFORM JOURNEY - Premium Flow Section */}
+      <section className="platform-journey-section" id="journey">
+        <div className="journey-bg-elements">
+          <div className="journey-gradient-orb orb-left"></div>
+          <div className="journey-gradient-orb orb-right"></div>
+          <div className="journey-grid-overlay"></div>
+        </div>
+
         <div className="section-container">
-        
-          <h2 className="section-title-gradient">
-            <span className="neon-text">Beta Access</span>
-            <span className="cyber-text">Pricing</span>
-          </h2>
-          <p className="section-desc-light">Join the future of creator intelligence at exclusive beta rates</p>
+          {/* Section Header */}
+          <div className="section-header">
+            <div className="section-badge glass" style={{ background: 'rgba(168, 85, 247, 0.1)', border: '1px solid rgba(168, 85, 247, 0.3)' }}>
+              <span className="badge-pulse" style={{ background: '#a855f7' }} />
+              <span>✦</span>
+              <span style={{ color: '#a855f7' }}>The Platform</span>
+            </div>
+            <h2 className="section-title">
+              <span className="title-gradient">One Platform. Complete Control.</span>
+              <span className="title-sub">From Discovery to Delivery</span>
+            </h2>
+            <p className="section-desc">
+              The end-to-end creator intelligence platform that transforms how brands build partnerships
+            </p>
+          </div>
 
-          <div className="pricing-grid">
-            <div className="pricing-card cyber-pricing-card">
-              <div className="pricing-header">
-                <h3 className="pricing-name">Explorer</h3>
-                <div className="pricing-price">$99<span>/mo</span></div>
-                <div className="original-price">$299/mo after beta</div>
-                <p className="pricing-desc">Perfect for startups</p>
-              </div>
-              <ul className="pricing-features">
-                <li><span className="check-icon">✓</span> 25 vibeAI™ Analyses/month</li>
-                <li><span className="check-icon">✓</span> Basic Neural Safety Check</li>
-                <li><span className="check-icon">✓</span> 2 Year History Analysis</li>
-                <li><span className="check-icon">✓</span> Email Support</li>
-              </ul>
-              <Link href="/register" className="pricing-btn cyber-btn-outline">Join Beta</Link>
+          {/* Main Journey Flow */}
+          <div className="journey-flow-wrapper">
+            {/* Connecting Line */}
+            <div className="journey-connector-line">
+              <div className="connector-progress"></div>
             </div>
 
-            <div className="pricing-card cyber-pricing-card featured">
-              <div className="pricing-badge neon-badge">MOST POPULAR</div>
-              <div className="pricing-header">
-                <h3 className="pricing-name">Pioneer</h3>
-                <div className="pricing-price">$299<span>/mo</span></div>
-                <div className="original-price">$799/mo after beta</div>
-                <p className="pricing-desc">For growing brands</p>
+            <div className="journey-stages">
+              {/* Stage 1 */}
+              <div className="journey-stage">
+                <div className="stage-number">01</div>
+                <div className="stage-icon-wrap" style={{ background: 'linear-gradient(135deg, #00f5ff, #0099ff)' }}>
+                  <i className="fa-solid fa-magnifying-glass"></i>
+                </div>
+                <div className="stage-content">
+                  <h3>Discover</h3>
+                  <p>AI scans every platform to find creators perfectly aligned with your brand DNA</p>
+                </div>
               </div>
-              <ul className="pricing-features">
-                <li><span className="check-icon">✓</span> 100 vibeAI™ Analyses/month</li>
-                <li><span className="check-icon">✓</span> Advanced Neural Safety</li>
-                <li><span className="check-icon">✓</span> Complete History Analysis</li>
-                <li><span className="check-icon">✓</span> Priority Support</li>
-                <li><span className="check-icon">✓</span> Custom Brand DNA Profile</li>
-              </ul>
-              <Link href="/register" className="pricing-btn neon-btn-full">Join Beta</Link>
-            </div>
 
-            <div className="pricing-card cyber-pricing-card">
-              <div className="pricing-header">
-                <h3 className="pricing-name">Visionary</h3>
-                <div className="pricing-price">Custom</div>
-                <p className="pricing-desc">For enterprise leaders</p>
+              {/* Stage 2 */}
+              <div className="journey-stage">
+                <div className="stage-number">02</div>
+                <div className="stage-icon-wrap" style={{ background: 'linear-gradient(135deg, #a855f7, #7c3aed)' }}>
+                  <i className="fa-solid fa-shield-halved"></i>
+                </div>
+                <div className="stage-content">
+                  <h3>Vet & Verify</h3>
+                  <p>Deep analysis of history, authenticity, brand safety, and hidden risks</p>
+                </div>
               </div>
-              <ul className="pricing-features">
-                <li><span className="check-icon">✓</span> Unlimited vibeAI™ Analyses</li>
-                <li><span className="check-icon">✓</span> White-label Solution</li>
-                <li><span className="check-icon">✓</span> Dedicated AI Engineer</li>
-                <li><span className="check-icon">✓</span> Custom Neural Training</li>
-                <li><span className="check-icon">✓</span> SLA Guarantee</li>
-              </ul>
-              <Link href="/contact" className="pricing-btn cyber-btn-outline">Contact Us</Link>
+
+              {/* Stage 3 */}
+              <div className="journey-stage">
+                <div className="stage-number">03</div>
+                <div className="stage-icon-wrap" style={{ background: 'linear-gradient(135deg, #ec4899, #db2777)' }}>
+                  <i className="fa-solid fa-envelope-open-text"></i>
+                </div>
+                <div className="stage-content">
+                  <h3>Outreach</h3>
+                  <p>AI crafts personalized messages that resonate with each creator&apos;s style</p>
+                </div>
+              </div>
+
+              {/* Stage 4 */}
+              <div className="journey-stage">
+                <div className="stage-number">04</div>
+                <div className="stage-icon-wrap" style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)' }}>
+                  <i className="fa-solid fa-handshake"></i>
+                </div>
+                <div className="stage-content">
+                  <h3>Negotiate</h3>
+                  <p>Smart AI negotiation ensures you always get the best market rates</p>
+                </div>
+              </div>
+
+              {/* Stage 5 */}
+              <div className="journey-stage">
+                <div className="stage-number">05</div>
+                <div className="stage-icon-wrap" style={{ background: 'linear-gradient(135deg, #22c55e, #16a34a)' }}>
+                  <i className="fa-solid fa-rocket"></i>
+                </div>
+                <div className="stage-content">
+                  <h3>Execute & Track</h3>
+                  <p>Contracts, delivery, and real-time performance monitoring in one place</p>
+                </div>
+              </div>
             </div>
           </div>
+
+          {/* Value Propositions */}
+          <div className="journey-value-grid">
+            <div className="value-card glass">
+              <div className="value-icon">
+                <i className="fa-solid fa-bolt"></i>
+              </div>
+              <div className="value-content">
+                <h4>Speed</h4>
+                <p>What takes weeks manually happens in seconds with vibeAI™</p>
+              </div>
+            </div>
+
+            <div className="value-card glass">
+              <div className="value-icon">
+                <i className="fa-solid fa-brain"></i>
+              </div>
+              <div className="value-content">
+                <h4>Intelligence</h4>
+                <p>AI sees patterns and risks invisible to human analysis</p>
+              </div>
+            </div>
+
+            <div className="value-card glass">
+              <div className="value-icon">
+                <i className="fa-solid fa-shield-halved"></i>
+              </div>
+              <div className="value-content">
+                <h4>Protection</h4>
+                <p>Continuous monitoring keeps your brand safe around the clock</p>
+              </div>
+            </div>
+
+            <div className="value-card glass">
+              <div className="value-icon">
+                <i className="fa-solid fa-chart-line"></i>
+              </div>
+              <div className="value-content">
+                <h4>Results</h4>
+                <p>Data-driven decisions that maximize campaign ROI</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Before/After Comparison */}
+          <div className="journey-comparison">
+            <div className="comparison-card before glass">
+              <div className="comparison-header">
+                <span className="comparison-label">Without VibeVetting</span>
+              </div>
+              <ul className="comparison-list">
+                <li><i className="fa-solid fa-xmark"></i>Hours of manual research per creator</li>
+                <li><i className="fa-solid fa-xmark"></i>Guessing game with authenticity</li>
+                <li><i className="fa-solid fa-xmark"></i>No leverage in negotiations</li>
+                <li><i className="fa-solid fa-xmark"></i>PR risks discovered too late</li>
+              </ul>
+            </div>
+
+            <div className="comparison-divider">
+              <div className="divider-arrow">
+                <i className="fa-solid fa-arrow-right"></i>
+              </div>
+            </div>
+
+            <div className="comparison-card after glass">
+              <div className="comparison-header">
+                <span className="comparison-label success">With VibeVetting</span>
+              </div>
+              <ul className="comparison-list">
+                <li><i className="fa-solid fa-check"></i>Instant AI-powered insights</li>
+                <li><i className="fa-solid fa-check"></i>Data-backed creator selection</li>
+                <li><i className="fa-solid fa-check"></i>AI negotiates optimal rates</li>
+                <li><i className="fa-solid fa-check"></i>Real-time brand protection</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="journey-cta-section">
+            <Link href="/register" className="journey-cta-btn">
+              <span>Start Your Journey</span>
+              <i className="fa-solid fa-arrow-right"></i>
+            </Link>
+            <p className="journey-cta-note">Join brands already transforming their creator partnerships</p>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Banner */}
+      <section className="urgency-section">
+        <div className="section-container">
+          <div className="urgency-banner glass">
+            <div className="urgency-icon">🎯</div>
+            <div className="urgency-content">
+              <h3>Ready to Stop Wasting Money?</h3>
+              <p>Start vetting creators <strong>today</strong>. Book a demo to see it in action.</p>
+            </div>
+            <Link href="/book-demo" className="urgency-cta">
+              Book Demo
+              <i className="fa-solid fa-arrow-right"></i>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Supported Platforms Section */}
+      <section className="trusted-section platforms-section">
+        <div className="section-container">
+          <p className="trusted-label">ANALYZE CREATORS ACROSS ALL MAJOR PLATFORMS</p>
+          <p className="platforms-subtitle">One powerful AI, every social network covered</p>
+          <div className="trusted-logos platforms-grid">
+            {supportedPlatforms.map((platform, index) => (
+              <div key={index} className="brand-logo platform-card glass">
+                <i className={`fa-brands ${platform.icon}`} style={{ color: platform.color }} />
+                <span>{platform.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="features-section" id="features">
+        <div className="section-container">
+          <div className="section-header">
+            <div className="section-badge glass">
+              <span className="badge-pulse" />
+              <span>🧠</span>
+              <span>vibeAI™ Analysis</span>
+            </div>
+            <h2 className="section-title">
+              <span className="title-gradient">How vibeAI™ Scores Creators</span>
+              <span className="title-sub">6 Dimensions of Analysis</span>
+            </h2>
+            <p className="section-desc">
+              Every creator gets a comprehensive score based on six key factors
+            </p>
+          </div>
+
+          <div className="features-grid">
+            {features.map((feature, index) => (
+              <div key={index} className={`feature-card glass ${feature.featured ? 'featured' : ''}`}>
+                <div className="feature-icon-wrap" style={{ background: feature.gradient }}>
+                  <i className={`fa-solid ${feature.icon}`} />
+                </div>
+                <h3 className="feature-title">{feature.title}</h3>
+                <p className="feature-desc">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Advanced Intelligence Section - Strategic Tools */}
+      <section className="advanced-section" id="advanced">
+        <div className="section-container">
+          <div className="section-header">
+            <div className="section-badge glass">
+              <span className="badge-pulse" />
+              <span>🎯</span>
+              <span>Strategic Tools</span>
+            </div>
+            <h2 className="section-title">
+              <span className="title-gradient">Outsmart Your Competition</span>
+              <span className="title-sub">Data-Driven Decisions</span>
+            </h2>
+            <p className="section-desc">
+              Make smarter partnership decisions with competitive intelligence and comparison tools
+            </p>
+          </div>
+
+          <div className="advanced-grid">
+            {advancedFeatures.map((feature, index) => (
+              <div key={index} className="advanced-card glass">
+                <div className="advanced-card-header">
+                  <div className="advanced-icon" style={{ background: feature.gradient }}>
+                    <i className={`fa-solid ${feature.icon}`} />
+                  </div>
+                  <div className="advanced-stat">
+                    <span className="stat-number">{feature.stat}</span>
+                    <span className="stat-text">{feature.statLabel}</span>
+                  </div>
+                </div>
+                <h3 className="advanced-title">{feature.title}</h3>
+                <p className="advanced-desc">{feature.description}</p>
+                <div className="advanced-card-line" style={{ background: feature.gradient }} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section - Animated Steps */}
+      <section className="how-it-works-section animated-steps" id="how-it-works">
+        <div className="section-container">
+          <div className="section-header">
+            <div className="section-badge glass" style={{ background: 'rgba(34, 197, 94, 0.1)', border: '1px solid rgba(34, 197, 94, 0.3)' }}>
+              <span className="badge-pulse" style={{ background: '#22c55e' }} />
+              <span>⚡</span>
+              <span style={{ color: '#22c55e' }}>Complete Journey</span>
+            </div>
+            <h2 className="section-title">
+              <span className="title-gradient">From Discovery to Results</span>
+              <span className="title-sub">Your Complete Influencer Marketing Workflow</span>
+            </h2>
+          </div>
+
+          {/* Row 1: Discovery Phase (Steps 1-4) */}
+          <div className="steps-row-label">
+            <span className="row-label-icon"><i className="fa-solid fa-search"></i></span>
+            <span>Discovery & Vetting</span>
+          </div>
+          <div className="steps-showcase">
+            {howItWorks.slice(0, 4).map((item, index) => (
+              <div key={index} className="step-showcase-item" style={{ animationDelay: `${index * 0.1}s` }}>
+                <div className="step-visual">
+                  <div className="step-orb">
+                    <div className="orb-glow"></div>
+                    <div className="orb-ring"></div>
+                    <span className="orb-number">{item.step}</span>
+                  </div>
+                  {index < 3 && (
+                    <div className="step-connector-line">
+                      <div className="connector-flow"></div>
+                    </div>
+                  )}
+                </div>
+                <div className="step-info-card">
+                  <div className="card-icon">
+                    <i className={`fa-solid ${item.icon}`}></i>
+                  </div>
+                  <h3>{item.title}</h3>
+                  <p>{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Row 2: Execution Phase (Steps 5-8) */}
+          <div className="steps-row-label row-2">
+            <span className="row-label-icon"><i className="fa-solid fa-rocket"></i></span>
+            <span>Outreach & Results</span>
+          </div>
+          <div className="steps-showcase steps-row-2">
+            {howItWorks.slice(4, 8).map((item, index) => (
+              <div key={index} className={`step-showcase-item step-${index + 5}`} style={{ animationDelay: `${(index + 4) * 0.1}s` }}>
+                <div className="step-visual">
+                  <div className="step-orb">
+                    <div className="orb-glow"></div>
+                    <div className="orb-ring"></div>
+                    <span className="orb-number">{item.step}</span>
+                  </div>
+                  {index < 3 && (
+                    <div className="step-connector-line">
+                      <div className="connector-flow"></div>
+                    </div>
+                  )}
+                </div>
+                <div className="step-info-card">
+                  <div className="card-icon">
+                    <i className={`fa-solid ${item.icon}`}></i>
+                  </div>
+                  <h3>{item.title}</h3>
+                  <p>{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="steps-cta">
+            <Link href="/register" className="steps-cta-btn">
+              <span>Start Your Journey</span>
+              <i className="fa-solid fa-arrow-right"></i>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section className="pricing-section" id="pricing">
+        <div className="section-container">
+          <div className="section-header">
+            <div className="section-badge glass">
+              <span className="badge-pulse" />
+              <span>💎</span>
+              <span>Beta Pricing</span>
+            </div>
+            <h2 className="section-title">
+              <span className="title-gradient">Simple Pricing</span>
+              <span className="title-sub">No Hidden Fees</span>
+            </h2>
+            <p className="section-desc">
+              Choose the plan that fits your needs.
+            </p>
+          </div>
+
+          <div className="pricing-grid">
+            {pricingPlans.map((plan, index) => (
+              <div key={index} className={`pricing-card glass ${plan.featured ? 'featured' : ''}`}>
+                {plan.featured && <div className="pricing-badge">MOST POPULAR</div>}
+                <div className="pricing-header">
+                  <h3 className="pricing-name">{plan.name}</h3>
+                  <div className="pricing-price">
+                    {plan.price}<span>{plan.period}</span>
+                  </div>
+                  <p className="pricing-desc">{plan.description}</p>
+                </div>
+                <ul className="pricing-features">
+                  {plan.features.map((feature, i) => (
+                    <li key={i}>
+                      <span className="check">✓</span>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+                <Link 
+                  href="/register" 
+                  className={plan.featured ? 'pricing-btn primary' : 'pricing-btn'}
+                >
+                  {plan.price === "Custom" ? "Contact Us" : "Join Beta"}
+                </Link>
+              </div>
+            ))}
+          </div>
+          
+          <p className="gst-note">
+            <span className="gst-icon">ℹ️</span>
+            Prices are exclusive of 18% GST for Indian customers
+          </p>
         </div>
       </section>
 
       {/* FAQ Section */}
-      <section className="section-dark">
+      <section className="faq-section" id="faq">
         <div className="section-container">
-          <h2 className="section-title-gradient">
-            <span className="cyan-text">Frequently Asked</span>
-            <span className="neon-text">Questions</span>
-          </h2>
+          <div className="section-header">
+            <h2 className="section-title">
+              <span className="title-gradient">Frequently Asked</span>
+              <span className="title-sub">Questions</span>
+            </h2>
+          </div>
 
-          <div className="faq-grid cyber-faq">
-            <div className="faq-item cyber-faq-item">
-              <h4 className="faq-question">How does vibeAI™ analyze creators?</h4>
-              <p className="faq-answer">vibeAI™ analyzes every piece of content a creator has posted - their complete digital footprint - examining patterns, values alignment, and predicting future behavior with 99.9% accuracy.</p>
-            </div>
-            <div className="faq-item cyber-faq-item">
-              <h4 className="faq-question">What makes vibeAI™ different?</h4>
-              <p className="faq-answer">Unlike traditional tools, vibeAI™ analyzes past digital footprint to predict future performance, ensuring you partner with creators who will grow and deliver results.</p>
-            </div>
-            <div className="faq-item cyber-faq-item">
-              <h4 className="faq-question">What platforms does vibeAI™ analyze?</h4>
-              <p className="faq-answer">vibeAI™ processes data from all major platforms including Instagram, YouTube, TikTok, Twitter, LinkedIn, Facebook, and emerging platforms.</p>
-            </div>
-            <div className="faq-item cyber-faq-item">
-              <h4 className="faq-question">How far back does AI analysis go?</h4>
-              <p className="faq-answer">vibeAI™ analyzes a creator&apos;s complete digital history - from their very first post to their most recent activity, no time limit.</p>
-            </div>
-            <div className="faq-item cyber-faq-item">
-              <h4 className="faq-question">What is the beta program?</h4>
-              <p className="faq-answer">Beta users get exclusive early access to vibeAI™ at discounted rates, plus direct input into feature development and priority support.</p>
-            </div>
-            <div className="faq-item cyber-faq-item">
-              <h4 className="faq-question">Can I customize the AI model?</h4>
-              <p className="faq-answer">Pioneer and Visionary plans allow you to customize AI analysis based on your specific brand requirements and target criteria.</p>
-            </div>
+          <div className="faq-grid">
+            {faqs.map((faq, index) => (
+              <div key={index} className="faq-item glass">
+                <h4 className="faq-question">{faq.q}</h4>
+                <p className="faq-answer">{faq.a}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="final-cta-section cyber-final-cta">
+      {/* Final CTA Section - Ultra Premium */}
+      <section className="final-cta-section">
+        <div className="cta-cosmic-bg">
+          <div className="cta-stars"></div>
+          <div className="cta-stars cta-stars-2"></div>
+          <div className="cta-nebula"></div>
+          <div className="cta-nebula cta-nebula-2"></div>
+        </div>
+        
         <div className="section-container">
-          <div className="final-cta-card cyber-cta-card">
-            <div className="cta-glow"></div>
-            <div className="ai-indicator">
-              <span className="ai-dot"></span>
-              vibeAI™ SYSTEM ONLINE
+          <div className="cta-card-ultra">
+            {/* Animated border */}
+            <div className="cta-border-glow"></div>
+            
+            {/* Floating orbs */}
+            <div className="cta-orb cta-orb-1"></div>
+            <div className="cta-orb cta-orb-2"></div>
+            <div className="cta-orb cta-orb-3"></div>
+            
+            {/* Content */}
+            <div className="cta-inner">
+              <div className="cta-badge-ultra">
+                <span className="badge-icon-pulse"></span>
+                <span className="badge-text">EARLY ACCESS</span>
+              </div>
+              
+              <h2 className="cta-title-ultra">
+                <span className="title-line-1">The Future of Influencer Marketing</span>
+                <span className="title-line-2">
+                  <span className="word-highlight">Starts Here</span>
+                </span>
+              </h2>
+              
+              <p className="cta-tagline">
+                Be among the first to transform how you discover, vet, and partner with creators.
+              </p>
+              
+              {/* Premium Features Row */}
+              <div className="cta-features-row">
+                <div className="cta-feature">
+                  <i className="fa-solid fa-shield-halved"></i>
+                  <span>AI-Powered Vetting</span>
+                </div>
+                <div className="cta-feature-divider"></div>
+                <div className="cta-feature">
+                  <i className="fa-solid fa-bolt"></i>
+                  <span>Instant Analysis</span>
+                </div>
+                <div className="cta-feature-divider"></div>
+                <div className="cta-feature">
+                  <i className="fa-solid fa-handshake"></i>
+                  <span>Smart Negotiation</span>
+                </div>
+              </div>
+              
+              <div className="cta-buttons-ultra">
+                <Link href="/register" className="btn-ultra-primary">
+                  <span className="btn-bg"></span>
+                  <span className="btn-content">
+                    <span>Get Early Access</span>
+                    <i className="fa-solid fa-arrow-right"></i>
+                  </span>
+                  <span className="btn-glow"></span>
+                </Link>
+                <Link href="/book-demo" className="btn-ultra-secondary">
+                  <span className="btn-ring"></span>
+                  <i className="fa-solid fa-calendar"></i>
+                  <span>Schedule Demo</span>
+                </Link>
+              </div>
+              
+              <p className="cta-subtext">
+                <i className="fa-solid fa-star"></i>
+                Limited beta spots available
+              </p>
             </div>
-            <h2 className="final-cta-title neon-glow">Join the Future of Creator Intelligence</h2>
-            <p className="final-cta-desc">
-              Be among the first to experience vibeAI™ - the next generation of AI-powered creator matching technology.
-            </p>
-            <div className="cta-buttons">
-              <Link href="/register" className="btn-hero-primary neon-btn large">
-                <span className="btn-icon">🚀</span> JOIN BETA NOW
-              </Link>
-              <Link href="/contact" className="btn-hero-secondary cyber-btn">
-                <span className="btn-icon">📞</span> BOOK DEMO
-              </Link>
-            </div>
-            <p className="cta-note">No credit card required • Exclusive beta pricing • Cancel anytime</p>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="landing-footer cyber-footer">
+      <footer className="landing-footer">
         <div className="footer-container">
-          <div className="footer-brand">
-            <Link href="/" className="nav-logo">
-              <span className="logo-vibe">VIBE</span>
-              <span className="logo-vetting">VETTING</span>
-              <span className="beta-badge small">BETA</span>
-            </Link>
-            <p className="footer-tagline">Powered by vibeAI™ Intelligence</p>
+          <div className="footer-main">
+            <div className="footer-brand">
+              <Link href="/" className="footer-logo">
+                <div className="logo-icon-new footer-logo-icon">
+                  <div className="logo-hexagon">
+                    <div className="hex-inner">
+                      <span className="hex-v">V</span>
+                    </div>
+                  </div>
+                </div>
+                <span className="logo-text">
+                  <span className="logo-vibe">VIBE</span>
+                  <span className="logo-vetting">VETTING</span>
+                </span>
+              </Link>
+              <p className="footer-tagline">
+                Powered by vibeAI™ Intelligence.<br />
+                Finding your perfect creator match.
+              </p>
+              <div className="footer-social">
+                <a href="#" className="social-link"><i className="fa-brands fa-twitter" /></a>
+                <a href="#" className="social-link"><i className="fa-brands fa-linkedin" /></a>
+                <a href="#" className="social-link"><i className="fa-brands fa-instagram" /></a>
+                <a href="#" className="social-link"><i className="fa-brands fa-youtube" /></a>
+              </div>
+            </div>
+
+            <div className="footer-links">
+              <div className="footer-column">
+                <h4>Platform</h4>
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How it Works</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#faq">FAQ</a>
+              </div>
+              {/* Company, Legal, and Support columns disabled - pages not yet created
+              <div className="footer-column">
+                <h4>Company</h4>
+                <a href="/about">About Us</a>
+                <a href="/careers">Careers</a>
+                <a href="/blog">Blog</a>
+                <a href="/contact">Contact</a>
+              </div>
+              <div className="footer-column">
+                <h4>Legal</h4>
+                <a href="/privacy">Privacy Policy</a>
+                <a href="/terms">Terms of Service</a>
+                <a href="/cookies">Cookie Policy</a>
+              </div>
+              <div className="footer-column">
+                <h4>Support</h4>
+                <a href="/help">Help Center</a>
+                <a href="/docs">Documentation</a>
+                <a href="/api">API Reference</a>
+                <a href="/status">System Status</a>
+              </div>
+              */}
+            </div>
           </div>
-          <div className="footer-links">
-            <div className="footer-column">
-              <h4>Platform</h4>
-              <Link href="#matching">AI Matching</Link>
-              <Link href="#protection">Brand Shield</Link>
-              <Link href="#analysis">Deep Analysis</Link>
-            </div>
-            <div className="footer-column">
-              <h4>Company</h4>
-              <Link href="/about">About</Link>
-              <Link href="/contact">Contact</Link>
-              <Link href="/careers">Careers</Link>
-            </div>
-            <div className="footer-column">
-              <h4>Legal</h4>
-              <Link href="/privacy">Privacy</Link>
-              <Link href="/terms">Terms</Link>
-            </div>
-          </div>
+
           <div className="footer-bottom">
             <p>&copy; 2025 VibeVetting. Powered by vibeAI™. All rights reserved.</p>
             <div className="footer-status">
-              <span className="status-indicator"></span>
+              <span className="status-dot" />
               All Systems Operational
             </div>
           </div>

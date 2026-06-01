@@ -45,29 +45,29 @@ export function Button({
         }
 
         .btn-sm {
-          padding: 8px 16px;
-          font-size: 12px;
+          padding: 6px 12px;
+          font-size: 11px;
         }
 
         .btn-md {
-          padding: 12px 24px;
-          font-size: 14px;
+          padding: 8px 16px;
+          font-size: 13px;
         }
 
         .btn-lg {
-          padding: 14px 32px;
-          font-size: 16px;
+          padding: 10px 20px;
+          font-size: 14px;
         }
 
         .btn-primary {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: var(--gradient-primary);
           color: white;
-          box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+          box-shadow: 0 6px 20px var(--gradient-glow);
         }
 
         .btn-primary:hover:not(:disabled) {
           transform: translateY(-2px);
-          box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+          box-shadow: 0 10px 30px var(--gradient-glow);
         }
 
         .btn-primary:active:not(:disabled) {

@@ -5,6 +5,7 @@ import { verifyToken } from "@/lib/auth";
 
 const DB_NAME = "vibe-vetting";
 const COLLECTION_NAME = "users";
+const SESSIONS_COLLECTION = "sessions";
 
 interface UserDocument {
   _id?: any;
@@ -12,6 +13,9 @@ interface UserDocument {
   name: string;
   password: string;
   company?: string;
+  twoFactorEnabled?: boolean;
+  currentPlan?: string;
+  planUpdatedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -19,6 +23,11 @@ interface UserDocument {
 async function getCollection(): Promise<Collection<UserDocument>> {
   const client = await clientPromise;
   return client.db(DB_NAME).collection<UserDocument>(COLLECTION_NAME);
+}
+
+async function getSessionsCollection(): Promise<Collection<any>> {
+  const client = await clientPromise;
+  return client.db(DB_NAME).collection(SESSIONS_COLLECTION);
 }
 
 export async function GET(request: NextRequest) {
@@ -43,6 +52,13 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Try to update session if it exists, but don't fail if it doesn't
+    const sessions = await getSessionsCollection();
+    const session = await sessions.findOne({ userId: new ObjectId(payload.userId), jti: payload.jti });
+    if (session) {
+      await sessions.updateOne({ _id: session._id }, { $set: { lastActive: new Date() } });
+    }
+
     const collection = await getCollection();
 
     // Find user by ID
@@ -61,6 +77,9 @@ export async function GET(request: NextRequest) {
         name: user.name,
         email: user.email,
         company: user.company,
+        twoFactorEnabled: user.twoFactorEnabled || false,
+        currentPlan: user.currentPlan || 'starter',
+        planUpdatedAt: user.planUpdatedAt,
         createdAt: user.createdAt,
       },
     });

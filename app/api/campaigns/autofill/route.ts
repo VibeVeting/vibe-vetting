@@ -29,7 +29,7 @@ Generate a JSON response with the following fields (use exact field names and va
   "description": "A detailed campaign description including objectives, target audience, and key messages (2-3 paragraphs)",
   "industry": "One of: fashion, tech, fitness, food, travel, gaming, finance, education, automotive, home",
   "budget": "One of: 500-1000, 1000-5000, 5000-10000, 10000-25000, 25000-50000, 50000-100000, 100000+",
-  "platforms": ["Array of: Instagram, YouTube, TikTok, Twitter, LinkedIn, Facebook"],
+  "platforms": ["Array of: Instagram, YouTube, Twitter, LinkedIn, Facebook, Twitch"],
   "followerRange": "One of: nano, micro, mid, macro, mega",
   "engagementRate": "One of: 1, 2, 3, 5",
   "audienceAge": ["Array of: 13-17, 18-24, 25-34, 35-44, 45-54, 55+"],

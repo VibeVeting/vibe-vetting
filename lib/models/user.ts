@@ -17,10 +17,10 @@ export const UserModel = {
     return collection.findOne({ _id: new ObjectId(id) });
   },
 
-  // Find user by email
+  // Find user by email (case-insensitive)
   async findByEmail(email: string): Promise<User | null> {
     const collection = await getCollection();
-    return collection.findOne({ email });
+    return collection.findOne({ email: email.toLowerCase() });
   },
 
   // Get all users
@@ -35,6 +35,7 @@ export const UserModel = {
     const now = new Date();
     const user: User = {
       ...data,
+      twoFactorEnabled: data.twoFactorEnabled ?? false,
       createdAt: now,
       updatedAt: now,
     };

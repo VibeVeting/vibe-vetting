@@ -1,11 +1,14 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 
 const JWT_SECRET = process.env.JWT_SECRET || "vibe-vetting-secret-key";
 
 export interface JWTPayload {
   userId: string;
   email: string;
+  userType?: 'brand' | 'barter_creator' | 'barter_company';
+  jti: string;
 }
 
 export async function hashPassword(password: string): Promise<string> {
@@ -19,14 +22,17 @@ export async function verifyPassword(
   return bcrypt.compare(password, hashedPassword);
 }
 
-export function generateToken(payload: JWTPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" });
+export function generateToken(payload: Omit<JWTPayload, "jti">): { token: string; jti: string } {
+  const jti = crypto.randomUUID();
+  const token = jwt.sign({ ...payload, jti }, JWT_SECRET, { expiresIn: "7d" });
+  return { token, jti };
 }
 
 export function verifyToken(token: string): JWTPayload | null {
   try {
     return jwt.verify(token, JWT_SECRET) as JWTPayload;
-  } catch {
+  } catch (error) {
+    console.error("Token verification failed:", error);
     return null;
   }
 }

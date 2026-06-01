@@ -1,13 +1,19 @@
 "use client";
 
 import { Sidebar } from '@/components/common/Sidebar';
-import { TopBar } from '@/components/common/TopBar';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function CreateCampaignPage() {
   const router = useRouter();
+  const [isVisible, setIsVisible] = useState(false);
+  const pageRef = useRef<HTMLDivElement>(null);
   const [isAutoFilling, setIsAutoFilling] = useState(false);
+
+  useEffect(() => {
+    setTimeout(() => setIsVisible(true), 50);
+  }, []);
+
   const [autoFillData, setAutoFillData] = useState({
     companyName: '',
     productName: '',
@@ -137,6 +143,25 @@ export default function CreateCampaignPage() {
           budget: budgetNum,
           startDate: formData.startDate || new Date().toISOString(),
           endDate: formData.endDate || null,
+          // Platform & Reach
+          industry: formData.industry,
+          platforms: formData.platforms,
+          followerRange: formData.followerRange,
+          engagementRate: formData.engagementRate,
+          // Audience Demographics
+          audienceAge: formData.audienceAge,
+          audienceGender: formData.audienceGender,
+          audienceLocation: formData.audienceLocation,
+          // Content Requirements
+          contentType: formData.contentType,
+          contentStyle: formData.contentStyle,
+          postingFrequency: formData.postingFrequency,
+          deliverables: formData.deliverables,
+          // Brand Safety
+          minTrustScore: formData.minTrustScore,
+          maxRiskLevel: formData.maxRiskLevel,
+          brandValues: formData.brandValues,
+          excludeCategories: formData.excludeCategories,
         }),
       });
 
@@ -179,20 +204,42 @@ export default function CreateCampaignPage() {
     <div className="dashboard-wrapper">
       <Sidebar />
       <div className="main-content">
-        <div className="container">
-          <TopBar
-            title="Create New Campaign"
-            subtitle="Set up your influencer vetting campaign with AI-powered creator matching"
-            showSearch={false}
-          />
+        <div className="yc-page" ref={pageRef}>
+          {/* YC Background Effects */}
+          <div className="yc-page-bg">
+            <div className="yc-page-orb yc-page-orb-1"></div>
+            <div className="yc-page-orb yc-page-orb-2"></div>
+            <div className="yc-page-grid"></div>
+          </div>
+
+          {/* YC Page Header */}
+          <div className={`yc-page-header ${isVisible ? 'visible' : ''}`}>
+            <div className="yc-page-header-content">
+              <div className="yc-page-title-section">
+                <div className="yc-page-icon" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+                  <i className="fa-solid fa-rocket"></i>
+                </div>
+                <div>
+                  <h1 className="yc-page-title">Create New Campaign</h1>
+                  <p className="yc-page-subtitle">Set up your influencer vetting campaign with AI-powered creator matching</p>
+                </div>
+              </div>
+              <div className="yc-page-actions">
+                <button className="yc-btn-secondary" onClick={() => router.back()}>
+                  <i className="fa-solid fa-arrow-left"></i> Back
+                </button>
+              </div>
+            </div>
+          </div>
 
           {/* AI Auto-Fill Box */}
           <div className="ai-autofill-card" style={{
-            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%)',
-            border: '1px solid rgba(139, 92, 246, 0.3)',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            border: 'none',
             borderRadius: '16px',
             padding: '24px',
             marginBottom: '24px',
+            boxShadow: '0 10px 40px rgba(102, 126, 234, 0.3)',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
               <div style={{
@@ -204,21 +251,21 @@ export default function CreateCampaignPage() {
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-                <i className="fa-solid fa-wand-magic-sparkles" style={{ color: '#fff', fontSize: '18px' }}></i>
+                <i className="fa-solid fa-wand-magic" style={{ color: '#fff', fontSize: '18px' }}></i>
               </div>
               <div>
                 <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 600, color: '#fff' }}>
                   ✨ AI Auto-Fill
                 </h3>
-                <p style={{ margin: 0, fontSize: '13px', color: 'rgba(255,255,255,0.6)' }}>
+                <p style={{ margin: 0, fontSize: '13px', color: 'rgba(255,255,255,0.7)' }}>
                   Enter your company details and let AI fill the entire form for you
                 </p>
               </div>
             </div>
             
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '16px' }}>
+            <div className="autofill-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '16px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.7)', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'rgba(255,255,255,0.8)', marginBottom: '6px' }}>
                   Company Name *
                 </label>
                 <input
@@ -230,15 +277,16 @@ export default function CreateCampaignPage() {
                     width: '100%',
                     padding: '10px 14px',
                     borderRadius: '8px',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    background: 'rgba(0,0,0,0.3)',
+                    border: '1px solid rgba(255,255,255,0.25)',
+                    background: 'rgba(255,255,255,0.15)',
                     color: '#fff',
                     fontSize: '14px',
                   }}
+                  className="autofill-input"
                 />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.7)', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'rgba(255,255,255,0.8)', marginBottom: '6px' }}>
                   Product Name *
                 </label>
                 <input
@@ -250,15 +298,16 @@ export default function CreateCampaignPage() {
                     width: '100%',
                     padding: '10px 14px',
                     borderRadius: '8px',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    background: 'rgba(0,0,0,0.3)',
+                    border: '1px solid rgba(255,255,255,0.25)',
+                    background: 'rgba(255,255,255,0.15)',
                     color: '#fff',
                     fontSize: '14px',
                   }}
+                  className="autofill-input"
                 />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.7)', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'rgba(255,255,255,0.8)', marginBottom: '6px' }}>
                   Website URL (optional)
                 </label>
                 <input
@@ -270,18 +319,19 @@ export default function CreateCampaignPage() {
                     width: '100%',
                     padding: '10px 14px',
                     borderRadius: '8px',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    background: 'rgba(0,0,0,0.3)',
+                    border: '1px solid rgba(255,255,255,0.25)',
+                    background: 'rgba(255,255,255,0.15)',
                     color: '#fff',
                     fontSize: '14px',
                   }}
+                  className="autofill-input"
                 />
               </div>
             </div>
 
             {/* Custom Prompt Textarea */}
             <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.7)', marginBottom: '6px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'rgba(255,255,255,0.8)', marginBottom: '6px' }}>
                 Custom Instructions (optional)
               </label>
               <textarea
@@ -293,13 +343,14 @@ export default function CreateCampaignPage() {
                   width: '100%',
                   padding: '12px 14px',
                   borderRadius: '8px',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  background: 'rgba(0,0,0,0.3)',
+                  border: '1px solid rgba(255,255,255,0.25)',
+                  background: 'rgba(255,255,255,0.15)',
                   color: '#fff',
                   fontSize: '14px',
                   resize: 'vertical',
                   fontFamily: 'inherit',
                 }}
+                className="autofill-input"
               />
             </div>
 
@@ -331,7 +382,7 @@ export default function CreateCampaignPage() {
                 </>
               ) : (
                 <>
-                  <i className="fa-solid fa-wand-magic-sparkles"></i>
+                  <i className="fa-solid fa-wand-magic"></i>
                   Auto-Fill with AI
                 </>
               )}
@@ -418,13 +469,13 @@ export default function CreateCampaignPage() {
                       required
                     >
                       <option value="">Select budget range...</option>
-                      <option value="500-1000">$500 - $1,000</option>
-                      <option value="1000-5000">$1,000 - $5,000</option>
-                      <option value="5000-10000">$5,000 - $10,000</option>
-                      <option value="10000-25000">$10,000 - $25,000</option>
-                      <option value="25000-50000">$25,000 - $50,000</option>
-                      <option value="50000-100000">$50,000 - $100,000</option>
-                      <option value="100000+">$100,000+</option>
+                      <option value="500-1000">₹40,000 - ₹80,000</option>
+                      <option value="1000-5000">₹80,000 - ₹4,00,000</option>
+                      <option value="5000-10000">₹4,00,000 - ₹8,00,000</option>
+                      <option value="10000-25000">₹8,00,000 - ₹20,00,000</option>
+                      <option value="25000-50000">₹20,00,000 - ₹40,00,000</option>
+                      <option value="50000-100000">₹40,00,000 - ₹80,00,000</option>
+                      <option value="100000+">₹80,00,000+</option>
                     </select>
                   </div>
                   <div className="form-group">
@@ -464,12 +515,10 @@ export default function CreateCampaignPage() {
                     {[
                       { name: 'Instagram', icon: 'fa-instagram' },
                       { name: 'YouTube', icon: 'fa-youtube' },
-                      { name: 'TikTok', icon: 'fa-tiktok' },
                       { name: 'Twitter', icon: 'fa-twitter' },
                       { name: 'LinkedIn', icon: 'fa-linkedin' },
                       { name: 'Facebook', icon: 'fa-facebook' },
                       { name: 'Twitch', icon: 'fa-twitch' },
-                      { name: 'Pinterest', icon: 'fa-pinterest' },
                     ].map((platform) => (
                       <label key={platform.name} className="checkbox-label">
                         <input
@@ -804,6 +853,7 @@ export default function CreateCampaignPage() {
                       type="date"
                       className="form-input"
                       value={formData.startDate}
+                      min={new Date().toISOString().split('T')[0]}
                       onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
                     />
                   </div>
@@ -813,6 +863,7 @@ export default function CreateCampaignPage() {
                       type="date"
                       className="form-input"
                       value={formData.endDate}
+                      min={formData.startDate || new Date().toISOString().split('T')[0]}
                       onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
                     />
                   </div>
