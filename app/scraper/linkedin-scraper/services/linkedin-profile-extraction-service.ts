@@ -272,7 +272,7 @@ export class LinkedinProfileExtractionService {
         const eduCard = cards.find((card) => card.querySelector("#education"));
         if (!eduCard) return [] as any[];
         const items = Array.from(eduCard.querySelectorAll("div[data-view-name='profile-component-entity']"));
-        return items.slice(0, 5).map((item) => {
+        return items.map((item) => {
           const { visibleText } = window.puppeteer;
           const school = visibleText(item.querySelector(".t-bold"));
           const degree = visibleText(item.querySelector(".t-normal"));
